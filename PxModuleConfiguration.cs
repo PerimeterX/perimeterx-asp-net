@@ -1,5 +1,6 @@
 using System;
 using System.Configuration;
+using System.Net;
 
 namespace PerimeterX
 {
@@ -161,18 +162,30 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("pxBlockPage")]
-        public bool PxBlockPage
+        [ConfigurationProperty("internalBlockPage", DefaultValue = false)]
+        public bool InternalBlockPage
         {
             get
             {
-                return (bool)this["pxBlockPage"];
+                return (bool)this["internalBlockPage"];
             }
             set
             {
-                this["pxBlockPage"] = value;
+                this["internalBlockPage"] = value;
             }
         }
 
+        [ConfigurationProperty("blockStatusCode", DefaultValue = (int)HttpStatusCode.Forbidden)]
+        public int BlockStatusCode
+        {
+            get
+            {
+                return (int)this["blockStatusCode"];
+            }
+            set
+            {
+                this["blockStatusCode"] = value;
+            }
+        }
     }
 }

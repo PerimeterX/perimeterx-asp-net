@@ -7,12 +7,10 @@ using System.Text;
 using System.IO;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Linq;
 using System.Collections.Specialized;
-using System.Net;
 
 namespace PerimeterX
 {
@@ -23,6 +21,9 @@ namespace PerimeterX
         private const int KEY_SIZE_BITS = 256;
         private const int IV_SIZE_BITS = 128;
         private static readonly string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
+        public static string UUID_ITEM_KEY = "PXUUID";
+        private const string HexAlphabet = "0123456789abcdef";
+
 
         public PxModule()
         {
@@ -47,8 +48,6 @@ namespace PerimeterX
             get { return "PxModule"; }
         }
 
-        // In the Init function, register for HttpApplication 
-        // events by adding your handlers.
         public void Init(HttpApplication application)
         {
             application.BeginRequest += new EventHandler(this.Application_BeginRequest);
@@ -56,8 +55,6 @@ namespace PerimeterX
 
         private void Application_BeginRequest(object source, EventArgs e)
         {
-            // Create HttpApplication and HttpContext objects to access
-            // request and response properties.
             HttpApplication application = (HttpApplication)source;
             if (application != null)
             {
@@ -71,20 +68,22 @@ namespace PerimeterX
 
         private void BlockRequest(HttpContext context)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            if (Config.PxBlockPage)
+            var config = Config;
+            context.Response.StatusCode = config.BlockStatusCode;
+            if (config.InternalBlockPage)
             {
-                WritePxBlockPage(context);
-                context.Response.End();
-                return;
+                ResponseInternalBlockPage(context);
             }
-            context.Response.SuppressContent = true;
+            else
+            {
+                context.Response.SuppressContent = true;
+            }
             context.Response.End();
         }
 
-        private void WritePxBlockPage(HttpContext context)
+        private void ResponseInternalBlockPage(HttpContext context)
         {
-            string id = (string)context.Items["PXUUID"];
+            string id = (string)context.Items[UUID_ITEM_KEY];
             if (id == null)
             {
                 id = string.Empty;
@@ -108,21 +107,14 @@ namespace PerimeterX
 
         private bool IsValidRequest(HttpContext context)
         {
-            Debug.WriteLine(context.Request.RawUrl);
-            if (!Config.Enabled)
+            if (!Config.Enabled || context.Request.HttpMethod.ToUpper() != "GET")
             {
-                return true;
-            }
-            // ignore non GET requests
-            if (context.Request.HttpMethod.ToUpper() != "GET")
-            {
-                Debug.WriteLine("PX - passed not GET method");
                 return true;
             }
             string ignoreUrlRegex = Config.IgnoreUrlRegex;
             if (!string.IsNullOrEmpty(ignoreUrlRegex) && Regex.IsMatch(context.Request.RawUrl, ignoreUrlRegex))
             {
-                Debug.WriteLine("PX - ignore url: " + context.Request.RawUrl);
+                PxModuleEventSource.Log.IgnoreRequest(context.Request.RawUrl, "regex");
                 return true;
             }
 
@@ -131,15 +123,13 @@ namespace PerimeterX
             var reason = CheckValidCookie(context, out riskCookie);
             if (reason == RiskRequestReasonEnum.NONE)
             {
-                context.Items["PXUUID"] = riskCookie.Uuid;
+                context.Items[UUID_ITEM_KEY] = riskCookie.Uuid;
                 // valid cookie, check if to block or not
                 if (IsBlockCookieScore(riskCookie.Scores))
                 {
-                    //logger.WriteVerbose("PX cookie blocked");
-                    Debug.WriteLine("PX - BLOCKED by cookie");
+                    PxModuleEventSource.Log.RequestBlocked(context.Request.RawUrl, "Cookie", riskCookie.Uuid);
                     return false;
                 }
-                Debug.WriteLine("PX - passed with valid cookie");
                 return true;
             }
 
@@ -147,16 +137,14 @@ namespace PerimeterX
             var risk = FetchGetRisk(context, reason);
             if (risk == null)
             {
-                Debug.WriteLine("PX - no response from risk api");
                 return true;
             }
             if (risk.Scores != null && IsBlockingRequestScore(risk.Scores))
             {
-                context.Items["PXUUID"] = risk.Uuid;
-                Debug.WriteLine("PX - BLOCKED by risk api");
+                context.Items[UUID_ITEM_KEY] = risk.Uuid;
+                PxModuleEventSource.Log.RequestBlocked(context.Request.RawUrl, "Server API", risk.Uuid);
                 return false;
             }
-            Debug.WriteLine("PX - passed by risk api");
             return true;
         }
 
@@ -199,7 +187,6 @@ namespace PerimeterX
             string riskUri = Config.BaseUri + @"/api/v1/risk";
             try
             {
-                Debug.WriteLine("FetchRequestScores " + context.Request.RawUrl);
                 RiskRequest riskRequest = new RiskRequest
                 {
                     Request = new RiskRequestRequest
@@ -225,8 +212,7 @@ namespace PerimeterX
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Failed to fetch request scores");
-                Debug.WriteLine(ex);
+                PxModuleEventSource.Log.FailedRiskApi(context.Request.RawUrl, ex.Message);
             }
             return null;
         }
@@ -329,7 +315,7 @@ namespace PerimeterX
                 HttpCookie pxcookie = context.Request.Cookies.Get(config.CookieName);
                 if (pxcookie == null)
                 {
-                    //logger.WriteVerbose("No PX cookie on request");
+                    PxModuleEventSource.Log.NoRiskCookie(context.Request.RawUrl);
                     return RiskRequestReasonEnum.NO_COOKIE;
                 }
                 // parse cookie
@@ -337,32 +323,28 @@ namespace PerimeterX
                 // check if expired
                 if (IsRiskCookieExpired(riskCookie))
                 {
-                    //logger.WriteVerbose("PX cookie expired");
+                    PxModuleEventSource.Log.CookieExpired(context.Request.RawUrl);
                     return RiskRequestReasonEnum.EXPIRED_COOKIE;
                 }
 
                 if (string.IsNullOrEmpty(riskCookie.Hash))
                 {
-                    //logger.WriteVerbose("PX cookie missing signature");
+                    PxModuleEventSource.Log.InvalidCookie(context.Request.RawUrl, "missing signature");
                     return RiskRequestReasonEnum.INVALID_COOKIE;
                 }
 
                 string expectedHash = CalcCookieHash(context, riskCookie);
                 if (expectedHash != riskCookie.Hash)
                 {
-                    //logger.WriteVerbose("PX cookie invalid signature");
+                    PxModuleEventSource.Log.InvalidCookie(context.Request.RawUrl, "invalid signature");
                     return RiskRequestReasonEnum.INVALID_COOKIE;
                 }
 
-                if (riskCookie.Scores != null)
-                {
-                    return RiskRequestReasonEnum.NONE;
-                }
+                return RiskRequestReasonEnum.NONE;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Failed to validate PX cookie");
-                Debug.WriteLine(ex);
+                PxModuleEventSource.Log.InvalidCookie(context.Request.RawUrl, ex.Message);
             }
             return RiskRequestReasonEnum.INVALID_COOKIE;
         }
@@ -428,16 +410,15 @@ namespace PerimeterX
             return (ip != null) ? ip.Trim() : string.Empty;
         }
 
-        private static string ByteArrayToHexString(byte[] Bytes)
+        private static string ByteArrayToHexString(byte[] input)
         {
-            StringBuilder Result = new StringBuilder(Bytes.Length * 2);
-            string HexAlphabet = "0123456789abcdef";
-            foreach (byte B in Bytes)
+            StringBuilder sb = new StringBuilder(input.Length * 2);
+            foreach (byte b in input)
             {
-                Result.Append(HexAlphabet[B >> 4]);
-                Result.Append(HexAlphabet[B & 0xF]);
+                sb.Append(HexAlphabet[b >> 4]);
+                sb.Append(HexAlphabet[b & 0xF]);
             }
-            return Result.ToString();
+            return sb.ToString();
         }
 
         private static byte[] PBKDF2Sha256GetBytes(int dklen, byte[] password, byte[] salt, int iterationCount)
