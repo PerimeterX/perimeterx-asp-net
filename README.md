@@ -8,7 +8,7 @@ HTTPModule for ASP.NET
 
 Add PerimeterX PxModule (system.webServer level)
 
-```
+```xml
     <modules>
       <add name="PxModule" type="PerimeterX.PxModule"/>
     </modules>
@@ -16,7 +16,7 @@ Add PerimeterX PxModule (system.webServer level)
 
 Add configuration section (configuration level)
 
-```
+```xml
   <configSections>
     <sectionGroup name="perimeterX">
       <section
@@ -29,7 +29,7 @@ Add configuration section (configuration level)
 
 Add site specific configuration (configuration level)
 
-```
+```xml
  <perimeterX>
     <pxModuleConfigurationSection
       enabled="true"
