@@ -22,28 +22,34 @@ namespace PerimeterX
             if (IsEnabled()) WriteEvent(3, rawUrl);
         }
 
-        [Event(4, Message = "Invalid risk cookie: {3}. RawUrl={0}", Level = EventLevel.Verbose)]
+        [Event(4, Message = "Invalid risk cookie: {1}. RawUrl={0}", Level = EventLevel.Verbose)]
         public void InvalidCookie(string rawUrl, string reason)
         {
             if (IsEnabled()) WriteEvent(4, rawUrl, reason);
         }
 
-        [Event(5, Message = "Ignore request: {3}. RawUrl={1}", Level = EventLevel.Verbose)]
+        [Event(5, Message = "Ignore request: {1}. RawUrl={0}", Level = EventLevel.Verbose)]
         public void IgnoreRequest(string rawUrl, string reason)
         {
             if (IsEnabled()) WriteEvent(5, rawUrl, reason);
         }
 
-        [Event(6, Message = "Request blocked: {3}. UUID={4} RawUrl={1}", Level = EventLevel.Informational)]
+        [Event(6, Message = "Request blocked: {1}. UUID={2} RawUrl={0}", Level = EventLevel.Informational)]
         public void RequestBlocked(string rawUrl, string reason, string uuid)
         {
             if (IsEnabled()) WriteEvent(6, rawUrl, reason, uuid);
         }
 
-        [Event(7, Message = "Failed risk API called failed: {0}", Level = EventLevel.Error)]
+        [Event(7, Message = "Failed risk API called failed: {1} RawUrl={0}", Level = EventLevel.Error)]
         public void FailedRiskApi(string rawUrl, string reason)
         {
             WriteEvent(7, rawUrl, reason);
+        }
+
+        [Event(8, Message = "Failed posting activities ({0}): {1}", Level = EventLevel.Error)]
+        public void FailedPostActivities(int activityCount, string error)
+        {
+            WriteEvent(8, activityCount, error);
         }
     }
 }

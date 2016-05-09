@@ -19,6 +19,19 @@ namespace PerimeterX
             }
         }
 
+        [ConfigurationProperty("appId", IsRequired = true)]
+        public string AppId
+        {
+            get
+            {
+                return (string)this["appId"];
+            }
+            set
+            {
+                this["appId"] = value;
+            }
+        }
+
         [ConfigurationProperty("cookieName", DefaultValue = "_px")]
         public string CookieName
         {
@@ -185,6 +198,32 @@ namespace PerimeterX
             set
             {
                 this["blockStatusCode"] = value;
+            }
+        }
+
+        [ConfigurationProperty("activitiesCapacity", DefaultValue = 500)]
+        public int ActivitiesCapacity
+        {
+            get
+            {
+                return (int)this["activitiesCapacity"];
+            }
+            set
+            {
+                this["activitiesCapacity"] = value;
+            }
+        }
+
+        [ConfigurationProperty("activitiesBulkSize", DefaultValue = 10)]
+        public int ActivitiesBulkSize
+        {
+            get
+            {
+                return (int)this["activitiesBulkSize"];
+            }
+            set
+            {
+                this["activitiesBulkSize"] = value;
             }
         }
     }

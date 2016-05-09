@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Linq;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace PerimeterX
 {
@@ -20,10 +21,13 @@ namespace PerimeterX
         private HttpClient httpClient;
         private const int KEY_SIZE_BITS = 256;
         private const int IV_SIZE_BITS = 128;
-        private static readonly string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
-        public static string UUID_ITEM_KEY = "PXUUID";
+        private const string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
         private const string HexAlphabet = "0123456789abcdef";
-
+        private readonly PxModuleReporter reporter;
+        private RiskRequestHeader[] requestHeaders;
+        private string requestSocketIP;
+        private string uuid;
+        private string blockReason;
 
         public PxModule()
         {
@@ -41,6 +45,8 @@ namespace PerimeterX
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PerimeterX middleware");
             httpClient.DefaultRequestHeaders.ExpectContinue = false;
+            reporter = PxModuleReporter.Instance(Config);
+            Debug.WriteLine("PxModule INITIALIZED");
         }
 
         public string ModuleName
@@ -59,11 +65,44 @@ namespace PerimeterX
             if (application != null)
             {
                 HttpContext context = application.Context;
-                if (!IsValidRequest(context))
+                if (!IsFilteredRequest(context))
                 {
-                    BlockRequest(context);
+                    if (!IsValidRequest(context))
+                    {
+                        BlockRequest(context);
+
+                        var details = new Dictionary<string, object>();
+                        if (blockReason != null)
+                        {
+                            details.Add("block_reason", blockReason);
+                        }
+                        if (uuid != null)
+                        {
+                            details.Add("block_uuid", uuid);
+                        }
+                        PostActivity(context, "block", details);
+                    }
+                    else
+                    {
+                        PostActivity(context, "page_requested");
+                    }
                 }
             }
+        }
+
+        private void PostActivity(HttpContext context, string eventType, Dictionary<string, object> details = null)
+        {
+            var activity = new Activity
+            {
+                Type = eventType,
+                Timestamp = DateTime.UtcNow.ToString("s"),
+                AppId = Config.AppId,
+                Details = details,
+                Headers = requestHeaders,
+                SocketIP = requestSocketIP,
+                Url = context.Request.RawUrl
+            };
+            reporter.Post(activity);
         }
 
         private void BlockRequest(HttpContext context)
@@ -77,17 +116,13 @@ namespace PerimeterX
             else
             {
                 context.Response.SuppressContent = true;
+                context.Response.End();
             }
-            context.Response.End();
         }
 
         private void ResponseInternalBlockPage(HttpContext context)
         {
-            string id = (string)context.Items[UUID_ITEM_KEY];
-            if (id == null)
-            {
-                id = string.Empty;
-            }
+            var id = uuid ?? string.Empty;
             string content = @"<html lang=""en""><head> <link type=""text / css"" rel=""stylesheet"" media=""screen, print"" href=""//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800""> <meta charset=""UTF-8""> <title>Title</title> <style> p { width: 60%; margin: 0 auto; font-size: 35px; } body { background-color: #a2a2a2; font-family: ""Open Sans""; margin: 5%; } img { widht: 180px; } a { color: #2020B1; text-decoration: blink; } a:hover { color: #2b60c6; } </style> <style type=""text/css""></style></head><body cz-shortcut-listen=""true""><div><img src=""http://storage.googleapis.com/instapage-thumbnails/035ca0ab/e94de863/1460594818-1523851-467x110-perimeterx.png""></div><span style=""color: white; font-size: 34px;"">Access to This Page Has Been Blocked</span><div style=""font-size: 24px;color: #000042;""><br> Access to '" +
                 context.Request.RawUrl + 
                 @"' is blocked according to the site security policy. <br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: <ul> <li>JavaScript is disabled or not running properly.</li> <li>Your browsing behaviour fingerprinting are not likely to be a regular user.</li> </ul> To read more about the bot defender solution: <a href=""https://www.perimeterx.com/bot-defender"">https://www.perimeterx.com/bot-defender</a> <br> If you think the blocking was done by mistake, contact the site administrator. <br> <br> </br>" +
@@ -104,8 +139,7 @@ namespace PerimeterX
                 httpClient = null;
             }
         }
-
-        private bool IsValidRequest(HttpContext context)
+        private bool IsFilteredRequest(HttpContext context)
         {
             if (!Config.Enabled || context.Request.HttpMethod.ToUpper() != "GET")
             {
@@ -117,13 +151,19 @@ namespace PerimeterX
                 PxModuleEventSource.Log.IgnoreRequest(context.Request.RawUrl, "regex");
                 return true;
             }
+            return false;
+        }
 
+        private bool IsValidRequest(HttpContext context)
+        {
+            CollectRequestInformation(context);
+            
             // validae using risk cookie
             RiskCookie riskCookie;
             var reason = CheckValidCookie(context, out riskCookie);
             if (reason == RiskRequestReasonEnum.NONE)
             {
-                context.Items[UUID_ITEM_KEY] = riskCookie.Uuid;
+                this.uuid = riskCookie.Uuid;
                 // valid cookie, check if to block or not
                 if (IsBlockCookieScore(riskCookie.Scores))
                 {
@@ -139,45 +179,43 @@ namespace PerimeterX
             {
                 return true;
             }
-            if (risk.Scores != null && IsBlockingRequestScore(risk.Scores))
+            if (risk.Scores != null && IsBlockCookieScore(risk.Scores))
             {
-                context.Items[UUID_ITEM_KEY] = risk.Uuid;
+                this.uuid = risk.Uuid;
                 PxModuleEventSource.Log.RequestBlocked(context.Request.RawUrl, "Server API", risk.Uuid);
                 return false;
             }
             return true;
         }
 
-        private bool IsBlockingRequestScore(Dictionary<string, int> scores)
+        private void CollectRequestInformation(HttpContext context)
         {
-            if (scores == null)
-            {
-                throw new ArgumentNullException("scores");
-            }
-            var config = Config;
-            int botScore;
-            if (scores.TryGetValue("non_human", out botScore) && (botScore >= config.BlockScore))
-            {
-                return true;
-            }
-            int filterScore;
-            if (scores.TryGetValue("filter", out filterScore) && (filterScore >= config.BlockScore))
-            {
-                return true;
-            }
-            return false;
+            requestHeaders = GetHeadersRiskRequestFormat(context.Request.Headers);
+            requestSocketIP = GetSocketIP(context);
+            uuid = null;
+            blockReason = null;
         }
 
         private static RiskRequestHeader[] GetHeadersRiskRequestFormat(NameValueCollection requestHeaders)
         {
-            var headers = new RiskRequestHeader[requestHeaders.Count];
-            for (int i = 0; i < headers.Length; i++)
+            RiskRequestHeader[] headers;
+            try
             {
-                headers[i] = new RiskRequestHeader
+                headers = new RiskRequestHeader[requestHeaders.Count];
+                for (int i = 0; i < headers.Length; i++)
                 {
-                    Name = requestHeaders.GetKey(i),
-                    Value = requestHeaders.Get(i)
-                };
+                    headers[i] = new RiskRequestHeader
+                    {
+                        Name = requestHeaders.GetKey(i),
+                        Value = requestHeaders.Get(i)
+                    };
+                }
+                return headers;
+            }
+            catch (Exception ex)
+            {
+                PxModuleEventSource.Log.Failure("extract request headers - " + ex.Message);
+                headers = new RiskRequestHeader[0];
             }
             return headers;
         }
@@ -191,9 +229,9 @@ namespace PerimeterX
                 {
                     Request = new RiskRequestRequest
                     {
-                        IP = GetSocketIP(context),
+                        IP = requestSocketIP,
                         Uri = context.Request.RawUrl,
-                        Headers = GetHeadersRiskRequestFormat(context.Request.Headers)
+                        Headers = requestHeaders
                     },
                     Additional = new RiskRequestAdditional
                     {
@@ -219,8 +257,15 @@ namespace PerimeterX
 
         private bool IsBlockCookieScore(Dictionary<string, int> scores)
         {
-            int botScore;
-            return (scores.TryGetValue("b", out botScore) && (botScore >= Config.BlockScore));
+            var blockScore = Config.BlockScore;
+            foreach (var score in scores)
+            {
+                if (score.Value >= blockScore)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private static string DecodeCookie(string cookie)
@@ -401,13 +446,21 @@ namespace PerimeterX
 
         private string GetSocketIP(HttpContext context)
         {
-            var socketIpHeader = Config.SocketIpHeader;
-            if (string.IsNullOrEmpty(socketIpHeader))
+            try
             {
-                return context.Request.UserHostAddress;
+                var socketIpHeader = Config.SocketIpHeader;
+                if (string.IsNullOrEmpty(socketIpHeader))
+                {
+                    return context.Request.UserHostAddress;
+                }
+                var ip = context.Request.Headers[socketIpHeader];
+                return (ip != null) ? ip.Trim() : string.Empty;
             }
-            var ip = context.Request.Headers[socketIpHeader];
-            return (ip != null) ? ip.Trim() : string.Empty;
+            catch (Exception ex)
+            {
+                PxModuleEventSource.Log.Failure("extract socket ip - " + ex.Message);
+            }
+            return string.Empty;
         }
 
         private static string ByteArrayToHexString(byte[] input)

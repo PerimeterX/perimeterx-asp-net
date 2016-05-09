@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Runtime.Serialization;
 
 namespace PerimeterX
@@ -91,4 +92,30 @@ namespace PerimeterX
         [DataMember(Name = "scores")]
         public Dictionary<string, int> Scores;
     }
+
+    [DataContract]
+    public class Activity
+    {
+        [DataMember(Name = "type")]
+        public string Type;
+
+        [DataMember(Name = "url")]
+        public string Url;
+
+        [DataMember(Name = "px_app_id")]
+        public string AppId;
+
+        [DataMember(Name = "headers")]
+        public RiskRequestHeader[] Headers;
+
+        [DataMember(Name = "timestamp")]
+        public string Timestamp;
+
+        [DataMember(Name = "socket_ip")]
+        public string SocketIP;
+
+        [DataMember(Name = "details", EmitDefaultValue =false)]
+        public Dictionary<string, object> Details;
+    }
+
 }
