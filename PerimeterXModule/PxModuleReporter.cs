@@ -1,4 +1,3 @@
-using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,7 +20,7 @@ namespace PerimeterX
         private readonly string postUri;
 
         private static volatile PxModuleReporter instance;
-        private static object syncInstance = new Object();
+        private static object syncInstance = new object();
 
         private PxModuleReporter(PxModuleConfigurationSection config)
         {
@@ -33,11 +32,12 @@ namespace PerimeterX
                 Timeout = TimeSpan.FromSeconds(5),
                 MaxResponseContentBufferSize = 1024 * 1024 * 10
             };
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.ApiToken);
+            //httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.ApiToken);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PerimeterX middleware");
+            //httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PerimeterX middleware");
             httpClient.DefaultRequestHeaders.ExpectContinue = false;
             Task.Run(() => SendActivitiesTask());
+            Debug.WriteLine("PxModuleReporter initialized");
         }
 
         public static PxModuleReporter Instance(PxModuleConfigurationSection config)
@@ -95,9 +95,10 @@ namespace PerimeterX
         {
             try
             {
+                string content = PxModuleJson.StringifyObject(activities);
                 var requestMessage = new HttpRequestMessage(HttpMethod.Post, postUri)
                 {
-                    Content = new StringContent(JsonConvert.SerializeObject(activities), Encoding.UTF8, "application/json")
+                    Content = new StringContent(content, Encoding.UTF8, "application/json")
                 };
                 var response = httpClient.SendAsync(requestMessage).Result;
                 response.EnsureSuccessStatusCode();
@@ -105,8 +106,7 @@ namespace PerimeterX
             }
             catch (Exception ex)
             {
-                PxModuleEventSource.Log.FailedPostActivities(activities.Count, ex.Message);
-                Debug.WriteLine("Failed to send activities (count {0})", activities.Count);
+                Debug.WriteLine(string.Format("Failed to send activities (count {0}) - {1}", activities.Count, ex.Message));
             }
         }
     }

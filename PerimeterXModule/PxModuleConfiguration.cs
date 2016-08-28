@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Configuration;
 using System.Net;
 
@@ -58,55 +60,68 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("encryptedCookie", DefaultValue = true)]
-        public bool EncryptedCookie
+        [ConfigurationProperty("encryptionEnabled", DefaultValue = true)]
+        public bool EncryptionEnabled
         {
             get
             {
-                return (bool)this["encryptedCookie"];
+                return (bool)this["encryptionEnabled"];
             }
             set
             {
-                this["encryptedCookie"] = value;
+                this["encryptionEnabled"] = value;
             }
         }
 
-        [ConfigurationProperty("signWithUserAgent", DefaultValue = true)]
-        public bool SignWithUserAgent
+        [ConfigurationProperty("captchaEnabled", DefaultValue = true)]
+        public bool CaptchaEnabled
         {
             get
             {
-                return (bool)this["signWithUserAgent"];
+                return (bool)this["captchaEnabled"];
             }
             set
             {
-                this["signWithUserAgent"] = value;
+                this["captchaEnabled"] = value;
             }
         }
 
-        [ConfigurationProperty("signWithSocketIp", DefaultValue = true)]
-        public bool SignWithSocketIp
+        [ConfigurationProperty("signedWithUserAgent", DefaultValue = true)]
+        public bool SignedWithUserAgent
         {
             get
             {
-                return (bool)this["signWithSocketIp"];
+                return (bool)this["signedWithUserAgent"];
             }
             set
             {
-                this["signWithSocketIp"] = value;
+                this["signedWithUserAgent"] = value;
             }
         }
 
-        [ConfigurationProperty("blockScore", DefaultValue = 0)]
-        public int BlockScore
+        [ConfigurationProperty("signedWithIP", DefaultValue = false)]
+        public bool SignedWithIP
         {
             get
             {
-                return (int)this["blockScore"];
+                return (bool)this["signedWithIP"];
             }
             set
             {
-                this["blockScore"] = value;
+                this["signedWithIP"] = value;
+            }
+        }
+
+        [ConfigurationProperty("blockingScore", DefaultValue = 70)]
+        public int BlockingScore
+        {
+            get
+            {
+                return (int)this["blockingScore"];
+            }
+            set
+            {
+                this["blockingScore"] = value;
             }
         }
 
@@ -123,7 +138,7 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("baseUri", DefaultValue = "https://collector.a.pxi.pub")]
+        [ConfigurationProperty("baseUri", DefaultValue = "https://sapi.perimeterx.net")]
         public string BaseUri
         {
             get
@@ -136,16 +151,16 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("backchannelTimeout", DefaultValue = "0:00:02")]
-        public TimeSpan BackchannelTimeout
+        [ConfigurationProperty("apiTimeout", DefaultValue = 2000)]
+        public int ApiTimeout
         {
             get
             {
-                return (TimeSpan)this["backchannelTimeout"];
+                return (int)this["apiTimeout"];
             }
             set
             {
-                this["backchannelTimeout"] = value;
+                this["apiTimeout"] = value;
             }
         }
 
@@ -177,7 +192,7 @@ namespace PerimeterX
 
         [ConfigurationProperty("internalBlockPage", DefaultValue = false)]
         public bool InternalBlockPage
-        {
+        { 
             get
             {
                 return (bool)this["internalBlockPage"];
@@ -226,5 +241,46 @@ namespace PerimeterX
                 this["activitiesBulkSize"] = value;
             }
         }
+
+        [ConfigurationProperty("sendPageActivities", DefaultValue = false)]
+        public bool SendPageActivites
+        {
+            get
+            {
+                return (bool)this["sendPageActivities"];
+            }
+            set
+            {
+                this["sendPageActivities"] = value;
+            }
+        }
+
+        [ConfigurationProperty("sendBlockActivities", DefaultValue = true)]
+        public bool SendBlockActivites
+        {
+            get
+            {
+                return (bool)this["sendBlockActivities"];
+            }
+            set
+            {
+                this["sendBlockActivities"] = value;
+            }
+        }
+
+        [ConfigurationProperty("sensitiveHeaders", DefaultValue = "cookie,cookies")]
+        [TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+        public StringCollection SensitiveHeaders
+        {
+            get
+            {
+                return (StringCollection)this["sensitiveHeaders"];
+            }
+            set
+            {
+                this["sensitiveHeaders"] = value;
+            }
+        }
+
     }
 }

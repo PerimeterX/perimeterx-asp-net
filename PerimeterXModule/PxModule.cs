@@ -5,29 +5,29 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Linq;
-using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Collections.Specialized;
 
 namespace PerimeterX
 {
 
     public class PxModule : IHttpModule
     {
+        public const string MODULE_VERSION = "PxModule ASP.NET v1.0";
         private HttpClient httpClient;
         private const int KEY_SIZE_BITS = 256;
         private const int IV_SIZE_BITS = 128;
         private const string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
         private const string HexAlphabet = "0123456789abcdef";
         private readonly PxModuleReporter reporter;
-        private RiskRequestHeader[] requestHeaders;
         private string requestSocketIP;
         private string uuid;
         private string blockReason;
+        private string rawRiskCookie;
 
         public PxModule()
         {
@@ -38,15 +38,15 @@ namespace PerimeterX
 
             httpClient = new HttpClient()
             {
-                Timeout = Config.BackchannelTimeout,
+                Timeout = TimeSpan.FromMilliseconds(Config.ApiTimeout),
                 MaxResponseContentBufferSize = 1024 * 1024 * 10
             };
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Config.ApiToken);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PerimeterX middleware");
+            //httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PerimeterX middleware");
             httpClient.DefaultRequestHeaders.ExpectContinue = false;
             reporter = PxModuleReporter.Instance(Config);
-            Debug.WriteLine("PxModule INITIALIZED");
+            Debug.WriteLine("PxModule initialized");
         }
 
         public string ModuleName
@@ -62,31 +62,44 @@ namespace PerimeterX
         private void Application_BeginRequest(object source, EventArgs e)
         {
             HttpApplication application = (HttpApplication)source;
-            if (application != null)
+            if (application == null || IsFilteredRequest(application.Context))
             {
-                HttpContext context = application.Context;
-                if (!IsFilteredRequest(context))
-                {
-                    if (!IsValidRequest(context))
-                    {
-                        BlockRequest(context);
+                return;
+            }
+            HttpContext context = application.Context;
+            if (IsValidRequest(context))
+            {
+                PostPageRequestedActivity(context);
+            }
+            else
+            {
+                PostBlockActivity(context);
+                BlockRequest(context);
+            }
+        }
 
-                        var details = new Dictionary<string, object>();
-                        if (blockReason != null)
-                        {
-                            details.Add("block_reason", blockReason);
-                        }
-                        if (uuid != null)
-                        {
-                            details.Add("block_uuid", uuid);
-                        }
-                        PostActivity(context, "block", details);
-                    }
-                    else
-                    {
-                        PostActivity(context, "page_requested");
-                    }
+        private void PostPageRequestedActivity(HttpContext context)
+        {
+            if (Config.SendPageActivites)
+            {
+                PostActivity(context, "page_requested");
+            }
+        }
+
+        private void PostBlockActivity(HttpContext context)
+        {
+            if (Config.SendBlockActivites)
+            {
+                var details = new Dictionary<string, object>();
+                if (blockReason != null)
+                {
+                    details.Add("block_reason", blockReason);
                 }
+                if (uuid != null)
+                {
+                    details.Add("block_uuid", uuid);
+                }
+                PostActivity(context, "block", details);
             }
         }
 
@@ -95,13 +108,17 @@ namespace PerimeterX
             var activity = new Activity
             {
                 Type = eventType,
-                Timestamp = DateTime.UtcNow.ToString("s"),
+                Timestamp = Math.Round(DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds, MidpointRounding.AwayFromZero),
                 AppId = Config.AppId,
-                Details = details,
-                Headers = requestHeaders,
+                Headers = new Dictionary<string, object>(),
                 SocketIP = requestSocketIP,
-                Url = context.Request.RawUrl
+                Url = context.Request.RawUrl,
+                Details = details
             };
+            foreach (var kv in GetNonSensitiveHeaders(context.Request.Headers))
+            {
+                activity.Headers.Add(kv.Key, kv.Value);
+            }
             reporter.Post(activity);
         }
 
@@ -124,7 +141,7 @@ namespace PerimeterX
         {
             var id = uuid ?? string.Empty;
             string content = @"<html lang=""en""><head> <link type=""text / css"" rel=""stylesheet"" media=""screen, print"" href=""//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800""> <meta charset=""UTF-8""> <title>Title</title> <style> p { width: 60%; margin: 0 auto; font-size: 35px; } body { background-color: #a2a2a2; font-family: ""Open Sans""; margin: 5%; } img { widht: 180px; } a { color: #2020B1; text-decoration: blink; } a:hover { color: #2b60c6; } </style> <style type=""text/css""></style></head><body cz-shortcut-listen=""true""><div><img src=""http://storage.googleapis.com/instapage-thumbnails/035ca0ab/e94de863/1460594818-1523851-467x110-perimeterx.png""></div><span style=""color: white; font-size: 34px;"">Access to This Page Has Been Blocked</span><div style=""font-size: 24px;color: #000042;""><br> Access to '" +
-                context.Request.RawUrl + 
+                context.Request.RawUrl +
                 @"' is blocked according to the site security policy. <br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: <ul> <li>JavaScript is disabled or not running properly.</li> <li>Your browsing behaviour fingerprinting are not likely to be a regular user.</li> </ul> To read more about the bot defender solution: <a href=""https://www.perimeterx.com/bot-defender"">https://www.perimeterx.com/bot-defender</a> <br> If you think the blocking was done by mistake, contact the site administrator. <br> <br> </br>" +
                 id +
                 @"</div></body></html>";
@@ -139,16 +156,19 @@ namespace PerimeterX
                 httpClient = null;
             }
         }
+
         private bool IsFilteredRequest(HttpContext context)
         {
-            if (!Config.Enabled || context.Request.HttpMethod.ToUpper() != "GET")
+            if (!Config.Enabled)
             {
                 return true;
             }
+            // TODO(barak): go over all supported filters types
+            //context.Request.HttpMethod.ToUpper() != "GET"
             string ignoreUrlRegex = Config.IgnoreUrlRegex;
             if (!string.IsNullOrEmpty(ignoreUrlRegex) && Regex.IsMatch(context.Request.RawUrl, ignoreUrlRegex))
             {
-                PxModuleEventSource.Log.IgnoreRequest(context.Request.RawUrl, "regex");
+                Debug.WriteLine("Skip, ignore URL regex matched for " + context.Request.RawUrl);
                 return true;
             }
             return false;
@@ -156,8 +176,11 @@ namespace PerimeterX
 
         private bool IsValidRequest(HttpContext context)
         {
-            CollectRequestInformation(context);
-            
+            if (!CollectRequestInformation(context))
+            {
+                return true;
+            }
+
             // validae using risk cookie
             RiskCookie riskCookie;
             var reason = CheckValidCookie(context, out riskCookie);
@@ -165,9 +188,10 @@ namespace PerimeterX
             {
                 this.uuid = riskCookie.Uuid;
                 // valid cookie, check if to block or not
-                if (IsBlockCookieScore(riskCookie.Scores))
+                if (IsBlockScores(riskCookie.Scores))
                 {
-                    PxModuleEventSource.Log.RequestBlocked(context.Request.RawUrl, "Cookie", riskCookie.Uuid);
+                    this.blockReason = "cookie_high_score";
+                    Debug.WriteLine(string.Format("Request blocked by risk cookie UUID {0}, VID {1} - {2}", this.uuid, riskCookie.Vid, context.Request.RawUrl));
                     return false;
                 }
                 return true;
@@ -179,50 +203,62 @@ namespace PerimeterX
             {
                 return true;
             }
-            if (risk.Scores != null && IsBlockCookieScore(risk.Scores))
+            if (risk.Scores != null && IsBlockScores(risk.Scores))
             {
                 this.uuid = risk.Uuid;
-                PxModuleEventSource.Log.RequestBlocked(context.Request.RawUrl, "Server API", risk.Uuid);
+                this.blockReason = "risk_high_score";
+                Debug.WriteLine(string.Format("Request blocked by risk api UUID {0} - {1}", this.uuid, context.Request.RawUrl));
                 return false;
             }
             return true;
         }
 
-        private void CollectRequestInformation(HttpContext context)
+        private bool CollectRequestInformation(HttpContext context)
         {
-            requestHeaders = GetHeadersRiskRequestFormat(context.Request.Headers);
-            requestSocketIP = GetSocketIP(context);
-            uuid = null;
-            blockReason = null;
-        }
-
-        private static RiskRequestHeader[] GetHeadersRiskRequestFormat(NameValueCollection requestHeaders)
-        {
-            RiskRequestHeader[] headers;
             try
             {
-                headers = new RiskRequestHeader[requestHeaders.Count];
-                for (int i = 0; i < headers.Length; i++)
-                {
-                    headers[i] = new RiskRequestHeader
-                    {
-                        Name = requestHeaders.GetKey(i),
-                        Value = requestHeaders.Get(i)
-                    };
-                }
-                return headers;
+                requestSocketIP = GetSocketIP(context);
+                uuid = null;
+                blockReason = null;
+                HttpCookie pxCookie = context.Request.Cookies.Get(Config.CookieName);
+                rawRiskCookie = pxCookie == null ? null : pxCookie.Value;
+                return true;
             }
             catch (Exception ex)
             {
-                PxModuleEventSource.Log.Failure("extract request headers - " + ex.Message);
-                headers = new RiskRequestHeader[0];
+                Debug.WriteLine(string.Format("Exception during collecting request information {0} - {1}", ex.Message, context.Request.RawUrl));
             }
-            return headers;
+            return false;
+        }
+        private IEnumerable<KeyValuePair<string, string>> GetNonSensitiveHeaders(NameValueCollection headers)
+        {
+            var sensitiveHeaders = Config.SensitiveHeaders;
+            for (int i = 0; i < headers.Count; i++)
+            {
+                var key = headers.GetKey(i);
+                if (!IsSensitiveHeader(sensitiveHeaders, key))
+                {
+                    var kv = new KeyValuePair<string, string>(key, headers.Get(i));
+                    yield return kv;
+                }
+            }
+        }
+
+        private static bool IsSensitiveHeader(StringCollection sensitiveHeaders, string key)
+        {
+            foreach (var header in sensitiveHeaders)
+            {
+                if (string.Compare(header, key, StringComparison.InvariantCultureIgnoreCase) == 0)
+                {
+                    return true;
+                }
+
+            }
+            return false;
         }
 
         private RiskResponse FetchGetRisk(HttpContext context, RiskRequestReasonEnum reason)
         {
-            string riskUri = Config.BaseUri + @"/api/v1/risk";
             try
             {
                 RiskRequest riskRequest = new RiskRequest
@@ -230,42 +266,46 @@ namespace PerimeterX
                     Request = new RiskRequestRequest
                     {
                         IP = requestSocketIP,
-                        Uri = context.Request.RawUrl,
-                        Headers = requestHeaders
+                        URI = context.Request.RawUrl,
+                        URL = context.Request.RawUrl,
+                        Headers = GetNonSensitiveHeaders(context.Request.Headers)
+                            .Select(kv => new RiskRequestHeader()
+                            {
+                                Name = kv.Key,
+                                Value = kv.Value
+                            })
+                            .ToArray()
                     },
                     Additional = new RiskRequestAdditional
                     {
-                        CallReason = reason
+                        HttpMethod = context.Request.HttpMethod,
+                        CallReason = reason,
+                        PXCookie = rawRiskCookie,
+                        HttpVersion = "1.1" // TODO(barak): extract from request
                     }
                 };
-
-                var riskRequestJson = JsonConvert.SerializeObject(riskRequest);
+                var riskRequestJson = PxModuleJson.StringifyObject(riskRequest);
+                string riskUri = Config.BaseUri + @"/api/v1/risk";
                 var requestMessage = new HttpRequestMessage(HttpMethod.Post, riskUri);
                 requestMessage.Content = new StringContent(riskRequestJson, Encoding.UTF8, "application/json");
                 var response = httpClient.SendAsync(requestMessage).Result;
                 response.EnsureSuccessStatusCode();
                 var contentJson = response.Content.ReadAsStringAsync().Result;
-                var riskResponse = JsonConvert.DeserializeObject<RiskResponse>(contentJson);
+                Debug.WriteLine(string.Format("Risk API call for {0}, returned {1}", context.Request.RawUrl, contentJson));
+                var riskResponse = PxModuleJson.ParseObject<RiskResponse>(contentJson);
                 return riskResponse;
             }
             catch (Exception ex)
             {
-                PxModuleEventSource.Log.FailedRiskApi(context.Request.RawUrl, ex.Message);
+                Debug.WriteLine(string.Format("Risk API call to server failed with exception {0} - {1}", ex.Message, context.Request.RawUrl));
             }
             return null;
         }
 
-        private bool IsBlockCookieScore(Dictionary<string, int> scores)
+        private bool IsBlockScores(RiskScores scores)
         {
-            var blockScore = Config.BlockScore;
-            foreach (var score in scores)
-            {
-                if (score.Value >= blockScore)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var blockScore = Config.BlockingScore;
+            return scores != null && (scores.Bot >= blockScore || scores.Application >= blockScore);
         }
 
         private static string DecodeCookie(string cookie)
@@ -323,7 +363,7 @@ namespace PerimeterX
         }
 
 
-        public static RiskCookie ParseRiskCookie(string cookieData, bool encrypted, string cookieKey = null)
+        public static RiskCookie ParseRiskCookie(string cookieData, bool encrypted, string cookieKey)
         {
             string cookieJson;
             if (encrypted)
@@ -334,7 +374,8 @@ namespace PerimeterX
             {
                 cookieJson = DecodeCookie(cookieData);
             }
-            return JsonConvert.DeserializeObject<RiskCookie>(cookieJson);
+            var riskCookie = PxModuleJson.ParseObject<RiskCookie>(cookieJson);
+            return riskCookie;
         }
 
         public static bool IsRiskCookieExpired(RiskCookie riskCookie)
@@ -357,31 +398,30 @@ namespace PerimeterX
                 var config = Config;
 
                 // get cookie
-                HttpCookie pxcookie = context.Request.Cookies.Get(config.CookieName);
-                if (pxcookie == null)
+                if (string.IsNullOrEmpty(rawRiskCookie))
                 {
-                    PxModuleEventSource.Log.NoRiskCookie(context.Request.RawUrl);
+                    Debug.WriteLine("Request without risk cookie - " + context.Request.RawUrl);
                     return RiskRequestReasonEnum.NO_COOKIE;
                 }
                 // parse cookie
-                riskCookie = ParseRiskCookie(pxcookie.Value, config.EncryptedCookie, config.CookieKey);
+                riskCookie = ParseRiskCookie(rawRiskCookie, config.EncryptionEnabled, config.CookieKey);
                 // check if expired
                 if (IsRiskCookieExpired(riskCookie))
                 {
-                    PxModuleEventSource.Log.CookieExpired(context.Request.RawUrl);
+                    Debug.WriteLine("Request with expired cookie - " + context.Request.RawUrl);
                     return RiskRequestReasonEnum.EXPIRED_COOKIE;
                 }
 
                 if (string.IsNullOrEmpty(riskCookie.Hash))
                 {
-                    PxModuleEventSource.Log.InvalidCookie(context.Request.RawUrl, "missing signature");
+                    Debug.WriteLine("Request with invalid cookie (missing signature) - " + context.Request.RawUrl);
                     return RiskRequestReasonEnum.INVALID_COOKIE;
                 }
 
                 string expectedHash = CalcCookieHash(context, riskCookie);
                 if (expectedHash != riskCookie.Hash)
                 {
-                    PxModuleEventSource.Log.InvalidCookie(context.Request.RawUrl, "invalid signature");
+                    Debug.WriteLine("Request with invalid cookie (hash mismatch) {0}, expected {1} - {2}", riskCookie.Hash, expectedHash, context.Request.RawUrl);
                     return RiskRequestReasonEnum.INVALID_COOKIE;
                 }
 
@@ -389,7 +429,7 @@ namespace PerimeterX
             }
             catch (Exception ex)
             {
-                PxModuleEventSource.Log.InvalidCookie(context.Request.RawUrl, ex.Message);
+                Debug.WriteLine("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Request.RawUrl);
             }
             return RiskRequestReasonEnum.INVALID_COOKIE;
         }
@@ -401,24 +441,25 @@ namespace PerimeterX
             // timestamp
             sb.Append(riskCookie.Time);
             // scores
-            var keys = riskCookie.Scores.Keys.ToList();
-            keys.Sort();
-            foreach (var scoreKey in keys)
+            if (riskCookie.Scores != null)
             {
-                int score;
-                if (riskCookie.Scores.TryGetValue(scoreKey, out score))
-                {
-                    sb.Append(score);
-                }
+                sb.Append(riskCookie.Scores.Application);
+                sb.Append(riskCookie.Scores.Bot);
+            }
+            // uuid
+            if (!string.IsNullOrEmpty(riskCookie.Uuid))
+            {
+                sb.Append(riskCookie.Uuid);
+            }
+            // vid
+            if (!string.IsNullOrEmpty(riskCookie.Vid))
+            {
+                sb.Append(riskCookie.Vid);
             }
             // socket ip
-            if (Config.SignWithSocketIp)
+            if (Config.SignedWithIP && !string.IsNullOrEmpty(this.requestSocketIP))
             {
-                string ip = GetSocketIP(context);
-                if (ip != null)
-                {
-                   sb.Append(ip);
-                }
+                sb.Append(this.requestSocketIP);
             }
             // user-agent
             sb.Append(GetSignUserAgent(context));
@@ -433,13 +474,10 @@ namespace PerimeterX
 
         private string GetSignUserAgent(HttpContext context)
         {
-            if (Config.SignWithUserAgent)
+            if (Config.SignedWithUserAgent)
             {
                 var userAgent = context.Request.Headers["user-agent"];
-                if (!string.IsNullOrEmpty(userAgent))
-                {
-                    return userAgent;
-                }
+                return userAgent ?? string.Empty;
             }
             return "";
         }
@@ -458,7 +496,7 @@ namespace PerimeterX
             }
             catch (Exception ex)
             {
-                PxModuleEventSource.Log.Failure("extract socket ip - " + ex.Message);
+                Debug.WriteLine(string.Format("Failed to extract request socket IP {0} - {1}", ex.Message, context.Request.RawUrl));
             }
             return string.Empty;
         }
@@ -530,7 +568,6 @@ namespace PerimeterX
                 }
             }
         }
-
         private PxModuleConfigurationSection Config
         {
             get
