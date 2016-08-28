@@ -1,11 +1,10 @@
 using System;
 using System.Web;
 using System.Security.Cryptography;
-using System.Net.Http;
+using System.Net;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 using System.Configuration;
 using System.Linq;
@@ -18,7 +17,6 @@ namespace PerimeterX
     public class PxModule : IHttpModule
     {
         public const string MODULE_VERSION = "PxModule ASP.NET v1.0";
-        private HttpClient httpClient;
         private const int KEY_SIZE_BITS = 256;
         private const int IV_SIZE_BITS = 128;
         private const string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
@@ -36,15 +34,6 @@ namespace PerimeterX
                 throw new ConfigurationErrorsException("Missing PerimeterX module configuration section");
             }
 
-            httpClient = new HttpClient()
-            {
-                Timeout = TimeSpan.FromMilliseconds(Config.ApiTimeout),
-                MaxResponseContentBufferSize = 1024 * 1024 * 10
-            };
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Config.ApiToken);
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            //httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("PerimeterX middleware");
-            httpClient.DefaultRequestHeaders.ExpectContinue = false;
             reporter = PxModuleReporter.Instance(Config);
             Debug.WriteLine("PxModule initialized");
         }
@@ -148,14 +137,14 @@ namespace PerimeterX
             context.Response.Write(content);
         }
 
-        public void Dispose()
-        {
-            if (httpClient != null)
-            {
-                httpClient.Dispose();
-                httpClient = null;
-            }
-        }
+        //public void Dispose()
+        //{
+            //if (httpClient != null)
+            //{
+                //httpClient.Dispose();
+                //httpClient = null;
+            //}
+        //}
 
         private bool IsFilteredRequest(HttpContext context)
         {
@@ -201,6 +190,7 @@ namespace PerimeterX
             var risk = FetchGetRisk(context, reason);
             if (risk == null)
             {
+                // failed to get response from server
                 return true;
             }
             if (risk.Scores != null && IsBlockScores(risk.Scores))
@@ -284,20 +274,49 @@ namespace PerimeterX
                         HttpVersion = "1.1" // TODO(barak): extract from request
                     }
                 };
-                var riskRequestJson = PxModuleJson.StringifyObject(riskRequest);
-                string riskUri = Config.BaseUri + @"/api/v1/risk";
-                var requestMessage = new HttpRequestMessage(HttpMethod.Post, riskUri);
-                requestMessage.Content = new StringContent(riskRequestJson, Encoding.UTF8, "application/json");
-                var response = httpClient.SendAsync(requestMessage).Result;
-                response.EnsureSuccessStatusCode();
-                var contentJson = response.Content.ReadAsStringAsync().Result;
-                Debug.WriteLine(string.Format("Risk API call for {0}, returned {1}", context.Request.RawUrl, contentJson));
-                var riskResponse = PxModuleJson.ParseObject<RiskResponse>(contentJson);
+                var riskResponse = PostRiskRequest(riskRequest);
+                //var riskRequestJson = PxModuleJson.StringifyObject(riskRequest);
+                //string riskUri = Config.BaseUri + @"/api/v1/risk";
+                //var requestMessage = new HttpRequestMessage(HttpMethod.Post, riskUri);
+                //requestMessage.Content = new StringContent(riskRequestJson, Encoding.UTF8, "application/json");
+                //var response = httpClient.SendAsync(requestMessage).Result;
+                //response.EnsureSuccessStatusCode();
+                //var contentJson = response.Content.ReadAsStringAsync().Result;
+                //Debug.WriteLine(string.Format("Risk API call for {0}, returned {1}", context.Request.RawUrl, contentJson));
+                //var riskResponse = PxModuleJson.ParseObject<RiskResponse>(contentJson);
                 return riskResponse;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(string.Format("Risk API call to server failed with exception {0} - {1}", ex.Message, context.Request.RawUrl));
+            }
+            return null;
+        }
+
+        private RiskResponse PostRiskRequest(RiskRequest riskRequest)
+        {
+            var config = Config;
+            var riskRequestJson = PxModuleJson.StringifyObject(riskRequest);
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(config.BaseUri + "/api/v1/risk");
+            httpWebRequest.ContentType = "application/json";
+            httpWebRequest.Method = "POST";
+            httpWebRequest.Headers.Add("Authorization", "Bearer " + config.ApiToken);
+            httpWebRequest.Timeout = config.ApiTimeout;
+            using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                streamWriter.Write(riskRequestJson);
+            }
+            var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            if (httpResponse.StatusCode == HttpStatusCode.OK)
+            {
+                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                {
+                    var jsonResponse = streamReader.ReadToEnd();
+                    Debug.WriteLine(string.Format("Risk call {0} for {1}, returned {2}",
+                                riskRequestJson, context.Request.RawUrl, jsonResponse));
+                    var riskResponse = PxModuleJson.ParseObject<RiskResponse>(jsonResponse);
+                    return riskResponse;
+                }
             }
             return null;
         }
