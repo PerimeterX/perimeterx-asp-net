@@ -6,7 +6,7 @@ HTTPModule for ASP.NET
 
 #### Edit web.config
 
-Add PerimeterX PxModule (system.webServer level)
+Add PerimeterX PxModule (configuration -> system.webServer level)
 
 ```xml
     <modules>
@@ -33,12 +33,11 @@ Add site specific configuration (configuration level)
  <perimeterX>
     <pxModuleConfigurationSection
       enabled="true"
+      appId="<Application ID (PX)>"
       internalBlockPage="true"
-      baseUri="http://localhost:5000"
-      apiToken="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzY29wZXMiOlsicmlza19zY29yZSIsInJlc3RfYXBpIl0sImlhdCI6MTQ2MTA1MTc1Nywic3ViIjoiUFg2MDAyIiwianRpIjoiMTczNTJkYmMtODYwOS00YTBjLWIzN2EtYzY0NjUxNDE2MzU1In0.gSxeM85FtJhh4YeNqHP2WfOSKZl6Y0AwgS1icjiSrSk"
-      cookieKey="password"
-      blockScore="60"
-      signWithSocketIp="false"
+      apiToken="<API token>"
+      cookieKey="<cookie key>"
+      blockingScore="70"
       ignoreUrlRegex="(\.css|\.txt|\.js|\.gif |\.jpg|\.png)$"
       >
     </pxModuleConfigurationSection>
