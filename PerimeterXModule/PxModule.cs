@@ -1,5 +1,5 @@
-// 	Copyright © 2016 PerimeterX, Inc.
-// 
+// 	Copyright ï¿½ 2016 PerimeterX, Inc.
+//
 // Permission is hereby granted, free of charge, to any
 // person obtaining a copy of this software and associated
 // documentation files (the "Software"), to deal in the
@@ -8,11 +8,11 @@
 // distribute, sublicense, and/or sell copies of the
 // Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice
 // shall be included in all copies or substantial portions of
 // the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -21,7 +21,7 @@
 // OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
+//
 
 using System;
 using System.Web;
@@ -290,7 +290,7 @@ namespace PerimeterX
                     "   </script> \n" +
                     "   </head>\n" +
                     "   <body cz-shortcut-listen=\"true\">\n" +
-                    "      <div><img src=\"http://storage.googleapis.com/instapage-thumbnails/035ca0ab/e94de863/1460594818-1523851-467x110-perimeterx.png\"> </div>\n" +
+                    "      <div><img src=\"https://s.perimeterx.net/logo.png\"> </div>\n" +
                     "      <span style=\"color: white; font-size: 34px;\">Access to This Page Has Been Blocked</span> \n" +
                     "      <div style=\"font-size: 24px;color: #000042;\">\n" +
                     "         <br> Access to '" + HttpUtility.HtmlEncode(context.Request.Url.AbsoluteUri) + "' is blocked according to the site security policy.<br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: \n" +
@@ -316,7 +316,7 @@ namespace PerimeterX
                     "      <style> p { width: 60%; margin: 0 auto; font-size: 35px; } body { background-color: #a2a2a2; font-family: \"Open Sans\"; margin: 5%; } img { width: 180px; } a { color: #2020B1; text-decoration: blink; } a:hover { color: #2b60c6; } </style>\n" +
                     "   </head>\n" +
                     "   <body cz-shortcut-listen=\"true\">\n" +
-                    "      <div><img src=\"http://storage.googleapis.com/instapage-thumbnails/035ca0ab/e94de863/1460594818-1523851-467x110-perimeterx.png\"> </div>\n" +
+                    "      <div><img src=\"https://s.perimeterx.net/logo.png\"> </div>\n" +
                     "      <span style=\"color: white; font-size: 34px;\">Access to This Page Has Been Blocked</span> \n" +
                     "      <div style=\"font-size: 24px;color: #000042;\">\n" +
                     "         <br> Access to '" + HttpUtility.HtmlEncode(context.Request.Url.AbsoluteUri) + "' is blocked according to the site security policy.<br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: \n" +
@@ -723,7 +723,7 @@ namespace PerimeterX
                         var ips = headerVal.Split(new char[] { ',', ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                         IPAddress firstIpAddress;
                         if (ips.Length > 0 && IPAddress.TryParse(ips[0], out firstIpAddress))
-                        { 
+                        {
                             return ips[0];
                         }
                     }
@@ -750,4 +750,3 @@ namespace PerimeterX
 
     }
 }
-
