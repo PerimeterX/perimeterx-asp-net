@@ -128,7 +128,7 @@ namespace PerimeterX
             fileExtWhitelist = config.FileExtWhitelist;
             routesWhitelist = config.RoutesWhitelist;
             useragentsWhitelist = config.UseragentsWhitelist;
-            baseUri = config.BaseUri;
+            baseUri = string.Format(config.BaseUri,appId);
             signedWithIP = config.SignedWithIP;
             signedWithUserAgent = config.SignedWithUserAgent;
             socketIpHeader = config.SocketIpHeader;
