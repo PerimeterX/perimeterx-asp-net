@@ -13,6 +13,7 @@ Table of Contents
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
 -   [Configuration](#configuration)
+  *   [Customizing Default Block Pages](#custom-block-page)
   *   [Blocking Score](#blocking-score)
   *   [Enable/Disable Captcha](#captcha-support)
   *   [Extracting Real IP Address](#real-ip)
@@ -94,6 +95,32 @@ Configuration options are set in `pxModuleConfigurationSection`
 - cookieKey
 - apiToken
 
+#### <a name="custom-block-page"></a> Customizing Default Block Pages
+###### Custom Logo
+Adding a custom logo to the blocking page is by providing the pxConfig a key ```customLogo``` , the logo will be displayed at the top div of the the block page The logo's ```max-heigh``` property would be 150px and width would be set to ```auto```
+
+The key ```customLogo``` expects a valid URL address such as ```https://s.perimeterx.net/logo.png```
+
+Example below:
+```xml
+...
+  customLogo="https://s.perimeterx.net/logo.png"
+...
+```
+
+Custom JS/CSS
+
+The block page can be modified with a custom CSS by adding to the ```pxConfig``` the key ```cssRef``` and providing a valid URL to the css In addition there is also the option to add a custom JS file by adding ```jsRef``` key to the ```pxConfig``` and providing the JS file that will be loaded with the block page, this key also expects a valid URL
+
+On both cases if the URL is not a valid format an exception will be thrown
+
+Example below:
+```xml
+  ...
+  jsRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  cssRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+  ...
+```
 #### <a name="blocking-score"></a> Changing the Minimum Score for Blocking
 
 **default:** 70
