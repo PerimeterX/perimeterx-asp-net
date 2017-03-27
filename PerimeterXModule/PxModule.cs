@@ -267,69 +267,15 @@ namespace PerimeterX
 
         private void ResponseBlockPage(HttpContext context)
         {
+            var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(CONFIG_SECTION);
+            string template = "block";
             string content;
             if (captchaEnabled)
             {
-                content =
-                    "<html lang=\"en\">\n" +
-                    "   <head>\n" +
-                    "      <link type=\"text/css\" rel=\"stylesheet\" media=\"screen, print\" href=\"//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800\">\n" +
-                    "      <meta charset=\"UTF-8\">\n" +
-                    "      <title>Access to This Page Has Been Blocked</title>\n" +
-                    "      <style> p { width: 60%; margin: 0 auto; font-size: 35px; } body { background-color: #a2a2a2; font-family: \"Open Sans\"; margin: 5%; } img { width: 180px; } a { color: #2020B1; text-decoration: blink; } a:hover { color: #2b60c6; } </style>\n" +
-                    "      <script src=\"https://www.google.com/recaptcha/api.js\"></script> " +
-                    "      <script> " +
-                    "           window.px_vid = '" + HttpUtility.HtmlEncode(this.vid ?? string.Empty) + "';\n" +
-                    "           function handleCaptcha(response) { \n" +
-                    "               var name = '_pxCaptcha';\n" +
-                    "               var expiryUtc = new Date(Date.now() + 1000 * 10).toUTCString();\n" +
-                    "               var cookieParts = [name, '=', response + ':' + window.px_vid, '; expires=', expiryUtc, '; path=/'];\n" +
-                    "               document.cookie = cookieParts.join('');\n" +
-                    "               location.reload();\n" +
-                    "           }\n" +
-                    "   </script> \n" +
-                    "   </head>\n" +
-                    "   <body cz-shortcut-listen=\"true\">\n" +
-                    "      <div><img src=\"https://s.perimeterx.net/logo.png\"> </div>\n" +
-                    "      <span style=\"color: white; font-size: 34px;\">Access to This Page Has Been Blocked</span> \n" +
-                    "      <div style=\"font-size: 24px;color: #000042;\">\n" +
-                    "         <br> Access to '" + HttpUtility.HtmlEncode(context.Request.Url.AbsoluteUri) + "' is blocked according to the site security policy.<br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: \n" +
-                    "         <ul>\n" +
-                    "            <li>JavaScript is disabled or not running properly.</li>\n" +
-                    "            <li>Your browsing behaviour fingerprinting are not likely to be a regular user.</li>\n" +
-                    "         </ul>\n" +
-                    "         To read more about the bot defender solution: <a href=\"https://www.perimeterx.com/bot-defender\">https://www.perimeterx.com/bot-defender</a><br> If you think the blocking was done by mistake, contact the site administrator. <br> \n" +
-                    "         <div class=\"g-recaptcha\" data-sitekey=\"6Lcj-R8TAAAAABs3FrRPuQhLMbp5QrHsHufzLf7b\" data-callback=\"handleCaptcha\" data-theme=\"dark\"></div>\n" +
-                    "         <br><span style=\"font-size: 20px;\">Block Reference: <span style=\"color: #525151;\">#'" + HttpUtility.HtmlEncode(this.uuid ?? string.Empty) + "'</span></span> \n" +
-                    "      </div>\n" +
-                    "   </body>\n" +
-                    "</html>";
+                template = "captcha";
             }
-            else
-            {
-                content =
-                    "<html lang=\"en\">\n" +
-                    "   <head>\n" +
-                    "      <link type=\"text/css\" rel=\"stylesheet\" media=\"screen, print\" href=\"//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800\">\n" +
-                    "      <meta charset=\"UTF-8\">\n" +
-                    "      <title>Access to This Page Has Been Blocked</title>\n" +
-                    "      <style> p { width: 60%; margin: 0 auto; font-size: 35px; } body { background-color: #a2a2a2; font-family: \"Open Sans\"; margin: 5%; } img { width: 180px; } a { color: #2020B1; text-decoration: blink; } a:hover { color: #2b60c6; } </style>\n" +
-                    "   </head>\n" +
-                    "   <body cz-shortcut-listen=\"true\">\n" +
-                    "      <div><img src=\"https://s.perimeterx.net/logo.png\"> </div>\n" +
-                    "      <span style=\"color: white; font-size: 34px;\">Access to This Page Has Been Blocked</span> \n" +
-                    "      <div style=\"font-size: 24px;color: #000042;\">\n" +
-                    "         <br> Access to '" + HttpUtility.HtmlEncode(context.Request.Url.AbsoluteUri) + "' is blocked according to the site security policy.<br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: \n" +
-                    "         <ul>\n" +
-                    "            <li>JavaScript is disabled or not running properly.</li>\n" +
-                    "            <li>Your browsing behaviour fingerprinting are not likely to be a regular user.</li>\n" +
-                    "         </ul>\n" +
-                    "         To read more about the bot defender solution: <a href=\"https://www.perimeterx.com/bot-defender\">https://www.perimeterx.com/bot-defender</a><br> If you think the blocking was done by mistake, contact the site administrator. <br> \n" +
-                    "         <br><span style=\"font-size: 20px;\">Block Reference: <span style=\"color: #525151;\">#'" + HttpUtility.HtmlEncode(this.uuid ?? string.Empty) + "'</span></span> \n" +
-                    "      </div>\n" +
-                    "   </body>\n" +
-                    "</html>";
-            }
+            Debug.WriteLine(string.Format("Using {0} template", template), LOG_CATEGORY);
+            content = TemplateFactory.getTemplate(template, config,uuid,vid);
             context.Response.Write(content);
         }
 

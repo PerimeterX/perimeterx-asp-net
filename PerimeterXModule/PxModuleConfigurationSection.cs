@@ -333,5 +333,45 @@ namespace PerimeterX
                 this["useragentsWhitelist"] = value;
             }
         }
+
+        [ConfigurationProperty("customLogo")]
+        public string CustomLogo
+        {
+            get
+            {
+                return (string)this["customLogo"];
+            }
+            set
+            {
+                this["logoVisibility"] = "visible";
+                this["customLogo"] = value;
+            }
+        }
+
+        [ConfigurationProperty("cssRef")]
+        public string CssRef
+        {
+            get
+            {
+                return (string)this["cssRef"];
+            }
+            set
+            {
+                this["cssRef"] = value;
+            }
+        }
+
+        [ConfigurationProperty("jsRef")]
+        public string JsRef
+        {
+            get
+            {
+                return (string)this["jsRef"];
+            }
+            set
+            {
+                this["jsRef"] = value;
+            }
+        }
     }
 }
