@@ -37,6 +37,8 @@ using System.Collections.Specialized;
 using Jil;
 using System.Net;
 using System.Linq;
+using System.Reflection;
+using System.Collections;
 
 namespace PerimeterX
 {
@@ -186,7 +188,34 @@ namespace PerimeterX
                 {
                     return;
                 }
-                context.Request.Headers.Add(PX_VALIDATED_HEADER, validationMarker);
+                // Setting custom header for classic mode
+                if (HttpRuntime.UsingIntegratedPipeline)
+                {
+                    context.Request.Headers.Add(PX_VALIDATED_HEADER, validationMarker);
+              
+                } else
+                {
+                    var headers = context.Request.Headers;
+                    Type hdr = headers.GetType();
+                    PropertyInfo ro = hdr.GetProperty("IsReadOnly",
+                        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy);
+                    // Remove the ReadOnly property
+                    ro.SetValue(headers, false, null);
+                    // Invoke the protected InvalidateCachedArrays method 
+                    hdr.InvokeMember("InvalidateCachedArrays",
+                        BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
+                        null, headers, null);
+                    // Now invoke the protected "BaseAdd" method of the base class to add the
+                    // headers you need. The header content needs to be an ArrayList or the
+                    // the web application will choke on it.
+                    hdr.InvokeMember("BaseAdd",
+                        BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
+                        null, headers,
+                        new object[] { PX_VALIDATED_HEADER, new ArrayList { validationMarker } });
+                    // repeat BaseAdd invocation for any other headers to be added
+                    // Then set the collection back to ReadOnly
+                    ro.SetValue(headers, true, null);
+                }
                 if (IsValidRequest(context))
                 {
                     Debug.WriteLine("Valid request to " + context.Request.RawUrl, LOG_CATEGORY);
