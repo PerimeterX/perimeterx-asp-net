@@ -1,5 +1,5 @@
-// 	Copyright © 2016 PerimeterX, Inc.
-// 
+// 	Copyright ï¿½ 2016 PerimeterX, Inc.
+//
 // Permission is hereby granted, free of charge, to any
 // person obtaining a copy of this software and associated
 // documentation files (the "Software"), to deal in the
@@ -8,11 +8,11 @@
 // distribute, sublicense, and/or sell copies of the
 // Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice
 // shall be included in all copies or substantial portions of
 // the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -21,7 +21,7 @@
 // OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
+//
 
 using System;
 using System.Web;
@@ -128,7 +128,7 @@ namespace PerimeterX
             fileExtWhitelist = config.FileExtWhitelist;
             routesWhitelist = config.RoutesWhitelist;
             useragentsWhitelist = config.UseragentsWhitelist;
-            baseUri = config.BaseUri;
+            baseUri = string.Format(config.BaseUri,appId);
             signedWithIP = config.SignedWithIP;
             signedWithUserAgent = config.SignedWithUserAgent;
             socketIpHeader = config.SocketIpHeader;
@@ -267,69 +267,15 @@ namespace PerimeterX
 
         private void ResponseBlockPage(HttpContext context)
         {
+            var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(CONFIG_SECTION);
+            string template = "block";
             string content;
             if (captchaEnabled)
             {
-                content =
-                    "<html lang=\"en\">\n" +
-                    "   <head>\n" +
-                    "      <link type=\"text/css\" rel=\"stylesheet\" media=\"screen, print\" href=\"//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800\">\n" +
-                    "      <meta charset=\"UTF-8\">\n" +
-                    "      <title>Access to This Page Has Been Blocked</title>\n" +
-                    "      <style> p { width: 60%; margin: 0 auto; font-size: 35px; } body { background-color: #a2a2a2; font-family: \"Open Sans\"; margin: 5%; } img { width: 180px; } a { color: #2020B1; text-decoration: blink; } a:hover { color: #2b60c6; } </style>\n" +
-                    "      <script src=\"https://www.google.com/recaptcha/api.js\"></script> " +
-                    "      <script> " +
-                    "           window.px_vid = '" + HttpUtility.HtmlEncode(this.vid ?? string.Empty) + "';\n" +
-                    "           function handleCaptcha(response) { \n" +
-                    "               var name = '_pxCaptcha';\n" +
-                    "               var expiryUtc = new Date(Date.now() + 1000 * 10).toUTCString();\n" +
-                    "               var cookieParts = [name, '=', response + ':' + window.px_vid, '; expires=', expiryUtc, '; path=/'];\n" +
-                    "               document.cookie = cookieParts.join('');\n" +
-                    "               location.reload();\n" +
-                    "           }\n" +
-                    "   </script> \n" +
-                    "   </head>\n" +
-                    "   <body cz-shortcut-listen=\"true\">\n" +
-                    "      <div><img src=\"http://storage.googleapis.com/instapage-thumbnails/035ca0ab/e94de863/1460594818-1523851-467x110-perimeterx.png\"> </div>\n" +
-                    "      <span style=\"color: white; font-size: 34px;\">Access to This Page Has Been Blocked</span> \n" +
-                    "      <div style=\"font-size: 24px;color: #000042;\">\n" +
-                    "         <br> Access to '" + HttpUtility.HtmlEncode(context.Request.Url.AbsoluteUri) + "' is blocked according to the site security policy.<br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: \n" +
-                    "         <ul>\n" +
-                    "            <li>JavaScript is disabled or not running properly.</li>\n" +
-                    "            <li>Your browsing behaviour fingerprinting are not likely to be a regular user.</li>\n" +
-                    "         </ul>\n" +
-                    "         To read more about the bot defender solution: <a href=\"https://www.perimeterx.com/bot-defender\">https://www.perimeterx.com/bot-defender</a><br> If you think the blocking was done by mistake, contact the site administrator. <br> \n" +
-                    "         <div class=\"g-recaptcha\" data-sitekey=\"6Lcj-R8TAAAAABs3FrRPuQhLMbp5QrHsHufzLf7b\" data-callback=\"handleCaptcha\" data-theme=\"dark\"></div>\n" +
-                    "         <br><span style=\"font-size: 20px;\">Block Reference: <span style=\"color: #525151;\">#'" + HttpUtility.HtmlEncode(this.uuid ?? string.Empty) + "'</span></span> \n" +
-                    "      </div>\n" +
-                    "   </body>\n" +
-                    "</html>";
+                template = "captcha";
             }
-            else
-            {
-                content =
-                    "<html lang=\"en\">\n" +
-                    "   <head>\n" +
-                    "      <link type=\"text/css\" rel=\"stylesheet\" media=\"screen, print\" href=\"//fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800\">\n" +
-                    "      <meta charset=\"UTF-8\">\n" +
-                    "      <title>Access to This Page Has Been Blocked</title>\n" +
-                    "      <style> p { width: 60%; margin: 0 auto; font-size: 35px; } body { background-color: #a2a2a2; font-family: \"Open Sans\"; margin: 5%; } img { width: 180px; } a { color: #2020B1; text-decoration: blink; } a:hover { color: #2b60c6; } </style>\n" +
-                    "   </head>\n" +
-                    "   <body cz-shortcut-listen=\"true\">\n" +
-                    "      <div><img src=\"http://storage.googleapis.com/instapage-thumbnails/035ca0ab/e94de863/1460594818-1523851-467x110-perimeterx.png\"> </div>\n" +
-                    "      <span style=\"color: white; font-size: 34px;\">Access to This Page Has Been Blocked</span> \n" +
-                    "      <div style=\"font-size: 24px;color: #000042;\">\n" +
-                    "         <br> Access to '" + HttpUtility.HtmlEncode(context.Request.Url.AbsoluteUri) + "' is blocked according to the site security policy.<br> Your browsing behaviour fingerprinting made us think you may be a bot. <br> <br> This may happen as a result of the following: \n" +
-                    "         <ul>\n" +
-                    "            <li>JavaScript is disabled or not running properly.</li>\n" +
-                    "            <li>Your browsing behaviour fingerprinting are not likely to be a regular user.</li>\n" +
-                    "         </ul>\n" +
-                    "         To read more about the bot defender solution: <a href=\"https://www.perimeterx.com/bot-defender\">https://www.perimeterx.com/bot-defender</a><br> If you think the blocking was done by mistake, contact the site administrator. <br> \n" +
-                    "         <br><span style=\"font-size: 20px;\">Block Reference: <span style=\"color: #525151;\">#'" + HttpUtility.HtmlEncode(this.uuid ?? string.Empty) + "'</span></span> \n" +
-                    "      </div>\n" +
-                    "   </body>\n" +
-                    "</html>";
-            }
+            Debug.WriteLine(string.Format("Using {0} template", template), LOG_CATEGORY);
+            content = TemplateFactory.getTemplate(template, config,uuid,vid);
             context.Response.Write(content);
         }
 
@@ -723,7 +669,7 @@ namespace PerimeterX
                         var ips = headerVal.Split(new char[] { ',', ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                         IPAddress firstIpAddress;
                         if (ips.Length > 0 && IPAddress.TryParse(ips[0], out firstIpAddress))
-                        { 
+                        {
                             return ips[0];
                         }
                     }
@@ -750,4 +696,3 @@ namespace PerimeterX
 
     }
 }
-

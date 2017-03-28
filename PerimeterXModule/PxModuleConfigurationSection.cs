@@ -1,5 +1,5 @@
-// 	Copyright © 2016 PerimeterX, Inc.
-// 
+// 	Copyright ï¿½ 2016 PerimeterX, Inc.
+//
 // Permission is hereby granted, free of charge, to any
 // person obtaining a copy of this software and associated
 // documentation files (the "Software"), to deal in the
@@ -8,11 +8,11 @@
 // distribute, sublicense, and/or sell copies of the
 // Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice
 // shall be included in all copies or substantial portions of
 // the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
 // KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
@@ -21,7 +21,7 @@
 // OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-// 
+//
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Configuration;
@@ -68,7 +68,7 @@ namespace PerimeterX
                 this["cookieName"] = value;
             }
         }
-        
+
         [ConfigurationProperty("cookieKey", IsRequired = true)]
         public string CookieKey
         {
@@ -160,7 +160,7 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("baseUri", DefaultValue = "https://sapi.perimeterx.net")]
+        [ConfigurationProperty("baseUri", DefaultValue = "https://sapi-{0}.perimeterx.net")]
         public string BaseUri
         {
             get
@@ -214,7 +214,7 @@ namespace PerimeterX
 
         [ConfigurationProperty("suppressContentBlock", DefaultValue = false)]
         public bool SuppressContentBlock
-        { 
+        {
             get
             {
                 return (bool)this["suppressContentBlock"];
@@ -331,6 +331,46 @@ namespace PerimeterX
             set
             {
                 this["useragentsWhitelist"] = value;
+            }
+        }
+
+        [ConfigurationProperty("customLogo")]
+        public string CustomLogo
+        {
+            get
+            {
+                return (string)this["customLogo"];
+            }
+            set
+            {
+                this["logoVisibility"] = "visible";
+                this["customLogo"] = value;
+            }
+        }
+
+        [ConfigurationProperty("cssRef")]
+        public string CssRef
+        {
+            get
+            {
+                return (string)this["cssRef"];
+            }
+            set
+            {
+                this["cssRef"] = value;
+            }
+        }
+
+        [ConfigurationProperty("jsRef")]
+        public string JsRef
+        {
+            get
+            {
+                return (string)this["jsRef"];
+            }
+            set
+            {
+                this["jsRef"] = value;
             }
         }
     }
