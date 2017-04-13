@@ -512,10 +512,14 @@ namespace PerimeterX
                     {
                         HttpMethod = context.Request.HttpMethod,
                         CallReason = reason,
-                        PXCookie = rawRiskCookie,
                         HttpVersion = ExtractHttpVersion(context.Request.ServerVariables["SERVER_PROTOCOL"])
                     }
                 };
+
+                if (reason == RiskRequestReasonEnum.DECRYPTION_FAILED)
+                {
+                    riskRequest.Additional.PxOrigCookie = rawRiskCookie;
+                }
                 return PostRequest<RiskResponse, RiskRequest>(baseUri + "/api/v1/risk", riskRequest);
             }
             catch (AggregateException ex)
@@ -623,7 +627,7 @@ namespace PerimeterX
                 if (expectedHash != riskCookie.Hash)
                 {
                     Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, expected {1} - {2}", riskCookie.Hash, expectedHash, context.Request.Url.AbsoluteUri), LOG_CATEGORY);
-                    return RiskRequestReasonEnum.INVALID_COOKIE;
+                    return RiskRequestReasonEnum.VALIDATION_FAILED;
                 }
 
                 return RiskRequestReasonEnum.NONE;
@@ -632,7 +636,7 @@ namespace PerimeterX
             {
                 Debug.WriteLine("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Request.Url.AbsoluteUri, LOG_CATEGORY);
             }
-            return RiskRequestReasonEnum.INVALID_COOKIE;
+            return RiskRequestReasonEnum.DECRYPTION_FAILED;
         }
 
         private string CalcCookieHash(HttpContext context, RiskCookie riskCookie)
