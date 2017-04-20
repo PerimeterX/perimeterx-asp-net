@@ -45,7 +45,7 @@ namespace PerimeterX
 
     public class PxModule : IHttpModule
     {
-        public static readonly string MODULE_VERSION = "PxModule ASP.NET v1.1.0";
+        public static readonly string MODULE_VERSION = "PxModule ASP.NET v1.1.1";
         public const string LOG_CATEGORY = "PxModule";
         private const string CAPTCHA_COOKIE_NAME = "_pxCaptcha";
         private HttpClient httpClient;

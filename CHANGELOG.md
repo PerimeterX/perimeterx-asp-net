@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+##[1.1.1] - 2017-20-04
+- added .axd files to whitelist files
+- sending px_orig_value when decryption fails
+
 ##[1.1] - 2017-28-03
 - Moved server url to new URL
 - New design for block pages
