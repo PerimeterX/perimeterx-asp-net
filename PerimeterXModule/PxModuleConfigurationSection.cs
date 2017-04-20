@@ -292,7 +292,7 @@ namespace PerimeterX
         }
 
 
-        [ConfigurationProperty("fileExtWhitelist", DefaultValue = ".css,.bmp,.tif,.ttf,.docx,.woff2,.js,.pict,.tiff,.eot,.xlsx,.jpg,.csv,.eps,.woff,.xls,.jpeg,.doc,.ejs,.otf,.pptx,.gif,.pdf,.swf,.svg,.ps,.ico,.pls,.midi,.svgz,.class,.png,.ppt,.mid,.jar")]
+        [ConfigurationProperty("fileExtWhitelist", DefaultValue = ".axd,.css,.bmp,.tif,.ttf,.docx,.woff2,.js,.pict,.tiff,.eot,.xlsx,.jpg,.csv,.eps,.woff,.xls,.jpeg,.doc,.ejs,.otf,.pptx,.gif,.pdf,.swf,.svg,.ps,.ico,.pls,.midi,.svgz,.class,.png,.ppt,.mid,.jar")]
         [TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
         public StringCollection FileExtWhitelist
         {

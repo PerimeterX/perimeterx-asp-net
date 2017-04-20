@@ -88,7 +88,11 @@ namespace PerimeterX
         [EnumMember(Value = "expired_cookie")]
         EXPIRED_COOKIE,
         [EnumMember(Value = "invalid_cookie")]
-        INVALID_COOKIE
+        INVALID_COOKIE,
+        [EnumMember(Value = "cookie_decryption_failed")]
+        DECRYPTION_FAILED,
+        [EnumMember(Value = "cookie_validation_failed")]
+        VALIDATION_FAILED
     }
 
     [DataContract]
@@ -108,6 +112,9 @@ namespace PerimeterX
 
         [DataMember(Name = "s2s_call_reason")]
         public RiskRequestReasonEnum CallReason;
+
+        [DataMember(Name = "px_orig_cookie")]
+        public string PxOrigCookie;
     }
 
     [DataContract]
