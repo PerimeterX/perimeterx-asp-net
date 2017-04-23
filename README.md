@@ -211,6 +211,18 @@ A user can define a different API endpoint as a target URI to send the requests 
     ..
 ```
 
+#### <a name="override-ua"></a> Custom User Agent Header
+
+The user's user agent can be returned to the PerimeterX module using a name of a header that includes the user agent
+
+**default: The User Agent is taken from header name "user-agent" from the incoming request**
+
+```xml
+	..
+    useragentOverride="px-user-agent"
+    ..
+```
+
 <a name="contributing"></a> Contributing
 ----------------------------------------
 
