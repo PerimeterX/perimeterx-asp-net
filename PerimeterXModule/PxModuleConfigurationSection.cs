@@ -373,5 +373,18 @@ namespace PerimeterX
                 this["jsRef"] = value;
             }
         }
+
+        [ConfigurationProperty("useragentOverride")]
+        public string UserAgentOverride
+        {
+            get
+            {
+                return (string)this["useragentOverride"];
+            }
+            set
+            {
+                this["useragentOverride"] = value;
+            }
+        }
     }
 }
