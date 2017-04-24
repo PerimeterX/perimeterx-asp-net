@@ -4,7 +4,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-##[1.1.1] - 2017-20-04
+##[1.2.0] - 2017-24-04
+- Support custom header for user-agent
+
+##[1.1.1] - 2017-20-04 
 - added .axd files to whitelist files
 - sending px_orig_value when decryption fails
 
