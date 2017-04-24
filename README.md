@@ -17,6 +17,7 @@ Table of Contents
   *   [Blocking Score](#blocking-score)
   *   [Enable/Disable Captcha](#captcha-support)
   *   [Extracting Real IP Address](#real-ip)
+  *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
@@ -194,7 +195,7 @@ amount requests blocked and API usage statistics.
 **default:** false
 
 ```xml
-	..
+    ..
     sendPageActivities="false"
     ..
 ```
@@ -218,7 +219,7 @@ The user's user agent can be returned to the PerimeterX module using a name of a
 **default: The User Agent is taken from header name "user-agent" from the incoming request**
 
 ```xml
-	..
+    ..
     useragentOverride="px-user-agent"
     ..
 ```
