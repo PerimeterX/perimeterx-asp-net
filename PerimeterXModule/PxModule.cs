@@ -59,7 +59,9 @@ namespace PerimeterX
         private BlockReasonEnum blockReason;
         private string rawRiskCookie;
         private string rawCaptchaCookie;
+        private string userAgent = null;
         private const string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
+        private const string PX_ORIG_UA_HEADER = "X-PX-ORIG-USER-AGENT";
         private readonly string validationMarker;
         private static readonly Options jsonOptions = new Options(false, true);
 
@@ -67,6 +69,7 @@ namespace PerimeterX
         private readonly bool sendPageActivites;
         private readonly bool sendBlockActivities;
         private readonly string cookieName;
+        private readonly string userAgentOverride;
         private readonly int blockingScore;
         private readonly string appId;
         private readonly bool suppressContentBlock;
@@ -129,6 +132,7 @@ namespace PerimeterX
             sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
             fileExtWhitelist = config.FileExtWhitelist;
             routesWhitelist = config.RoutesWhitelist;
+            userAgentOverride = config.UserAgentOverride;
             useragentsWhitelist = config.UseragentsWhitelist;
             baseUri = string.Format(config.BaseUri,appId);
             signedWithIP = config.SignedWithIP;
@@ -220,12 +224,15 @@ namespace PerimeterX
                 {
                     Debug.WriteLine("Valid request to " + context.Request.RawUrl, LOG_CATEGORY);
                     PostPageRequestedActivity(context);
+                    CleanContext(context);
+
                 }
                 else
                 {
                     Debug.WriteLine("Invalid request to " + context.Request.RawUrl, LOG_CATEGORY);
                     PostBlockActivity(context);
                     BlockRequest(context);
+                    CleanContext(context);
                     application.CompleteRequest();
                 }
             }
@@ -680,13 +687,39 @@ namespace PerimeterX
         {
             if (signedWithUserAgent)
             {
-                var userAgent = context.Request.Headers["user-agent"];
+                userAgent = context.Request.Headers["user-agent"];
+                // if userAgentOverride is present override the default user-agent
+                if (userAgentOverride != null && !String.IsNullOrEmpty(context.Request.Headers[userAgentOverride]))
+                {
+                    // x-px-orig-user-agent should be removed from request as well as user-agent should return old value,
+                    // CleanContext should be called at the end of the module
+                    context.Request.Headers[PX_ORIG_UA_HEADER] = userAgent;
+
+                    userAgent = context.Request.Headers[userAgentOverride];
+                    context.Request.Headers["user-agent"] = userAgent;
+
+                }
+
                 if (userAgent != null)
                 {
                     return userAgent;
                 }
             }
             return string.Empty;
+        }
+
+
+        /**
+         * Removes all PX enrichment from the context, until pxCtx will be used to hold
+        */
+        private void CleanContext(HttpContext context)
+        {
+            if (userAgentOverride != null && !string.IsNullOrEmpty(context.Request.Headers.Get(userAgentOverride)))
+            {
+                string pxOrigUserAgent = context.Request.Headers.Get(PX_ORIG_UA_HEADER);
+                context.Request.Headers.Remove(PX_ORIG_UA_HEADER);
+                context.Request.Headers["user-agent"] = pxOrigUserAgent;
+            }
         }
 
         private string GetSocketIP(HttpContext context)
