@@ -27,34 +27,7 @@ using System.Runtime.Serialization;
 
 namespace PerimeterX
 {
-    [DataContract]
-    public class RiskCookieScores
-    {
-        [DataMember(Name = "a")]
-        public int Application;
 
-        [DataMember(Name = "b")]
-        public int Bot;
-    }
-
-    [DataContract]
-    public class RiskCookie
-    {
-        [DataMember(Name = "t")]
-        public double Time;
-
-        [DataMember(Name = "h")]
-        public string Hash;
-
-        [DataMember(Name = "u")]
-        public string Uuid;
-
-        [DataMember(Name = "v")]
-        public string Vid;
-
-        [DataMember(Name = "s")]
-        public RiskCookieScores Scores;
-    }
 
     [DataContract]
     public class RiskRequestHeader
@@ -77,22 +50,6 @@ namespace PerimeterX
 
         [DataMember(Name = "headers")]
         public RiskRequestHeader[] Headers;
-    }
-
-    public enum RiskRequestReasonEnum
-    {
-        [EnumMember(Value = "none")]
-        NONE,
-        [EnumMember(Value = "no_cookie")]
-        NO_COOKIE,
-        [EnumMember(Value = "expired_cookie")]
-        EXPIRED_COOKIE,
-        [EnumMember(Value = "invalid_cookie")]
-        INVALID_COOKIE,
-        [EnumMember(Value = "cookie_decryption_failed")]
-        DECRYPTION_FAILED,
-        [EnumMember(Value = "cookie_validation_failed")]
-        VALIDATION_FAILED
     }
 
     [DataContract]

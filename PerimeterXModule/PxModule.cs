@@ -39,7 +39,8 @@ using System.Net;
 using System.Linq;
 using System.Reflection;
 using System.Collections;
-using PerimeterX.Internals;
+using PerimeterX.DataContracts.Cookies.Interface;
+using PerimeterX.DataContracts.Cookies;
 
 namespace PerimeterX
 {
@@ -346,7 +347,8 @@ namespace PerimeterX
 
         private bool IsValidRequest(HttpContext applicationContext)
         {
-            context = new PxContext(applicationContext, (PxModuleConfigurationSection)ConfigurationManager.GetSection(CONFIG_SECTION));
+            var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(CONFIG_SECTION);
+            context = new PxContext(applicationContext, config);
 
             // check captcha after cookie validation to capture vid
             if (!string.IsNullOrEmpty(context.PxCaptcha))
@@ -355,19 +357,19 @@ namespace PerimeterX
             }
 
             // validate using risk cookie
-            RiskCookie riskCookie;
-            var reason = CheckValidCookie(context, out riskCookie);
+            IPxCookie pxCookie = CookieFactory.BuildCookie(config, context, cookieDecoder);
+            var reason = CheckValidCookie(context, pxCookie);
 
             if (reason == RiskRequestReasonEnum.NONE)
             {
-                context.Vid = riskCookie.Vid;
-                context.UUID = riskCookie.Uuid;
+                context.Vid = pxCookie.GetDecodedCookie().GetVID();
+                context.UUID = pxCookie.GetDecodedCookie().GetUUID();
 
                 // valid cookie, check if to block or not
-                if (IsBlockScores(riskCookie.Scores))
+                if (pxCookie.IsCookieHighScore())
                 {
                     context.BlockReason = BlockReasonEnum.COOKIE_HIGH_SCORE;
-                    Debug.WriteLine(string.Format("Request blocked by risk cookie UUID {0}, VID {1} - {2}", context.UUID, riskCookie.Vid, context.Uri), LOG_CATEGORY);
+                    Debug.WriteLine(string.Format("Request blocked by risk cookie UUID {0}, VID {1} - {2}", context.UUID, pxCookie.GetDecodedCookie().GetVID(), context.Uri), LOG_CATEGORY);
                     return false;
                 }
                 return true;
@@ -375,7 +377,7 @@ namespace PerimeterX
 
             // validate using server risk api
             var risk = CallRiskApi(context, reason);
-            if (risk != null && risk.Scores != null && risk.Status == 0 && IsBlockScores(risk.Scores))
+            if (risk != null && risk.Scores != null && risk.Status == 0 && IsBlockScores(risk.Scores) )
             {
                 context.UUID = risk.Uuid;
                 context.BlockReason = BlockReasonEnum.RISK_HIGH_SCORE;
@@ -509,67 +511,39 @@ namespace PerimeterX
             return scores != null && (scores.Filter >= blockingScore || scores.Bot >= blockingScore || scores.Application >= blockingScore);
         }
 
-        private bool IsBlockScores(RiskCookieScores scores)
-        {
-            return scores != null && (scores.Bot >= blockingScore || scores.Application >= blockingScore);
-        }
-
-
         private static string DecodeCookie(string cookie)
         {
             byte[] bytes = Convert.FromBase64String(cookie);
             return Encoding.UTF8.GetString(bytes);
         }
 
-        public RiskCookie ParseRiskCookie(string cookieData)
+        private RiskRequestReasonEnum CheckValidCookie(PxContext context, IPxCookie pxCookie)
         {
-            string cookieJson = cookieDecoder.Decode(cookieData);
-            Debug.WriteLineIf(cookieJson != null, "Parse risk cookie " + cookieJson, LOG_CATEGORY);
-            var riskCookie = JSON.Deserialize<RiskCookie>(cookieJson, jsonOptions);
-            return riskCookie;
-        }
-
-        public static bool IsRiskCookieExpired(RiskCookie riskCookie)
-        {
-            if (riskCookie == null)
-            {
-                throw new ArgumentNullException("riskCookie");
-            }
-            double now = DateTime.UtcNow
-                    .Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                    .TotalMilliseconds;
-            return (riskCookie.Time < now);
-        }
-
-        private RiskRequestReasonEnum CheckValidCookie(PxContext context, out RiskCookie riskCookie)
-        {
-            riskCookie = null;
             try
             {
-                if (string.IsNullOrEmpty(context.getPxCookie()))
+                if (pxCookie == null)
                 {
                     Debug.WriteLine("Request without risk cookie - " + context.Uri, LOG_CATEGORY);
                     return RiskRequestReasonEnum.NO_COOKIE;
                 }
 
                 // parse cookie and check if cookie valid
-                riskCookie = ParseRiskCookie(context.getPxCookie());
-                if (IsRiskCookieExpired(riskCookie))
+                pxCookie.Deserialize();
+                if (pxCookie.IsExpired())
                 {
                     Debug.WriteLine("Request with expired cookie - " + context.Uri, LOG_CATEGORY);
                     return RiskRequestReasonEnum.EXPIRED_COOKIE;
                 }
 
-                if (string.IsNullOrEmpty(riskCookie.Hash))
+                if (string.IsNullOrEmpty(pxCookie.GetDecodedCookieHMAC()))
                 {
                     Debug.WriteLine("Request with invalid cookie (missing signature) - " + context.Uri, LOG_CATEGORY);
                     return RiskRequestReasonEnum.INVALID_COOKIE;
                 }
 
-                string expectedHash = CalcCookieHash(context, riskCookie);
-                if (expectedHash != riskCookie.Hash)
+                if (!pxCookie.IsSecured())
                 {
-                    Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, expected {1} - {2}", riskCookie.Hash, expectedHash, context.Uri), LOG_CATEGORY);
+                    Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.GetDecodedCookieHMAC(), context.Uri), LOG_CATEGORY);
                     return RiskRequestReasonEnum.VALIDATION_FAILED;
                 }
 
@@ -581,46 +555,6 @@ namespace PerimeterX
             }
             return RiskRequestReasonEnum.DECRYPTION_FAILED;
         }
-
-        private string CalcCookieHash(PxContext context, RiskCookie riskCookie)
-        {
-            // build string with data to validate
-            var sb = new StringBuilder();
-            // timestamp
-            sb.Append(riskCookie.Time);
-            // scores
-            if (riskCookie.Scores != null)
-            {
-                sb.Append(riskCookie.Scores.Application);
-                sb.Append(riskCookie.Scores.Bot);
-            }
-            // uuid
-            if (!string.IsNullOrEmpty(riskCookie.Uuid))
-            {
-                sb.Append(riskCookie.Uuid);
-            }
-            // vid
-            if (!string.IsNullOrEmpty(riskCookie.Vid))
-            {
-                sb.Append(riskCookie.Vid);
-            }
-            // socket ip
-            if (signedWithIP && !string.IsNullOrEmpty(context.Ip))
-            {
-                sb.Append(context.Ip);
-            }
-            // user-agent
-            sb.Append(context.UserAgent);
-            string dataToValidate = sb.ToString();
-
-            // calc hmac sha256 as hex string
-            var hash = new HMACSHA256(cookieKeyBytes);
-            var expectedHashBytes = hash.ComputeHash(Encoding.UTF8.GetBytes(dataToValidate));
-            return ByteArrayToHexString(expectedHashBytes);
-        }
-
-
-     
 
         private static string ByteArrayToHexString(byte[] input)
         {

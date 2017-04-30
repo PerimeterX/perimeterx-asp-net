@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Web;
-using PerimeterX.Internals.Helpers;
 using System;
 using System.Net;
 
-namespace PerimeterX.Internals
+namespace PerimeterX
 {
-    class PxContext
+    public class PxContext
     {
         public Dictionary<string, string> PxCookies { get; set; }
         public string DecodedPxCookie { get; set; }
@@ -43,7 +42,7 @@ namespace PerimeterX.Internals
                 if (Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1 )
                 {
                     PxCookies.Add(key, contextCookie.Get(key).Value);
-                } else if ( key.Equals(PxConstants.PX_CAPTCHA_PREFIX))
+                } else if ( key.Equals(PxConstants.COOKIE_CAPTCHA_PREFIX))
                 {
                     var captchaCookie = contextCookie.Get(key).Value;
                     var captchaCookieParts = captchaCookie.Split(new char[] { ':' }, 2);
@@ -51,7 +50,7 @@ namespace PerimeterX.Internals
                     {
                         PxCaptcha = captchaCookieParts[0];
                         Vid = captchaCookieParts[1];
-                        var expiredCookie = new HttpCookie(PxConstants.PX_CAPTCHA_PREFIX) { Expires = DateTime.Now.AddDays(-1) };
+                        var expiredCookie = new HttpCookie(PxConstants.COOKIE_CAPTCHA_PREFIX) { Expires = DateTime.Now.AddDays(-1) };
                         context.Response.Cookies.Add(expiredCookie);
                     }
                 }
