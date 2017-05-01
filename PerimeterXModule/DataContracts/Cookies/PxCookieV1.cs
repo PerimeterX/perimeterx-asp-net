@@ -21,10 +21,9 @@ namespace PerimeterX.DataContracts.Cookies
             string basicHmac = new StringBuilder()
                 .Append(DecodedCookie.GetTimestamp())
                 .Append(DecodedCookie.Score.Application)
-                .Append(DecodedCookie.GetScore())
+                .Append(DecodedCookie.Score.Bot)
                 .Append(DecodedCookie.GetUUID())
                 .Append(DecodedCookie.GetVID())
-                .Append(GetDecodedCookieHMAC())
                 .ToString();
             string hmacWithIp = new StringBuilder()
                 .Append(basicHmac)
@@ -35,7 +34,7 @@ namespace PerimeterX.DataContracts.Cookies
                 .Append(basicHmac)
                 .Append(PxContext.UserAgent)
                 .ToString();
-            return IsHMACValid(hmacWithIp, GetDecodedCookieHMAC()) || IsHMACValid(hmacWithoutIp, GetDecodedCookieHMAC());
+            return IsHMACValid(hmacWithoutIp, GetDecodedCookieHMAC()) || IsHMACValid(hmacWithIp, GetDecodedCookieHMAC());
 
         }
     }

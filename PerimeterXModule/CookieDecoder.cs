@@ -70,7 +70,6 @@ namespace PerimeterX
                 AES.Key = key;
                 AES.IV = iv;
                 AES.Mode = CipherMode.CBC;
-                AES.Padding = PaddingMode.Zeros;
                 var ms = new MemoryStream();
                 using (var cs = new CryptoStream(ms, AES.CreateDecryptor(), CryptoStreamMode.Write))
                 {

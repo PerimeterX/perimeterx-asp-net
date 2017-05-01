@@ -25,7 +25,7 @@ namespace PerimeterX.DataContracts.Cookies
                 .Append(RawCookie)
                 .Append(PxContext.UserAgent)
                 .ToString();
-            return IsHMACValid(hmacString, Hmac);
+            return IsHMACValid(hmacString, GetDecodedCookieHMAC());
         }
 
         public override string GetDecodedCookieHMAC()

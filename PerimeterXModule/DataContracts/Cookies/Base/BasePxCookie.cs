@@ -31,13 +31,11 @@ namespace PerimeterX.DataContracts.Cookies.Base
                 return false;
             }
 
-            var JsonCookie =  JSON.Deserialize<T>(cookieString, jsonOptions);
+            DecodedCookie =  JSON.Deserialize<T>(cookieString, jsonOptions);
             if (!DecodedCookie.IsCookieFormatValid())
             {
                 return false;
             }
-
-            DecodedCookie = JsonCookie;
             return true;
         }
 
@@ -56,12 +54,12 @@ namespace PerimeterX.DataContracts.Cookies.Base
 
         public bool IsHMACValid(string UncodedHmac, string CookieHmac)
         {
-            var cookieKeyBytes = Encoding.UTF8.GetBytes(Config.CookieKey);
-            var hash = new HMACSHA256(cookieKeyBytes);
+			var cookieKeyBytes = Encoding.UTF8.GetBytes(Config.CookieKey);
+			var hash = new HMACSHA256(cookieKeyBytes);
             var expectedHashBytes = hash.ComputeHash(Encoding.UTF8.GetBytes(UncodedHmac));
-            var encodedHmac = ByteArrayToHexString(expectedHashBytes);
+			var encodedHmac = this.ByteArrayToHexString(expectedHashBytes);
 
-            return encodedHmac != CookieHmac;
+			return encodedHmac == CookieHmac;
         }
 
         private string ByteArrayToHexString(byte[] input)

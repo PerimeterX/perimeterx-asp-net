@@ -129,7 +129,7 @@ namespace PerimeterX
             {
                 return null;
             }
-            return PxCookies.ContainsKey(PxConstants.PX_COOKIES_PREFIX[0]) ? PxCookies[PxConstants.PX_COOKIES_PREFIX[0]] : PxCookies[PxConstants.PX_COOKIES_PREFIX[1]];
+            return PxCookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX) ? PxCookies[PxConstants.COOKIE_V3_PREFIX] : PxCookies[PxConstants.COOKIE_V1_PREFIX];
         }
 
 
