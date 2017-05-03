@@ -13,6 +13,7 @@ namespace PerimeterX
         public const string COOKIE_CAPTCHA_PREFIX = "_pxCaptcha";
     }   
 
+    [DataContract]
     public enum RiskRequestReasonEnum
     {
         [EnumMember(Value = "none")]
@@ -28,4 +29,25 @@ namespace PerimeterX
         [EnumMember(Value = "cookie_validation_failed")]
         VALIDATION_FAILED
     }
+
+    [DataContract]
+    public enum BlockReasonEnum
+    {
+        [EnumMember(Value = "none")]
+        NONE,
+        [EnumMember(Value = "cookie_high_score")]
+        COOKIE_HIGH_SCORE,
+        [EnumMember(Value = "risk_high_score")]
+        RISK_HIGH_SCORE
+    }
+
+	[DataContract]
+	public class ActivityDetails
+	{
+		[DataMember(Name = "block_reason")]
+		public BlockReasonEnum BlockReason;
+
+		[DataMember(Name = "block_uuid")]
+		public string BlockUuid;
+	}
 }
