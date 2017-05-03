@@ -1,5 +1,4 @@
-﻿using PerimeterX.DataContracts.Cookies.Interface;
-using System.Linq;
+﻿using System.Linq;
 using System;
 
 namespace PerimeterX.DataContracts.Cookies

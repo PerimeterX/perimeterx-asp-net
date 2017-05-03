@@ -59,16 +59,21 @@ namespace PerimeterX
             // Get Headers
             Headers = new List<RiskRequestHeader>();
 
-			foreach (RiskRequestHeader header in context.Request.Headers)
+			foreach (string header in context.Request.Headers.Keys)
 			{
-				var key = header.Name;
-                if (!pxConfiguration.SensitiveHeaders.Contains(key))
+                if (!pxConfiguration.SensitiveHeaders.Contains(header))
                 {
-                    Headers.Add(header);
+                    RiskRequestHeader riskHeader = new RiskRequestHeader
+                    {
+                        Name = header,
+                        Value = context.Request.Headers.Get(header)
+                    };
+
+                    Headers.Add(riskHeader);
                 }
 			}
 
-            Hostname = context.Request.UserHostName;
+            Hostname = context.Request.UserHostAddress;
 
             UserAgent = context.Request.Headers["user-agent"];
             // if userAgentOverride is present override the default user-agent

@@ -1,41 +1,46 @@
-﻿using System;
-using Jil;
+﻿using Jil;
+using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
 
-namespace PerimeterX.Internals.Validators
+namespace PerimeterX
 {
-    public class PXS2SValidator
+    public class PXS2SValidator : IPXS2SValidator
     {
 
         private readonly PxModuleConfigurationSection PxConfig;
-        private readonly PxContext PxContext;
         private readonly HttpClient HttpClient;
 
-        public PXS2SValidator(PxModuleConfigurationSection PxConfig, PxContext PxContext, HttpClient HttpClient)
+        public PXS2SValidator(PxModuleConfigurationSection PxConfig, HttpClient HttpClient)
         {
             this.PxConfig = PxConfig;
-            this.PxContext = PxContext;
             this.HttpClient = HttpClient;
         }
 
-        public bool VerifyS2S(){
+        public bool VerifyS2S(PxContext PxContext)
+        {
             try{
-                RiskResponseV2 riskReponse = this.SendRiskResponse();
+                RiskResponseV2 riskResponse = this.SendRiskResponse(PxContext);
                 PxContext.MadeS2SCallReason = true;
 
-                if ( !double.IsNaN(riskReponse.Score) && !string.IsNullOrEmpty(riskReponse.RiskResponseAction))
+                if ( !double.IsNaN(riskResponse.Score) && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
                 {
-                    double score = riskReponse.Score;
+                    double score = riskResponse.Score;
                     PxContext.Score = score;
-                    PxContext.UUID = riskReponse.Uuid;
-                    PxContext.BlockAction = riskReponse.RiskResponseAction;
+                    PxContext.UUID = riskResponse.Uuid;
+                    PxContext.BlockAction = riskResponse.RiskResponseAction;
 
                     if (score >= PxConfig.BlockingScore)
                     {
                         PxContext.BlockReason = BlockReasonEnum.RISK_HIGH_SCORE;
                     }
+                }
+
+                if (!string.IsNullOrEmpty(riskResponse.ErrorMessage))
+                {
+                    PxContext.S2SHttpErrorMessage = riskResponse.ErrorMessage;
+                    return false;
                 }
 
             }catch (Exception ex){
@@ -45,10 +50,11 @@ namespace PerimeterX.Internals.Validators
             return true;
         }
 
-        public RiskResponseV2 SendRiskResponse(){
+        public RiskResponseV2 SendRiskResponse(PxContext PxContext)
+        {
 
             var riskMode = ModuleMode.BLOCK_MODE;
-            if (PxConfig.MonitorMode == ModuleMode.MONITOR_MODE)
+            if (PxConfig.MonitorMode == true)
             {
                 riskMode = ModuleMode.MONITOR_MODE;
             }
@@ -83,11 +89,11 @@ namespace PerimeterX.Internals.Validators
             if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.DECRYPTION_FAILED)){
                 riskRequest.Additional.PxOrigCookie = PxContext.getPxCookie();
             }else if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.EXPIRED_COOKIE) || PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.VALIDATION_FAILED)){
-                riskRequest.Additional.PXCookie = this.PxContext.DecodedPxCookie;
+                riskRequest.Additional.PXCookie = PxContext.DecodedPxCookie;
             }
 
-            var requestJson = JSON.Serialize(riskRequest, PxConstants.JSON_OPTIONS);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConstants.RISK_API_V2)
+            string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConfig.BaseUri + PxConstants.RISK_API_V2)
             {
                 Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
             };

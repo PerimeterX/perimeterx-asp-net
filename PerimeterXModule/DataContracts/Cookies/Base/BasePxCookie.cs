@@ -1,5 +1,4 @@
 ﻿using Jil;
-using PerimeterX.DataContracts.Cookies.Interface;
 using System;
 using System.Security.Cryptography;
 using System.Text;
@@ -29,7 +28,7 @@ namespace PerimeterX
                 return false;
             }
 
-            DecodedCookie =  JSON.Deserialize<T>(cookieString, jsonOptions);
+            DecodedCookie =  JSON.Deserialize<T>(cookieString, PxConstants.JSON_OPTIONS);
             if (!DecodedCookie.IsCookieFormatValid())
             {
                 return false;

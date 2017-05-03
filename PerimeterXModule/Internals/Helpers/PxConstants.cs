@@ -10,14 +10,14 @@ namespace PerimeterX
     {
         public static readonly string HEX_ALPHABET = "0123456789abcdef";
         public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX };
-        public static readonly string COOKIE_V1_PREFIX = "_px";
-        public static readonly string COOKIE_V3_PREFIX = "_px3";
+        public const string COOKIE_V1_PREFIX = "_px";
+        public const string COOKIE_V3_PREFIX = "_px3";
         public static readonly string COOKIE_CAPTCHA_PREFIX = "_pxCaptcha";
         public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
         public static readonly string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
         public static readonly string LOG_CATEGORY = "PxModule";
         public static readonly string MODULE_VERSION = GetAssemblyVersion();
-		public static readonly Options JSON_OPTIONS = new Options(false, true);
+        public static readonly Options JSON_OPTIONS = new Options(prettyPrint: false, excludeNulls: true, includeInherited: true);
 
 
 		// Endpoints
@@ -29,7 +29,6 @@ namespace PerimeterX
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             return fvi.FileVersion;
         }
-
     }   
 
     [DataContract]
@@ -64,9 +63,9 @@ namespace PerimeterX
     public enum ModuleMode
     {
 		[EnumMember(Value = "monitor_mode")]
-		MONITOR_MODE,
+		MONITOR_MODE = 1,
 		
         [EnumMember(Value = "block_mode")]
-		BLOCK_MODE
+		BLOCK_MODE = 0
     }
 }

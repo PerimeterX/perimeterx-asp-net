@@ -1,7 +1,4 @@
-﻿using PerimeterX.DataContracts.Cookies.Base;
-using PerimeterX.DataContracts.Cookies.Helpers;
-using System;
-using System.Text;
+﻿using System.Text;
 
 namespace PerimeterX.DataContracts.Cookies
 {

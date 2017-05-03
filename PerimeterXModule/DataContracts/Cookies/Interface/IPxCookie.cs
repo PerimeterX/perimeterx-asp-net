@@ -1,6 +1,4 @@
-﻿using PerimeterX.DataContracts.Cookies.Base;
-
-namespace PerimeterX
+﻿namespace PerimeterX
 {
     public interface IPxCookie
     {

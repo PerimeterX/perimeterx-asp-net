@@ -165,7 +165,7 @@ namespace PerimeterX
         {
             get
             {
-                return (string)this["baseUri"];
+                return string.Format((string)this["baseUri"], (string)this["appId"]);
             }
             set
             {
@@ -173,7 +173,7 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("apiTimeout", DefaultValue = 1000)]
+        [ConfigurationProperty("apiTimeout", DefaultValue = 1500)]
         public int ApiTimeout
         {
             get
@@ -387,12 +387,12 @@ namespace PerimeterX
             }
         }
 
-		[ConfigurationProperty("monitorMode", DefaultValue = "active_mode")]
-        public ModuleMode MonitorMode
+		[ConfigurationProperty("monitorMode", DefaultValue = false)]
+        public bool MonitorMode
 		{
 			get
 			{
-				return (ModuleMode)this["monitorMode"];
+				return (bool)this["monitorMode"];
 			}
 			set
 			{

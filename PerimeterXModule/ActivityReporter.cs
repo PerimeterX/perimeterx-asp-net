@@ -71,13 +71,13 @@ namespace PerimeterX
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.ExpectContinue = false;
             Task.Run(() => SendActivitiesTask());
-            Debug.WriteLine("Reporter initialized", PxModule.LOG_CATEGORY);
+            Debug.WriteLine("Reporter initialized", PxConstants.LOG_CATEGORY);
         }
 
         public bool Post(Activity activity)
         {
             var added = activities.TryAdd(activity);
-            Debug.WriteLineIf(!added, "Failed to post activity", PxModule.LOG_CATEGORY);
+            Debug.WriteLineIf(!added, "Failed to post activity", PxConstants.LOG_CATEGORY);
             return added;
         }
 
@@ -108,14 +108,14 @@ namespace PerimeterX
         {
             try
             {
-                var jsonContent = JSON.Serialize(activities, jsonOptions);
+                var jsonContent = JSON.Serialize(activities, PxConstants.JSON_OPTIONS);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
                 var response = httpClient.PostAsync(postUri, content).Result;
                 response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message), PxModule.LOG_CATEGORY);
+                Debug.WriteLine(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message), PxConstants.LOG_CATEGORY);
             }
         }
 

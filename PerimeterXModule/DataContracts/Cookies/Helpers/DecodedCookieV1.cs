@@ -1,7 +1,4 @@
-﻿using PerimeterX.DataContracts.Cookies.Base;
-using PerimeterX.DataContracts.Cookies.Helpers;
-using System;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace PerimeterX
 {

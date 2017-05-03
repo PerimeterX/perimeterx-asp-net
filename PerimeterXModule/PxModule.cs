@@ -51,6 +51,7 @@ namespace PerimeterX
         private static IActivityReporter reporter;
         private readonly string validationMarker;
         private readonly ICookieDecoder cookieDecoder;
+        private readonly IPXS2SValidator PXS2SValidator;
 
         private readonly bool enabled;
         private readonly bool sendPageActivites;
@@ -110,7 +111,9 @@ namespace PerimeterX
             fileExtWhitelist = config.FileExtWhitelist;
             routesWhitelist = config.RoutesWhitelist;
             useragentsWhitelist = config.UseragentsWhitelist;
-            baseUri = string.Format(config.BaseUri,appId);
+            baseUri = config.BaseUri;
+
+            // Set Decoder
             if (config.EncryptionEnabled)
             {
                 cookieDecoder = new EncryptedCookieDecoder(cookieKeyBytes);
@@ -138,6 +141,9 @@ namespace PerimeterX
             {
                 validationMarker = ByteArrayToHexString(hasher.ComputeHash(cookieKeyBytes));
             }
+
+            // Set Validators
+            PXS2SValidator = new PXS2SValidator(config, httpClient);
             Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
         }
 
@@ -242,19 +248,17 @@ namespace PerimeterX
                 Type = eventType,
                 Timestamp = Math.Round(DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds, MidpointRounding.AwayFromZero),
                 AppId = appId,
-                Headers = new Dictionary<string, string>(),
                 SocketIP = pxContext.Ip,
                 Url = pxContext.FullUrl,
                 Details = details
             };
 
+            activity.Headers = new Dictionary<string, string>();
+
             foreach ( RiskRequestHeader riskHeader in pxContext.Headers)
             {
                 var key = riskHeader.Name;
-                if (!IsSensitiveHeader(key))
-                {
-                    activity.Headers.Add(key, riskHeader.Value);
-                }
+                activity.Headers.Add(key, riskHeader.Value);
             }
                
             reporter.Post(activity);
@@ -366,15 +370,11 @@ namespace PerimeterX
             }
 
             // validate using server risk api
-            var risk = CallRiskApi(pxContext, reason);
-            if (risk != null && risk.Scores != null && risk.Status == 0 && IsBlockScores(risk.Scores) )
-            {
-                pxContext.UUID = risk.Uuid;
-                pxContext.BlockReason = BlockReasonEnum.RISK_HIGH_SCORE;
-                Debug.WriteLine(string.Format("Request blocked by risk api UUID {0} - {1}", pxContext.UUID, pxContext.Uri), PxConstants.LOG_CATEGORY);
-                return false;
-            }
-            return true;
+            PXS2SValidator.VerifyS2S(pxContext);
+            return pxContext.Score >= config.BlockingScore;
+    
+            
+          
         }
 
         private bool CheckCaptchaCookie(PxContext context)
@@ -387,7 +387,7 @@ namespace PerimeterX
                     Hostname = context.Hostname,
                     PXCaptcha = context.PxCaptcha,
                     Vid = context.Vid,
-                    Request = CreateRequestHelper(context)
+                    Request = Request.CreateRequestFromContext(context)
                 };
                 var response = PostRequest<CaptchaResponse, CaptchaRequest>(baseUri + "/api/v1/risk/captcha", captchaRequest);
                 if (response != null && response.Status == 0)
@@ -411,89 +411,16 @@ namespace PerimeterX
             return false;
         }
 
-        private bool IsSensitiveHeader(string key)
-        {
-            return sensetiveHeaders.Contains(key, StringComparer.InvariantCultureIgnoreCase) || key == PxConstants.PX_VALIDATED_HEADER;
-        }
-
-        private Request CreateRequestHelper(PxContext context)
-        {
-            var headers = new List<RiskRequestHeader>(context.Headers.Count);
-            foreach (RiskRequestHeader header in context.Headers)
-            {
-                var key = header.Name;
-                if (!IsSensitiveHeader(key))
-                {
-                    headers.Add(header);
-                }
-            }
-            return new Request
-            {
-                IP = context.Ip,
-                URL = context.Uri,
-                Headers = headers.ToArray()
-            };
-        }
-
-        private RiskResponse CallRiskApi(PxContext context, RiskRequestReasonEnum reason)
-        {
-            try
-            {
-                RiskRequest riskRequest = new RiskRequest
-                {
-                    Vid = context.Vid,
-                    Request = CreateRequestHelper(context),
-                    Additional = new Additional
-                    {
-                        HttpMethod = context.HttpMethod,
-                        CallReason = reason,
-                        HttpVersion = context.HttpVersion
-                    }
-                };
-
-                if (reason == RiskRequestReasonEnum.DECRYPTION_FAILED)
-                {
-                    riskRequest.Additional.PxOrigCookie = context.getPxCookie();
-                }
-                return PostRequest<RiskResponse, RiskRequest>(baseUri + "/api/v1/risk", riskRequest);
-            }
-            catch (AggregateException ex)
-            {
-                foreach (var e in ex.InnerExceptions)
-                {
-                    Debug.WriteLine(string.Format("Risk API call to server failed with inner exception {0} - {1}", e.Message, context.Uri), PxConstants.LOG_CATEGORY);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(string.Format("Risk API call to server failed with exception {0} - {1}", ex.Message, context.Uri), PxConstants.LOG_CATEGORY);
-            }
-            return null;
-        }
-
-        private static string ExtractHttpVersion(string serverProtocol)
-        {
-            if (serverProtocol != null)
-            {
-                int i = serverProtocol.IndexOf("/");
-                if (i != -1)
-                {
-                    return serverProtocol.Substring(i + 1);
-                }
-            }
-            return serverProtocol;
-        }
-
         private R PostRequest<R, T>(string url, T request)
         {
-            var requestJson = JSON.Serialize<T>(request, jsonOptions);
+            var requestJson = JSON.Serialize<T>(request, PxConstants.JSON_OPTIONS);
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
             requestMessage.Content = new StringContent(requestJson, Encoding.UTF8, "application/json");
             var httpResponse = this.httpClient.SendAsync(requestMessage).Result;
             httpResponse.EnsureSuccessStatusCode();
             var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
             Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", url, requestJson, responseJson), PxConstants.LOG_CATEGORY);
-            return JSON.Deserialize<R>(responseJson, jsonOptions);
+            return JSON.Deserialize<R>(responseJson, PxConstants.JSON_OPTIONS);
         }
 
         private bool IsBlockScores(RiskResponseScores scores)

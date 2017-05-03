@@ -1,32 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace PerimeterX
 {
 	[DataContract]
-	public class RequestV2
+    [Serializable]
+    public class RequestV2 : Request
 	{
-		[DataMember(Name = "ip")]
-		public string IP;
-
-		[DataMember(Name = "url")]
-		public string URL;
-
 		[DataMember(Name = "uri")]
-		public string URI;
+		public string URI { get; set; }
 
-		[DataMember(Name = "headers")]
-		public RiskRequestHeader[] Headers;
-
-        public static RequestV2 CreateRequestFromContext(PxContext pxContext){
-			return new RequestV2
-			{
-				IP = pxContext.Ip,
+        public static new RequestV2 CreateRequestFromContext(PxContext pxContext)
+        {
+            return new RequestV2
+            {
+                IP = pxContext.Ip,
                 URL = pxContext.FullUrl,
                 URI = pxContext.Uri,
-				Headers = pxContext.Headers.ToArray()
-			};
+                Headers = pxContext.Headers.ToArray()
+            };
         }
-	}
+    }
 }
