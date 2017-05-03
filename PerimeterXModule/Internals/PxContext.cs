@@ -8,7 +8,7 @@ namespace PerimeterX
     public class PxContext
     {
         public Dictionary<string, string> PxCookies { get; set; }
-        public string DecodedPxCookie { get; set; }
+        public BaseDecodedCookie DecodedPxCookie { get; set; }
         public string PxCookieHmac { get; set; }
         public string PxCaptcha { get; set; }
         public string Ip { get; set; }
@@ -19,8 +19,8 @@ namespace PerimeterX
         public string Uri { get; set; }
         public string UserAgent { get; set; }
         public string FullUrl { get; set; }
-        public string S2SCallReason { get; set; }
-        public int Score { get; set; }
+        public RiskRequestReasonEnum S2SCallReason { get; set; }
+        public double Score { get; set; }
         public string Vid { get; set; }
         public string UUID { get; set; }
         public BlockReasonEnum BlockReason { get; set; }
@@ -57,18 +57,16 @@ namespace PerimeterX
             }
 
             // Get Headers
-            Headers = new List<RiskRequestHeader>(context.Request.Headers.Count);
-            for (int i = 0; i < context.Request.Headers.Count; i++)
-            {
-                var key = context.Request.Headers.GetKey(i);
-                // Remove HTTP_ prefix
-                var header = new RiskRequestHeader
+            Headers = new List<RiskRequestHeader>();
+
+			foreach (RiskRequestHeader header in context.Request.Headers)
+			{
+				var key = header.Name;
+                if (!pxConfiguration.SensitiveHeaders.Contains(key))
                 {
-                    Name = key,
-                    Value = context.Request.Headers.Get(i)
-                };
-                Headers.Add(header);
-            }
+                    Headers.Add(header);
+                }
+			}
 
             Hostname = context.Request.UserHostName;
 

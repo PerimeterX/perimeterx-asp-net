@@ -1,16 +1,35 @@
-﻿using System;
+﻿using System.Diagnostics;
 using System.Runtime.Serialization;
+using Jil;
+
 
 namespace PerimeterX
 {
 
     public static class PxConstants
     {
-        public readonly static string HEX_ALPHABET = "0123456789abcdef";
-        public readonly static string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX };
-        public const string COOKIE_V1_PREFIX = "_px";
-        public const string COOKIE_V3_PREFIX = "_px3";
-        public const string COOKIE_CAPTCHA_PREFIX = "_pxCaptcha";
+        public static readonly string HEX_ALPHABET = "0123456789abcdef";
+        public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX };
+        public static readonly string COOKIE_V1_PREFIX = "_px";
+        public static readonly string COOKIE_V3_PREFIX = "_px3";
+        public static readonly string COOKIE_CAPTCHA_PREFIX = "_pxCaptcha";
+        public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
+        public static readonly string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
+        public static readonly string LOG_CATEGORY = "PxModule";
+        public static readonly string MODULE_VERSION = GetAssemblyVersion();
+		public static readonly Options JSON_OPTIONS = new Options(false, true);
+
+
+		// Endpoints
+		public const string RISK_API_V2 = "/api/v2/risk";
+
+        private static string GetAssemblyVersion()
+        {
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            return fvi.FileVersion;
+        }
+
     }   
 
     [DataContract]
@@ -41,13 +60,13 @@ namespace PerimeterX
         RISK_HIGH_SCORE
     }
 
-	[DataContract]
-	public class ActivityDetails
-	{
-		[DataMember(Name = "block_reason")]
-		public BlockReasonEnum BlockReason;
-
-		[DataMember(Name = "block_uuid")]
-		public string BlockUuid;
-	}
+    [DataContract]
+    public enum ModuleMode
+    {
+		[EnumMember(Value = "monitor_mode")]
+		MONITOR_MODE,
+		
+        [EnumMember(Value = "block_mode")]
+		BLOCK_MODE
+    }
 }

@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace PerimeterX.DataContracts
+namespace PerimeterX
 {
 	[DataContract]
 	public class Activity

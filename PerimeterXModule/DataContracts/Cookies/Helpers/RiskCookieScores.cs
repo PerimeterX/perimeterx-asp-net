@@ -1,5 +1,5 @@
 ﻿using System.Runtime.Serialization;
-namespace PerimeterX.DataContracts.Cookies.Helpers
+namespace PerimeterX
 {
     [DataContract]
     public class RiskCookieScores : BaseRiskCookieScores

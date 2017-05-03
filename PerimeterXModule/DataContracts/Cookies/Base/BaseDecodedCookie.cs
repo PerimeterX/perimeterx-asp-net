@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace PerimeterX.DataContracts.Cookies.Base
+namespace PerimeterX
 {
     public abstract class BaseDecodedCookie
     {

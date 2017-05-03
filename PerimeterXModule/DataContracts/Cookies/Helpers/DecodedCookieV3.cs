@@ -1,8 +1,6 @@
-﻿using PerimeterX.DataContracts.Cookies.Base;
-using System;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
-namespace PerimeterX.DataContracts.Cookies.Helpers
+namespace PerimeterX
 {
     public class DecodedCookieV3 : BaseDecodedCookie
     {

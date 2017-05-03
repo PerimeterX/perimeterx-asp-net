@@ -4,7 +4,7 @@ using System;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PerimeterX.DataContracts.Cookies.Base
+namespace PerimeterX
 {
     public abstract class BasePxCookie<T> : IPxCookie where T : BaseDecodedCookie
     {
@@ -14,8 +14,6 @@ namespace PerimeterX.DataContracts.Cookies.Base
         public ICookieDecoder CookieDecoder;
         public PxContext PxContext { get; set; }
         public string RawCookie { get; set; }
-
-        private static readonly Options jsonOptions = new Options(false, true);
 
         public BasePxCookie(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder) {
             Config = config;

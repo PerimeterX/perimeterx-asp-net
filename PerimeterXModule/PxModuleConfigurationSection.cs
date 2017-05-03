@@ -386,5 +386,18 @@ namespace PerimeterX
                 this["useragentOverride"] = value;
             }
         }
+
+		[ConfigurationProperty("monitorMode", DefaultValue = "active_mode")]
+        public ModuleMode MonitorMode
+		{
+			get
+			{
+				return (ModuleMode)this["monitorMode"];
+			}
+			set
+			{
+				this["monitorMode"] = value;
+			}
+		}
     }
 }

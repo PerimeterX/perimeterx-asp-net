@@ -1,4 +1,4 @@
-﻿namespace PerimeterX.DataContracts.Cookies.Helpers
+﻿namespace PerimeterX
 {
     public abstract class BaseRiskCookieScores
     {
