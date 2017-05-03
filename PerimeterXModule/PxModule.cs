@@ -34,7 +34,6 @@ using System.Net.Http.Headers;
 using System.Configuration;
 using System.Diagnostics;
 using System.Collections.Specialized;
-using Jil;
 using System.Net;
 using System.Linq;
 using System.Reflection;
@@ -51,7 +50,9 @@ namespace PerimeterX
         private static IActivityReporter reporter;
         private readonly string validationMarker;
         private readonly ICookieDecoder cookieDecoder;
-        private readonly IPXS2SValidator PXS2SValidator;
+        private readonly IPXCaptchaValidator PxCaptchaValidator;
+        private readonly IPXCookieValidator PxCookieValidator;
+        private readonly IPXS2SValidator PxS2SValidator;
 
         private readonly bool enabled;
         private readonly bool sendPageActivites;
@@ -143,7 +144,11 @@ namespace PerimeterX
             }
 
             // Set Validators
-            PXS2SValidator = new PXS2SValidator(config, httpClient);
+            
+            PxS2SValidator = new PXS2SValidator(config, httpClient);
+            PxCaptchaValidator = new PXCaptchaValidator(config, httpClient);
+            PxCookieValidator = new PXCookieValidator();
+
             Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
         }
 
@@ -201,7 +206,7 @@ namespace PerimeterX
 					ro.SetValue(headers, true, null);
 				}
 
-				if (IsValidRequest(applicationContext))
+				if (VerifyRequest(applicationContext))
                 {
                     Debug.WriteLine("Valid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
                     PostPageRequestedActivity(pxContext);
@@ -338,7 +343,7 @@ namespace PerimeterX
             return false;
         }
 
-        private bool IsValidRequest(HttpContext applicationContext)
+        private bool VerifyRequest(HttpContext applicationContext)
         {
             var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
             pxContext = new PxContext(applicationContext, config);
@@ -346,12 +351,12 @@ namespace PerimeterX
             // check captcha after cookie validation to capture vid
             if (!string.IsNullOrEmpty(pxContext.PxCaptcha))
             {
-                return CheckCaptchaCookie(pxContext);
+                return PxCaptchaValidator.CaptchaVerify(pxContext);
             }
 
             // validate using risk cookie
             IPxCookie pxCookie = CookieFactory.BuildCookie(config, pxContext, cookieDecoder);
-            var reason = CheckValidCookie(pxContext, pxCookie);
+            var reason = PxCookieValidator.CookieVerify(pxContext, pxCookie);
 
             if (reason == RiskRequestReasonEnum.NONE)
             {
@@ -370,57 +375,11 @@ namespace PerimeterX
             }
 
             // validate using server risk api
-            PXS2SValidator.VerifyS2S(pxContext);
+            PxS2SValidator.VerifyS2S(pxContext);
             return pxContext.Score >= config.BlockingScore;
-    
-            
-          
-        }
 
-        private bool CheckCaptchaCookie(PxContext context)
-        {
-            Debug.WriteLine(string.Format("Check captcha cookie {0} for {1}", context.PxCaptcha, context.Vid ?? ""), PxConstants.LOG_CATEGORY);
-            try
-            {
-                var captchaRequest = new CaptchaRequest()
-                {
-                    Hostname = context.Hostname,
-                    PXCaptcha = context.PxCaptcha,
-                    Vid = context.Vid,
-                    Request = Request.CreateRequestFromContext(context)
-                };
-                var response = PostRequest<CaptchaResponse, CaptchaRequest>(baseUri + "/api/v1/risk/captcha", captchaRequest);
-                if (response != null && response.Status == 0)
-                {
-                    Debug.WriteLine("Captcha API call to server was successful", PxConstants.LOG_CATEGORY);
-                    return true;
-                }
-                Debug.WriteLine(string.Format("Captcha API call to server failed - {0}", response), PxConstants.LOG_CATEGORY);
-            }
-            catch (AggregateException ex)
-            {
-                foreach (var e in ex.InnerExceptions)
-                {
-                    Debug.WriteLine(string.Format("Captcha API call to server failed with inner exception {0} - {1}", e.Message, context.Uri), PxConstants.LOG_CATEGORY);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(string.Format("Captcha API call to server failed with exception {0} - {1}", ex.Message, context.Uri), PxConstants.LOG_CATEGORY);
-            }
-            return false;
-        }
 
-        private R PostRequest<R, T>(string url, T request)
-        {
-            var requestJson = JSON.Serialize<T>(request, PxConstants.JSON_OPTIONS);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
-            requestMessage.Content = new StringContent(requestJson, Encoding.UTF8, "application/json");
-            var httpResponse = this.httpClient.SendAsync(requestMessage).Result;
-            httpResponse.EnsureSuccessStatusCode();
-            var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-            Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", url, requestJson, responseJson), PxConstants.LOG_CATEGORY);
-            return JSON.Deserialize<R>(responseJson, PxConstants.JSON_OPTIONS);
+
         }
 
         private bool IsBlockScores(RiskResponseScores scores)
@@ -432,53 +391,6 @@ namespace PerimeterX
         {
             byte[] bytes = Convert.FromBase64String(cookie);
             return Encoding.UTF8.GetString(bytes);
-        }
-
-        private RiskRequestReasonEnum CheckValidCookie(PxContext context, IPxCookie pxCookie)
-        {
-            try
-            {
-                if (pxCookie == null)
-                {
-                    Debug.WriteLine("Request without risk cookie - " + context.Uri, PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.NO_COOKIE;
-                }
-
-                // parse cookie and check if cookie valid
-                pxCookie.Deserialize();
-
-                context.DecodedPxCookie = pxCookie.GetDecodedCookie();
-                context.Score = pxCookie.GetDecodedCookie().GetScore();
-                context.UUID = pxCookie.GetDecodedCookie().GetUUID();
-                context.Vid = pxCookie.GetDecodedCookie().GetVID();
-                context.BlockAction = pxCookie.GetDecodedCookie().GetBlockAction();
-                context.PxCookieHmac = pxCookie.GetDecodedCookieHMAC();
-
-                if (pxCookie.IsExpired())
-                {
-                    Debug.WriteLine("Request with expired cookie - " + context.Uri, PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.EXPIRED_COOKIE;
-                }
-
-                if (string.IsNullOrEmpty(pxCookie.GetDecodedCookieHMAC()))
-                {
-                    Debug.WriteLine("Request with invalid cookie (missing signature) - " + context.Uri, PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.INVALID_COOKIE;
-                }
-
-                if (!pxCookie.IsSecured())
-                {
-                    Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.GetDecodedCookieHMAC(), context.Uri), PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.VALIDATION_FAILED;
-                }
-
-                return RiskRequestReasonEnum.NONE;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Uri, PxConstants.LOG_CATEGORY);
-            }
-            return RiskRequestReasonEnum.DECRYPTION_FAILED;
         }
 
         private static string ByteArrayToHexString(byte[] input)

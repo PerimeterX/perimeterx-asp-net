@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace PerimeterX
 {
-	[DataContract]
+    [DataContract]
 	public class Activity
 	{
 		[DataMember(Name = "type")]

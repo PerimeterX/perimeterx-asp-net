@@ -20,7 +20,7 @@ namespace PerimeterX
         {
             string templateStr ="";
             Assembly _assembly = Assembly.GetExecutingAssembly();
-            StreamReader _textStream = new StreamReader(_assembly.GetManifestResourceStream(string.Format("PerimeterX.{0}.mustache", template)));
+            StreamReader _textStream = new StreamReader(_assembly.GetManifestResourceStream(string.Format("PerimeterX.Internals.Templates.{0}.mustache", template)));
 
             while (_textStream.Peek() != -1)
             {

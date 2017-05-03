@@ -1,9 +1,8 @@
-﻿using System;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace PerimeterX
 {
-	[DataContract]
+    [DataContract]
 	public class Additional
 	{
 		[DataMember(Name = "px_cookie", EmitDefaultValue = false)]
