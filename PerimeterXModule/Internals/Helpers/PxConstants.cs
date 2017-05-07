@@ -20,8 +20,8 @@ namespace PerimeterX
         public static readonly Options JSON_OPTIONS = new Options(prettyPrint: false, excludeNulls: true, includeInherited: true);
 
 
-		// Endpoints
-		public const string RISK_API_V2 = "/api/v2/risk";
+        // Endpoints
+        public const string RISK_API_V2 = "/api/v2/risk";
         public const string CAPTCHA_API_V1 = "/api/v1/risk/captcha";
 
         private static string GetAssemblyVersion()
@@ -30,7 +30,7 @@ namespace PerimeterX
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
             return fvi.FileVersion;
         }
-    }   
+    }
 
     [DataContract]
     public enum RiskRequestReasonEnum
@@ -63,10 +63,10 @@ namespace PerimeterX
     [DataContract]
     public enum ModuleMode
     {
-		[EnumMember(Value = "monitor_mode")]
-		MONITOR_MODE = 1,
-		
+        [EnumMember(Value = "monitor_mode")]
+        MONITOR_MODE = 1,
+
         [EnumMember(Value = "block_mode")]
-		BLOCK_MODE = 0
+        BLOCK_MODE = 0
     }
 }

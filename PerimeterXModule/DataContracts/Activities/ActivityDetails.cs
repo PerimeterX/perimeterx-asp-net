@@ -3,13 +3,13 @@
 namespace PerimeterX
 {
     [DataContract]
-	public class ActivityDetails
-	{
-		[DataMember(Name = "block_reason")]
-		public BlockReasonEnum BlockReason;
+    public class ActivityDetails
+    {
+        [DataMember(Name = "block_reason")]
+        public BlockReasonEnum BlockReason;
 
-		[DataMember(Name = "block_uuid")]
-		public string BlockUuid;
-	}
+        [DataMember(Name = "block_uuid")]
+        public string BlockUuid;
+    }
 
 }

@@ -12,13 +12,13 @@ namespace PerimeterX
         public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid)
         {
             string templateStr = getTemplateString(template);
-            return Render.StringToString(templateStr, getProps(pxConfiguration,uuid, vid));
-             
+            return Render.StringToString(templateStr, getProps(pxConfiguration, uuid, vid));
+
         }
 
         private static string getTemplateString(string template)
         {
-            string templateStr ="";
+            string templateStr = "";
             Assembly _assembly = Assembly.GetExecutingAssembly();
             StreamReader _textStream = new StreamReader(_assembly.GetManifestResourceStream(string.Format("PerimeterX.Internals.Templates.{0}.mustache", template)));
 
@@ -34,10 +34,10 @@ namespace PerimeterX
             return templateStr;
         }
 
-        private static IDictionary<String,String> getProps(PxModuleConfigurationSection pxConfiguration,string uuid, string vid)
+        private static IDictionary<String, String> getProps(PxModuleConfigurationSection pxConfiguration, string uuid, string vid)
         {
-            IDictionary<String,String> props = new Dictionary<String, String>();
-            props.Add("refId",uuid);
+            IDictionary<String, String> props = new Dictionary<String, String>();
+            props.Add("refId", uuid);
             props.Add("appId", pxConfiguration.AppId);
             props.Add("vid", vid);
             props.Add("uuid", uuid);

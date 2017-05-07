@@ -6,7 +6,7 @@ namespace PerimeterX.DataContracts.Cookies
     {
         public PxCookieV1(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder) : base(config, context, cookieDecoder)
         {
-            RawCookie = context.getPxCookie(); 
+            RawCookie = context.getPxCookie();
         }
 
         public override string GetDecodedCookieHMAC()

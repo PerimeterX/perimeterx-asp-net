@@ -14,7 +14,8 @@ namespace PerimeterX
         public PxContext PxContext { get; set; }
         public string RawCookie { get; set; }
 
-        public BasePxCookie(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder) {
+        public BasePxCookie(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder)
+        {
             Config = config;
             PxContext = context;
             CookieDecoder = cookieDecoder;
@@ -28,35 +29,32 @@ namespace PerimeterX
                 return false;
             }
 
-            DecodedCookie =  JSON.Deserialize<T>(cookieString, PxConstants.JSON_OPTIONS);
-            if (!DecodedCookie.IsCookieFormatValid())
-            {
-                return false;
-            }
-            return true;
+            DecodedCookie = JSON.Deserialize<T>(cookieString, PxConstants.JSON_OPTIONS);
+
+            return !DecodedCookie.IsCookieFormatValid();
         }
 
         public bool IsCookieHighScore()
         {
             return DecodedCookie.GetScore() >= this.Config.BlockingScore;
         }
-        
+
         public bool IsExpired()
         {
             double now = DateTime.UtcNow
-                                .Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                                .TotalMilliseconds;
+                            .Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+                            .TotalMilliseconds;
             return DecodedCookie.GetTimestamp() < now;
         }
 
         public bool IsHMACValid(string UncodedHmac, string CookieHmac)
         {
-			var cookieKeyBytes = Encoding.UTF8.GetBytes(Config.CookieKey);
-			var hash = new HMACSHA256(cookieKeyBytes);
+            var cookieKeyBytes = Encoding.UTF8.GetBytes(Config.CookieKey);
+            var hash = new HMACSHA256(cookieKeyBytes);
             var expectedHashBytes = hash.ComputeHash(Encoding.UTF8.GetBytes(UncodedHmac));
-			var encodedHmac = this.ByteArrayToHexString(expectedHashBytes);
+            var encodedHmac = this.ByteArrayToHexString(expectedHashBytes);
 
-			return encodedHmac == CookieHmac;
+            return encodedHmac == CookieHmac;
         }
 
         private string ByteArrayToHexString(byte[] input)

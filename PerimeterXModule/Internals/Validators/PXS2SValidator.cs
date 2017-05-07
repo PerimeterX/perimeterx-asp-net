@@ -20,11 +20,12 @@ namespace PerimeterX
 
         public bool VerifyS2S(PxContext PxContext)
         {
-            try{
+            try
+            {
                 RiskResponseV2 riskResponse = this.SendRiskResponse(PxContext);
                 PxContext.MadeS2SCallReason = true;
 
-                if ( !double.IsNaN(riskResponse.Score) && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
+                if (!double.IsNaN(riskResponse.Score) && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
                 {
                     double score = riskResponse.Score;
                     PxContext.Score = score;
@@ -43,9 +44,11 @@ namespace PerimeterX
                     return false;
                 }
 
-            }catch (Exception ex){
-				Debug.WriteLine("Failed to verify S2S: " + ex.Message, PxConstants.LOG_CATEGORY);
-				return false;  
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Failed to verify S2S: " + ex.Message, PxConstants.LOG_CATEGORY);
+                return false;
             }
             return true;
         }
@@ -72,23 +75,26 @@ namespace PerimeterX
                     RiskMode = riskMode,
                     PxCookieHMAC = PxContext.PxCookieHmac
 
-				}
-			};
+                }
+            };
 
-			if (!string.IsNullOrEmpty(PxContext.Vid))
-			{
-				riskRequest.Vid = PxContext.Vid;
-			}
+            if (!string.IsNullOrEmpty(PxContext.Vid))
+            {
+                riskRequest.Vid = PxContext.Vid;
+            }
 
 
             if (!string.IsNullOrEmpty(PxContext.UUID))
-			{
-				riskRequest.UUID = PxContext.UUID;
-			}
+            {
+                riskRequest.UUID = PxContext.UUID;
+            }
 
-            if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.DECRYPTION_FAILED)){
+            if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.DECRYPTION_FAILED))
+            {
                 riskRequest.Additional.PxOrigCookie = PxContext.getPxCookie();
-            }else if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.EXPIRED_COOKIE) || PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.VALIDATION_FAILED)){
+            }
+            else if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.EXPIRED_COOKIE) || PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.VALIDATION_FAILED))
+            {
                 riskRequest.Additional.PXCookie = PxContext.DecodedPxCookie;
             }
 
@@ -98,10 +104,10 @@ namespace PerimeterX
                 Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
             };
 
-			var httpResponse = HttpClient.SendAsync(requestMessage).Result;
-			httpResponse.EnsureSuccessStatusCode();
-			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.RISK_API_V2, requestJson, responseJson), PxConstants.LOG_CATEGORY);
+            var httpResponse = HttpClient.SendAsync(requestMessage).Result;
+            httpResponse.EnsureSuccessStatusCode();
+            var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
+            Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.RISK_API_V2, requestJson, responseJson), PxConstants.LOG_CATEGORY);
             return JSON.Deserialize<RiskResponseV2>(responseJson, PxConstants.JSON_OPTIONS);
         }
     }

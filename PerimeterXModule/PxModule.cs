@@ -144,7 +144,7 @@ namespace PerimeterX
             }
 
             // Set Validators
-            
+
             PxS2SValidator = new PXS2SValidator(config, httpClient);
             PxCaptchaValidator = new PXCaptchaValidator(config, httpClient);
             PxCookieValidator = new PXCookieValidator();
@@ -176,37 +176,37 @@ namespace PerimeterX
                 {
                     return;
                 }
-				// Setting custom header for classic mode
-				if (HttpRuntime.UsingIntegratedPipeline)
-				{
-					applicationContext.Request.Headers.Add(PxConstants.PX_VALIDATED_HEADER, validationMarker);
+                // Setting custom header for classic mode
+                if (HttpRuntime.UsingIntegratedPipeline)
+                {
+                    applicationContext.Request.Headers.Add(PxConstants.PX_VALIDATED_HEADER, validationMarker);
 
-				}
-				else
-				{
-					var headers = applicationContext.Request.Headers;
-					Type hdr = headers.GetType();
-					PropertyInfo ro = hdr.GetProperty("IsReadOnly",
-						BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy);
-					// Remove the ReadOnly property
-					ro.SetValue(headers, false, null);
-					// Invoke the protected InvalidateCachedArrays method 
-					hdr.InvokeMember("InvalidateCachedArrays",
-						BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
-						null, headers, null);
-					// Now invoke the protected "BaseAdd" method of the base class to add the
-					// headers you need. The header content needs to be an ArrayList or the
-					// the web application will choke on it.
-					hdr.InvokeMember("BaseAdd",
-						BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
-						null, headers,
-						new object[] { PxConstants.PX_VALIDATED_HEADER, new ArrayList { validationMarker } });
-					// repeat BaseAdd invocation for any other headers to be added
-					// Then set the collection back to ReadOnly
-					ro.SetValue(headers, true, null);
-				}
+                }
+                else
+                {
+                    var headers = applicationContext.Request.Headers;
+                    Type hdr = headers.GetType();
+                    PropertyInfo ro = hdr.GetProperty("IsReadOnly",
+                        BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy);
+                    // Remove the ReadOnly property
+                    ro.SetValue(headers, false, null);
+                    // Invoke the protected InvalidateCachedArrays method 
+                    hdr.InvokeMember("InvalidateCachedArrays",
+                        BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
+                        null, headers, null);
+                    // Now invoke the protected "BaseAdd" method of the base class to add the
+                    // headers you need. The header content needs to be an ArrayList or the
+                    // the web application will choke on it.
+                    hdr.InvokeMember("BaseAdd",
+                        BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
+                        null, headers,
+                        new object[] { PxConstants.PX_VALIDATED_HEADER, new ArrayList { validationMarker } });
+                    // repeat BaseAdd invocation for any other headers to be added
+                    // Then set the collection back to ReadOnly
+                    ro.SetValue(headers, true, null);
+                }
 
-				if (VerifyRequest(applicationContext))
+                if (VerifyRequest(applicationContext))
                 {
                     Debug.WriteLine("Valid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
                     PostPageRequestedActivity(pxContext);
@@ -214,7 +214,7 @@ namespace PerimeterX
                 }
                 else
                 {
-                  Debug.WriteLine("Invalid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
+                    Debug.WriteLine("Invalid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
                     PostBlockActivity(pxContext);
                     BlockRequest(pxContext);
                     application.CompleteRequest();
@@ -260,12 +260,12 @@ namespace PerimeterX
 
             activity.Headers = new Dictionary<string, string>();
 
-            foreach ( RiskRequestHeader riskHeader in pxContext.Headers)
+            foreach (RiskRequestHeader riskHeader in pxContext.Headers)
             {
                 var key = riskHeader.Name;
                 activity.Headers.Add(key, riskHeader.Value);
             }
-               
+
             reporter.Post(activity);
         }
 

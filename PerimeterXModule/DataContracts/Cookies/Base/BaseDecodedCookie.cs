@@ -16,7 +16,8 @@ namespace PerimeterX
         public abstract double GetScore();
         public abstract bool IsCookieFormatValid();
 
-        public string GetUUID() {
+        public string GetUUID()
+        {
             return Uuid;
         }
         public string GetVID()

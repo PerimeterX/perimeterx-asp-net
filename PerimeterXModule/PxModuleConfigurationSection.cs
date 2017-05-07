@@ -387,17 +387,17 @@ namespace PerimeterX
             }
         }
 
-		[ConfigurationProperty("monitorMode", DefaultValue = false)]
+        [ConfigurationProperty("monitorMode", DefaultValue = false)]
         public bool MonitorMode
-		{
-			get
-			{
-				return (bool)this["monitorMode"];
-			}
-			set
-			{
-				this["monitorMode"] = value;
-			}
-		}
+        {
+            get
+            {
+                return (bool)this["monitorMode"];
+            }
+            set
+            {
+                this["monitorMode"] = value;
+            }
+        }
     }
 }

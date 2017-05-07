@@ -39,10 +39,11 @@ namespace PerimeterX
             var contextCookie = context.Request.Cookies;
             foreach (string key in contextCookie.AllKeys)
             {
-                if (Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1 )
+                if (Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1)
                 {
                     PxCookies.Add(key, contextCookie.Get(key).Value);
-                } else if ( key.Equals(PxConstants.COOKIE_CAPTCHA_PREFIX))
+                }
+                else if (key.Equals(PxConstants.COOKIE_CAPTCHA_PREFIX))
                 {
                     var captchaCookie = contextCookie.Get(key).Value;
                     var captchaCookieParts = captchaCookie.Split(new char[] { ':' }, 2);
@@ -59,8 +60,8 @@ namespace PerimeterX
             // Get Headers
             Headers = new List<RiskRequestHeader>();
 
-			foreach (string header in context.Request.Headers.Keys)
-			{
+            foreach (string header in context.Request.Headers.Keys)
+            {
                 if (!pxConfiguration.SensitiveHeaders.Contains(header))
                 {
                     RiskRequestHeader riskHeader = new RiskRequestHeader
@@ -71,7 +72,7 @@ namespace PerimeterX
 
                     Headers.Add(riskHeader);
                 }
-			}
+            }
 
             Hostname = context.Request.UserHostAddress;
 
@@ -86,7 +87,7 @@ namespace PerimeterX
             Uri = context.Request.Url.PathAndQuery;
             FullUrl = context.Request.Url.ToString();
             Score = 0;
-            BlockReason = BlockReason = BlockReasonEnum.NONE;
+            BlockReason = BlockReasonEnum.NONE;
 
 
             Ip = context.Request.UserHostAddress;

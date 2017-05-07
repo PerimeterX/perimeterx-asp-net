@@ -13,7 +13,7 @@ namespace PerimeterX.DataContracts.Cookies
             {
                 RawCookie = SplitedRawCookie[1];
                 Hmac = SplitedRawCookie[0];
-            }            
+            }
         }
 
         public override bool IsSecured()

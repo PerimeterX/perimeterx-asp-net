@@ -8,12 +8,12 @@ namespace PerimeterX.DataContracts.Cookies
         public static IPxCookie BuildCookie(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder)
         {
             string[] PxCookiesKeys = new string[context.PxCookies.Keys.Count()];
-            context.PxCookies.Keys.CopyTo(PxCookiesKeys,0);
+            context.PxCookies.Keys.CopyTo(PxCookiesKeys, 0);
 
             if (PxCookiesKeys.Length > 0)
             {
                 Array.Sort(PxCookiesKeys, new Comparison<string>((i1, i2) => i2.CompareTo(i1)));// descending sort;
-				string Key = PxCookiesKeys[0];
+                string Key = PxCookiesKeys[0];
 
                 switch (Key)
                 {
