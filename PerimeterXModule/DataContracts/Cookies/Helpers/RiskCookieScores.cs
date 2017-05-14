@@ -2,7 +2,7 @@
 namespace PerimeterX
 {
     [DataContract]
-    public class RiskCookieScores : BaseRiskCookieScores
+    public class RiskCookieScores
     {
         [DataMember(Name = "a")]
         public int Application;

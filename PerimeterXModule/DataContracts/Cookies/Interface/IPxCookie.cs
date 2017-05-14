@@ -3,10 +3,15 @@
     public interface IPxCookie
     {
         bool Deserialize();
-        string GetDecodedCookieHMAC();
-        BaseDecodedCookie GetDecodedCookie();
-        bool IsCookieHighScore();
-        bool IsExpired();
-        bool IsSecured();
+
+        bool IsSecured(string userAgent, string cookieKey, bool signedWithIP = false, string ip = "");
+
+        double Score { get; }
+        string Uuid { get; }
+        string Vid { get; }
+        string BlockAction { get; }
+        string Hmac { get; }
+        double Timestamp { get; }
+        BaseDecodedCookie DecodedCookie { get; }
     }
 }

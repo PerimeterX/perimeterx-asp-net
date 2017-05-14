@@ -1,60 +1,79 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PerimeterX
 {
     class PXCookieValidator : IPXCookieValidator
     {
+        private PxModuleConfigurationSection config;
 
-        public RiskRequestReasonEnum CookieVerify(PxContext context, IPxCookie pxCookie)
+        public PXCookieValidator(PxModuleConfigurationSection config)
+        {
+            this.config = config;
+        }
+
+        public bool CookieVerify(PxContext context, IPxCookie pxCookie)
         {
             try
             {
                 if (pxCookie == null)
                 {
                     Debug.WriteLine("Request without risk cookie - " + context.Uri, PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.NO_COOKIE;
+                    context.S2SCallReason = RiskRequestReasonEnum.NO_COOKIE;
+                    return false;
                 }
 
                 // parse cookie and check if cookie valid
-                pxCookie.Deserialize();
+                if (!pxCookie.Deserialize())
+                {
+                    Debug.WriteLine("Cookie decryption failed" + context.Uri, PxConstants.LOG_CATEGORY);
+                    context.S2SCallReason = RiskRequestReasonEnum.DECRYPTION_FAILED;
+                    return false;
+                }
 
-                context.DecodedPxCookie = pxCookie.GetDecodedCookie();
-                context.Score = pxCookie.GetDecodedCookie().GetScore();
-                context.UUID = pxCookie.GetDecodedCookie().GetUUID();
-                context.Vid = pxCookie.GetDecodedCookie().GetVID();
-                context.BlockAction = pxCookie.GetDecodedCookie().GetBlockAction();
-                context.PxCookieHmac = pxCookie.GetDecodedCookieHMAC();
+                context.DecodedPxCookie = pxCookie.DecodedCookie;
+                context.Score = pxCookie.Score;
+                context.UUID = pxCookie.Uuid;
+                context.Vid = pxCookie.Vid;
+                context.BlockAction = pxCookie.BlockAction;
+                context.PxCookieHmac = pxCookie.Hmac;
 
-                if (pxCookie.IsExpired())
+                if (PxCookieUtils.IsExpired(pxCookie.Timestamp))
                 {
                     Debug.WriteLine("Request with expired cookie - " + context.Uri, PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.EXPIRED_COOKIE;
+                    context.S2SCallReason = RiskRequestReasonEnum.EXPIRED_COOKIE;
+                    return false;
                 }
 
-                if (string.IsNullOrEmpty(pxCookie.GetDecodedCookieHMAC()))
+                if (pxCookie.Score >= config.BlockingScore)
+                {
+                    context.BlockReason = BlockReasonEnum.COOKIE_HIGH_SCORE;
+                    Debug.WriteLine(string.Format("Request blocked by risk cookie UUID {0}, VID {1}", pxCookie.Uuid, pxCookie.Vid), PxConstants.LOG_CATEGORY);
+                    return true;
+                }
+
+                if (string.IsNullOrEmpty(pxCookie.Hmac))
                 {
                     Debug.WriteLine("Request with invalid cookie (missing signature) - " + context.Uri, PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.INVALID_COOKIE;
+                    context.S2SCallReason = RiskRequestReasonEnum.INVALID_COOKIE;
+                    return false;
                 }
 
-                if (!pxCookie.IsSecured())
+                if (!pxCookie.IsSecured(context.UserAgent,config.CookieKey,config.SignedWithIP,context.Ip))
                 {
-                    Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.GetDecodedCookieHMAC(), context.Uri), PxConstants.LOG_CATEGORY);
-                    return RiskRequestReasonEnum.VALIDATION_FAILED;
+                    Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.Hmac, context.Uri), PxConstants.LOG_CATEGORY);
+                    context.S2SCallReason = RiskRequestReasonEnum.VALIDATION_FAILED;
+                    return false;
                 }
-
-                return RiskRequestReasonEnum.NONE;
+                context.S2SCallReason = RiskRequestReasonEnum.NONE;
+                return true; 
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Uri, PxConstants.LOG_CATEGORY);
+                context.S2SCallReason = RiskRequestReasonEnum.DECRYPTION_FAILED;
+                return false;
             }
-            return RiskRequestReasonEnum.DECRYPTION_FAILED;
         }
     }
 }

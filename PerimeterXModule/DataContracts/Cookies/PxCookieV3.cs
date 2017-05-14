@@ -2,32 +2,91 @@
 
 namespace PerimeterX.DataContracts.Cookies
 {
-    public class PxCookieV3 : BasePxCookie<DecodedCookieV3>
+    public class PxCookieV3 : IPxCookie
     {
+        private DecodedCookieV3 data;
+        private ICookieDecoder cookieDecoder;
+        private string rawCookie;
+
         public string Hmac { set; get; }
 
-        public PxCookieV3(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder) : base(config, context, cookieDecoder)
+        public double Score
         {
-            string[] SplitedRawCookie = context.getPxCookie().Split(new char[] { ':' }, 2);
+            get
+            {
+                return data.Score;
+            }
+        }
+
+        public string Uuid
+        {
+            get
+            {
+                return data.Uuid;
+            }
+        }
+
+        public string Vid
+        {
+            get
+            {
+                return data.Vid;
+            }
+        }
+
+        public string BlockAction
+        {
+            get
+            {
+                return data.Action;
+            }
+        }
+
+        public double Timestamp
+        {
+            get
+            {
+                return data.Time;
+            }
+        }
+
+        public BaseDecodedCookie DecodedCookie
+        {
+            get
+            {
+                return data;
+            }
+        }
+
+        public PxCookieV3(ICookieDecoder cookieDecoder, string rawCookie)
+        {
+            this.cookieDecoder = cookieDecoder;
+            string[] SplitedRawCookie =  rawCookie.Split(new char[] { ':' }, 2);
             if (SplitedRawCookie.Length == 2)
             {
-                RawCookie = SplitedRawCookie[1];
+                this.rawCookie = SplitedRawCookie[1];
                 Hmac = SplitedRawCookie[0];
             }
         }
 
-        public override bool IsSecured()
+        public bool IsSecured(string userAgent, string cookieKey, bool signedWithIP = false, string ip = "")
         {
             string hmacString = new StringBuilder()
-                .Append(RawCookie)
-                .Append(PxContext.UserAgent)
+                .Append(rawCookie)
+                .Append(userAgent)
                 .ToString();
-            return IsHMACValid(hmacString, GetDecodedCookieHMAC());
+            return PxCookieUtils.IsHMACValid(cookieKey, hmacString, Hmac);
         }
 
-        public override string GetDecodedCookieHMAC()
+        public bool Deserialize()
         {
-            return Hmac;
+            data = PxCookieUtils.Deserialize<DecodedCookieV3>(cookieDecoder, rawCookie);
+            return data != null;
+        }
+
+        public bool IsExpired(double time)
+        {
+            return IsExpired(data.Time);
         }
     }
 }

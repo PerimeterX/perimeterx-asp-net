@@ -38,7 +38,6 @@ using System.Net;
 using System.Linq;
 using System.Reflection;
 using System.Collections;
-using PerimeterX.DataContracts.Cookies;
 
 namespace PerimeterX
 {
@@ -147,7 +146,7 @@ namespace PerimeterX
 
             PxS2SValidator = new PXS2SValidator(config, httpClient);
             PxCaptchaValidator = new PXCaptchaValidator(config, httpClient);
-            PxCookieValidator = new PXCookieValidator();
+            PxCookieValidator = new PXCookieValidator(config);
 
             Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
         }
@@ -355,31 +354,14 @@ namespace PerimeterX
             }
 
             // validate using risk cookie
-            IPxCookie pxCookie = CookieFactory.BuildCookie(config, pxContext, cookieDecoder);
-            var reason = PxCookieValidator.CookieVerify(pxContext, pxCookie);
-
-            if (reason == RiskRequestReasonEnum.NONE)
+            IPxCookie pxCookie = PxCookieUtils.BuildCookie(config, pxContext, cookieDecoder);
+            if (!PxCookieValidator.CookieVerify(pxContext, pxCookie))
             {
-                pxContext.Vid = pxCookie.GetDecodedCookie().GetVID();
-                pxContext.UUID = pxCookie.GetDecodedCookie().GetUUID();
-
-
-                // valid cookie, check if to block or not
-                if (pxCookie.IsCookieHighScore())
-                {
-                    pxContext.BlockReason = BlockReasonEnum.COOKIE_HIGH_SCORE;
-                    Debug.WriteLine(string.Format("Request blocked by risk cookie UUID {0}, VID {1} - {2}", pxContext.UUID, pxCookie.GetDecodedCookie().GetVID(), pxContext.Uri), PxConstants.LOG_CATEGORY);
-                    return false;
-                }
-                return true;
+                PxS2SValidator.VerifyS2S(pxContext);
             }
 
             // validate using server risk api
-            PxS2SValidator.VerifyS2S(pxContext);
-            return pxContext.Score >= config.BlockingScore;
-
-
-
+            return config.BlockingScore >= pxContext.Score;
         }
 
         private bool IsBlockScores(RiskResponseScores scores)
