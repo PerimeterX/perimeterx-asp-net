@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PerimeterX.Internals.Enums
+namespace PerimeterX
 {
 	[DataContract]
 	public enum BlockReasonEnum

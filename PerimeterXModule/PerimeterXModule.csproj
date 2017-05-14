@@ -100,7 +100,6 @@
     <Compile Include="DataContracts\Requests\Additional.cs" />
     <Compile Include="DataContracts\Requests\RiskRequest.cs" />
     <Compile Include="DataContracts\Responses\RiskResponseScores.cs" />
-    <Compile Include="DataContracts\Responses\RiskResponse.cs" />
     <Compile Include="DataContracts\Requests\CaptchaRequest.cs" />
     <Compile Include="DataContracts\Responses\CaptchaResponse.cs" />
     <Compile Include="DataContracts\Requests\RiskRequestV2.cs" />
