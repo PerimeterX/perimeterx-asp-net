@@ -100,7 +100,7 @@
     <Compile Include="DataContracts\Requests\CaptchaRequest.cs" />
     <Compile Include="DataContracts\Responses\CaptchaResponse.cs" />
     <Compile Include="DataContracts\Requests\RiskRequest.cs" />
-    <Compile Include="DataContracts\Requests\RequestV2.cs" />
+    <Compile Include="DataContracts\Requests\Request.cs" />
     <Compile Include="Internals\Validators\PXS2SValidator.cs" />
     <Compile Include="DataContracts\Responses\RiskResponse.cs" />
     <Compile Include="DataContracts\Activities\Activity.cs" />

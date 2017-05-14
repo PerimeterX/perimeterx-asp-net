@@ -24,7 +24,7 @@ namespace PerimeterX
 		public string Vid { get; set; }
 		public string UUID { get; set; }
 		public BlockReasonEnum BlockReason { get; set; }
-		public bool MadeS2SCall { get; set; }
+		public bool MadeS2SCallReason { get; set; }
 		public string S2SHttpErrorMessage { get; set; }
 		public string BlockAction { get; set; }
 		public string BlockData { get; set; }

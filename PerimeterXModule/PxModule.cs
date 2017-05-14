@@ -346,9 +346,9 @@ namespace PerimeterX
 			pxContext = new PxContext(applicationContext, config);
 
 			// check captcha after cookie validation to capture vid
-			if (!string.IsNullOrEmpty(pxContext.PxCaptcha))
+			if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && PxCaptchaValidator.CaptchaVerify(pxContext))
 			{
-				return PxCaptchaValidator.CaptchaVerify(pxContext);
+				return true;
 			}
 
 			// validate using risk cookie

@@ -23,7 +23,7 @@ namespace PerimeterX
 			try
 			{
 				RiskResponse riskResponse = this.SendRiskResponse(PxContext);
-				PxContext.MadeS2SCall = true;
+				PxContext.MadeS2SCallReason = true;
 
 				if (!double.IsNaN(riskResponse.Score) && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
 				{
