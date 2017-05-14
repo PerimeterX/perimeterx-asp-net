@@ -2,7 +2,7 @@
 
 namespace PerimeterX.DataContracts.Cookies
 {
-    public class PxCookieV3 : IPxCookie
+    public sealed class PxCookieV3 : IPxCookie
     {
         private DecodedCookieV3 data;
         private ICookieDecoder cookieDecoder;
@@ -69,24 +69,21 @@ namespace PerimeterX.DataContracts.Cookies
             }
         }
 
-        public bool IsSecured(string userAgent, string cookieKey, bool signedWithIP = false, string ip = "")
+        public bool IsSecured(string cookieKey, string[] additionalFields)
         {
-            string hmacString = new StringBuilder()
-                .Append(rawCookie)
-                .Append(userAgent)
-                .ToString();
-            return PxCookieUtils.IsHMACValid(cookieKey, hmacString, Hmac);
+            var sb = new StringBuilder()
+                .Append(rawCookie);
+            foreach (string field in additionalFields)
+            {
+                sb.Append(field);
+            }
+            return PxCookieUtils.IsHMACValid(cookieKey, sb.ToString(), Hmac);
         }
 
         public bool Deserialize()
         {
             data = PxCookieUtils.Deserialize<DecodedCookieV3>(cookieDecoder, rawCookie);
             return data != null;
-        }
-
-        public bool IsExpired(double time)
-        {
-            return IsExpired(data.Time);
         }
     }
 }

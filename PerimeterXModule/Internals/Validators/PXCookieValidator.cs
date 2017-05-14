@@ -59,14 +59,14 @@ namespace PerimeterX
                     return false;
                 }
 
-                if (!pxCookie.IsSecured(context.UserAgent,config.CookieKey,config.SignedWithIP,context.Ip))
+                if (!pxCookie.IsSecured(config.CookieKey, getAdditionalSignedFields(context)))
                 {
                     Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.Hmac, context.Uri), PxConstants.LOG_CATEGORY);
                     context.S2SCallReason = RiskRequestReasonEnum.VALIDATION_FAILED;
                     return false;
                 }
                 context.S2SCallReason = RiskRequestReasonEnum.NONE;
-                return true; 
+                return true;
             }
             catch (Exception ex)
             {
@@ -74,6 +74,13 @@ namespace PerimeterX
                 context.S2SCallReason = RiskRequestReasonEnum.DECRYPTION_FAILED;
                 return false;
             }
+        }
+
+        private string[] getAdditionalSignedFields(PxContext context)
+        {
+            return config.SignedWithIP ?
+                new string[] { context.Ip, context.UserAgent } :
+                new string[] { context.UserAgent };
         }
     }
 }

@@ -76,13 +76,18 @@ namespace PerimeterX
 
             Hostname = context.Request.UserHostAddress;
 
-            UserAgent = context.Request.Headers["user-agent"];
             // if userAgentOverride is present override the default user-agent
             string userAgentOverride = pxConfiguration.UserAgentOverride;
             if (!string.IsNullOrEmpty(userAgentOverride))
             {
                 UserAgent = context.Request.Headers[userAgentOverride];
             }
+            // ua fallback
+            if (string.IsNullOrEmpty(UserAgent))
+            {
+                UserAgent = context.Request.Headers["user-agent"];
+            }
+
 
             Uri = context.Request.Url.PathAndQuery;
             FullUrl = context.Request.Url.ToString();
@@ -109,8 +114,6 @@ namespace PerimeterX
 
             HttpVersion = ExtractHttpVersion(context);
             HttpMethod = context.Request.HttpMethod;
-
-
         }
 
         private string ExtractHttpVersion(HttpContext context)

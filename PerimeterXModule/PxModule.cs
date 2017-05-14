@@ -64,7 +64,6 @@ namespace PerimeterX
         private readonly StringCollection fileExtWhitelist;
         private readonly StringCollection routesWhitelist;
         private readonly StringCollection useragentsWhitelist;
-        private readonly string baseUri;
         private readonly string cookieKey;
         private readonly byte[] cookieKeyBytes;
 
@@ -111,7 +110,6 @@ namespace PerimeterX
             fileExtWhitelist = config.FileExtWhitelist;
             routesWhitelist = config.RoutesWhitelist;
             useragentsWhitelist = config.UseragentsWhitelist;
-            baseUri = config.BaseUri;
 
             // Set Decoder
             if (config.EncryptionEnabled)

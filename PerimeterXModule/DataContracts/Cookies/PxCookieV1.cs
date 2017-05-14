@@ -3,7 +3,7 @@ using System.Text;
 
 namespace PerimeterX.DataContracts.Cookies
 {
-    public class PxCookieV1 : IPxCookie
+    public sealed class PxCookieV1 : IPxCookie
     {
         private DecodedCookieV1 data;
         private ICookieDecoder cookieDecoder;
@@ -71,7 +71,7 @@ namespace PerimeterX.DataContracts.Cookies
             this.cookieDecoder = cookieDecoder;
         }
 
-        public bool IsSecured(string userAgent, string cookieKey, bool signedWithIP = false, string ip = "")
+        public bool IsSecured(string cookieKey, string[] additionalFields)
         {
             var sb = new StringBuilder()
                 .Append(data.Time)
@@ -79,11 +79,9 @@ namespace PerimeterX.DataContracts.Cookies
                 .Append(data.Score.Bot)
                 .Append(data.Uuid)
                 .Append(data.Vid);
-            if (signedWithIP)
-            {
-                sb.Append(ip);
+            foreach (string field in additionalFields) {
+                sb.Append(field);
             }
-            sb.Append(userAgent);
             return PxCookieUtils.IsHMACValid(cookieKey, sb.ToString(), Hmac);
         }
 
@@ -91,14 +89,6 @@ namespace PerimeterX.DataContracts.Cookies
         {
             data = PxCookieUtils.Deserialize<DecodedCookieV1>(cookieDecoder, rawCookie);
             return data != null;
-        }
-
-        public bool IsExpired(double time)
-        {
-            double now = DateTime.UtcNow
-                            .Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-                            .TotalMilliseconds;
-            return time < now;
         }
     }
 }

@@ -6,11 +6,8 @@ using System.Text;
 
 namespace PerimeterX
 {
-    public abstract class PxCookieUtils
+    public static class PxCookieUtils
     {
-        protected ICookieDecoder cookieDecoder;
-        protected string rawCookie;
-
         public static IPxCookie BuildCookie(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder)
         {
             if (context.PxCookies.Count > 0)

@@ -4,7 +4,7 @@
     {
         bool Deserialize();
 
-        bool IsSecured(string userAgent, string cookieKey, bool signedWithIP = false, string ip = "");
+        bool IsSecured(string cookieKey, string[] additionalFields);
 
         double Score { get; }
         string Uuid { get; }

@@ -11,8 +11,8 @@ namespace PerimeterX
         [DataMember(Name = "vid", EmitDefaultValue = false)]
         public string Vid;
 
-		[DataMember(Name = "uuid", EmitDefaultValue = false)]
-		public string UUID;
+        [DataMember(Name = "uuid", EmitDefaultValue = false)]
+        public string UUID;
 
         [DataMember(Name = "additional", EmitDefaultValue = false)]
         public Additional Additional;
