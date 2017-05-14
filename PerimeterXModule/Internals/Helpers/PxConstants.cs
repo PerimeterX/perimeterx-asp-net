@@ -31,42 +31,4 @@ namespace PerimeterX
             return fvi.FileVersion;
         }
     }
-
-    [DataContract]
-    public enum RiskRequestReasonEnum
-    {
-        [EnumMember(Value = "none")]
-        NONE,
-        [EnumMember(Value = "no_cookie")]
-        NO_COOKIE,
-        [EnumMember(Value = "expired_cookie")]
-        EXPIRED_COOKIE,
-        [EnumMember(Value = "invalid_cookie")]
-        INVALID_COOKIE,
-        [EnumMember(Value = "cookie_decryption_failed")]
-        DECRYPTION_FAILED,
-        [EnumMember(Value = "cookie_validation_failed")]
-        VALIDATION_FAILED
-    }
-
-    [DataContract]
-    public enum BlockReasonEnum
-    {
-        [EnumMember(Value = "none")]
-        NONE,
-        [EnumMember(Value = "cookie_high_score")]
-        COOKIE_HIGH_SCORE,
-        [EnumMember(Value = "risk_high_score")]
-        RISK_HIGH_SCORE
-    }
-
-    [DataContract]
-    public enum ModuleMode
-    {
-        [EnumMember(Value = "monitor_mode")]
-        MONITOR_MODE = 1,
-
-        [EnumMember(Value = "block_mode")]
-        BLOCK_MODE = 0
-    }
 }
