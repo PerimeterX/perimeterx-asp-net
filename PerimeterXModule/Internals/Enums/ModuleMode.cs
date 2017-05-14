@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace PerimeterX.Internals.Enums
 {
 
-    [DataContract]
-    public enum ModuleMode
-    {
-        [EnumMember(Value = "monitor_mode")]
-        MONITOR_MODE = 1,
+	[DataContract]
+	public enum ModuleMode
+	{
+		[EnumMember(Value = "monitor_mode")]
+		MONITOR_MODE = 1,
 
-        [EnumMember(Value = "block_mode")]
-        BLOCK_MODE = 0
-    }
+		[EnumMember(Value = "block_mode")]
+		BLOCK_MODE = 0
+	}
 }

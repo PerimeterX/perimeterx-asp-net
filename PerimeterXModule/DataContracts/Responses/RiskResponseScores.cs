@@ -2,7 +2,7 @@
 
 namespace PerimeterX
 {
-    [DataContract]
+	[DataContract]
 	public class RiskResponseScores
 	{
 		[DataMember(Name = "filter")]

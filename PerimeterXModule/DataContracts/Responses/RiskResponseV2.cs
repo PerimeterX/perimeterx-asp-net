@@ -2,25 +2,25 @@
 
 namespace PerimeterX
 {
-    [DataContract]
-    public class RiskResponseV2
-    {
-        [DataMember(Name = "status")]
-        public int Status;
+	[DataContract]
+	public class RiskResponseV2
+	{
+		[DataMember(Name = "status")]
+		public int Status;
 
-        [DataMember(Name = "message")]
-        public string Message;
+		[DataMember(Name = "message")]
+		public string Message;
 
-        [DataMember(Name = "uuid")]
-        public string Uuid;
+		[DataMember(Name = "uuid")]
+		public string Uuid;
 
-        [DataMember(Name = "scores")]
-        public double Score;
+		[DataMember(Name = "scores")]
+		public double Score;
 
-        [DataMember(Name = "action")]
-        public string RiskResponseAction;
+		[DataMember(Name = "action")]
+		public string RiskResponseAction;
 
-        [DataMember(Name = "error_msg")]
-        public string ErrorMessage;
-    }
+		[DataMember(Name = "error_msg")]
+		public string ErrorMessage;
+	}
 }
