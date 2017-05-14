@@ -6,7 +6,7 @@ namespace PerimeterX
 	public class Additional
 	{
 		[DataMember(Name = "px_cookie", EmitDefaultValue = false)]
-        public BaseDecodedCookie PXCookie;
+        public object PXCookie;
 
 		[DataMember(Name = "http_method")]
 		public string HttpMethod;

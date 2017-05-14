@@ -50,7 +50,7 @@ namespace PerimeterX.DataContracts.Cookies
             }
         }
 
-        public BaseDecodedCookie DecodedCookie
+        public object DecodedCookie
         {
             get
             {

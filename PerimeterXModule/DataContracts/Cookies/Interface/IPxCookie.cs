@@ -12,6 +12,6 @@
         string BlockAction { get; }
         string Hmac { get; }
         double Timestamp { get; }
-        BaseDecodedCookie DecodedCookie { get; }
+        object DecodedCookie { get; }
     }
 }

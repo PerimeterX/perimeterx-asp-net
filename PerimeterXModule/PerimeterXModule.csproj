@@ -62,7 +62,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataContracts\Cookies\Base\BaseDecodedCookie.cs" />
     <Compile Include="DataContracts\Cookies\Base\PxCookieUtils.cs" />
     <Compile Include="DataContracts\Cookies\Helpers\DecodedCookieV3.cs" />
     <Compile Include="DataContracts\Cookies\Helpers\RiskCookieScores.cs" />

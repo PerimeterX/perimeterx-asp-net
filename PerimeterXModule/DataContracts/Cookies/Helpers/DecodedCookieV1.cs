@@ -2,7 +2,7 @@
 
 namespace PerimeterX
 {
-    public class DecodedCookieV1 : BaseDecodedCookie
+    public class DecodedCookieV1
     {
         [DataMember(Name = "u")]
         public string Uuid { get; set; }
