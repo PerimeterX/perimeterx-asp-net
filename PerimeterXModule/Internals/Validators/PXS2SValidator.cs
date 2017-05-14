@@ -22,8 +22,8 @@ namespace PerimeterX
 		{
 			try
 			{
-				RiskResponseV2 riskResponse = this.SendRiskResponse(PxContext);
-				PxContext.MadeS2SCallReason = true;
+				RiskResponse riskResponse = this.SendRiskResponse(PxContext);
+				PxContext.MadeS2SCall = true;
 
 				if (!double.IsNaN(riskResponse.Score) && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
 				{
@@ -53,7 +53,7 @@ namespace PerimeterX
 			return true;
 		}
 
-		public RiskResponseV2 SendRiskResponse(PxContext PxContext)
+		public RiskResponse SendRiskResponse(PxContext PxContext)
 		{
 
 			var riskMode = ModuleMode.BLOCK_MODE;
@@ -62,10 +62,10 @@ namespace PerimeterX
 				riskMode = ModuleMode.MONITOR_MODE;
 			}
 
-			RiskRequestV2 riskRequest = new RiskRequestV2
+			RiskRequest riskRequest = new RiskRequest
 			{
 				Vid = PxContext.Vid,
-				Request = RequestV2.CreateRequestFromContext(PxContext),
+				Request = Request.CreateRequestFromContext(PxContext),
 				Additional = new Additional
 				{
 					CallReason = PxContext.S2SCallReason,
@@ -108,7 +108,7 @@ namespace PerimeterX
 			httpResponse.EnsureSuccessStatusCode();
 			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
 			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.RISK_API_V2, requestJson, responseJson), PxConstants.LOG_CATEGORY);
-			return JSON.Deserialize<RiskResponseV2>(responseJson, PxConstants.JSON_OPTIONS);
+			return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
 		}
 	}
 }

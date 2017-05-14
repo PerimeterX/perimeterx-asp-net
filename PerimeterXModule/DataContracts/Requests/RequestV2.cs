@@ -5,14 +5,23 @@ namespace PerimeterX
 {
 	[DataContract]
 	[Serializable]
-	public class RequestV2 : Request
+	public class Request
 	{
+		[DataMember(Name = "ip")]
+		public string IP { get; set; }
+
+		[DataMember(Name = "url")]
+		public string URL { get; set; }
+
+		[DataMember(Name = "headers")]
+		public RiskRequestHeader[] Headers { get; set; }
+
 		[DataMember(Name = "uri")]
 		public string URI { get; set; }
 
-		public static new RequestV2 CreateRequestFromContext(PxContext pxContext)
+		public static Request CreateRequestFromContext(PxContext pxContext)
 		{
-			return new RequestV2
+			return new Request
 			{
 				IP = pxContext.Ip,
 				URL = pxContext.FullUrl,

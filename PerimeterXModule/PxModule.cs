@@ -362,17 +362,6 @@ namespace PerimeterX
 			return config.BlockingScore >= pxContext.Score;
 		}
 
-		private bool IsBlockScores(RiskResponseScores scores)
-		{
-			return scores != null && (scores.Filter >= blockingScore || scores.Bot >= blockingScore || scores.Application >= blockingScore);
-		}
-
-		private static string DecodeCookie(string cookie)
-		{
-			byte[] bytes = Convert.FromBase64String(cookie);
-			return Encoding.UTF8.GetString(bytes);
-		}
-
 		private static string ByteArrayToHexString(byte[] input)
 		{
 			StringBuilder sb = new StringBuilder(input.Length * 2);
