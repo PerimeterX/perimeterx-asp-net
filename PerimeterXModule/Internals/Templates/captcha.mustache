@@ -76,17 +76,20 @@
       color: #c5c5c5;
       font-size: 70%;
   }
+
   @media (min-width:768px){
     html,body{
       height: 100%;
     }
   }
-  </style>
-  <!-- Custom CSS -->
-  {{# cssRef }}
-    <link rel="stylesheet" type="text/css" href="{{cssRef}}" />
-  {{/ cssRef }}
+    </style>
+    <!-- Custom CSS -->
+    {{#cssRef}}
+      <link rel="stylesheet" type="text/css" href="{{cssRef}}" />
+    {{/cssRef}}
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   </head>
+
   <body>
     <section class="container">
       <div class="customer-logo-wrapper">
@@ -96,19 +99,32 @@
       </div>
       <div class="page-title-wrapper">
         <div class="page-title">
-          <h1>Access to this page has been denied.</h1>
+          <h1>Please verify you are a human</h1>
         </div>
       </div>
       <div class="content-wrapper">
         <div class="content">
           <p>
-            You have been blocked because we believe you are using automation tools to browse the website.
+            Please click "I am not a robot" to continue
+          </p>
+          <div class="g-recaptcha" data-sitekey="6Lcj-R8TAAAAABs3FrRPuQhLMbp5QrHsHufzLf7b" data-callback="handleCaptcha" data-theme="dark">
+          </div>
+          <p>
+            Access to this page has been denied because we believe you are using automation tools to browse the website.
           </p>
           <p>
-            Please note that Javascript and Cookies must be enabled on your browser to access the website.
+            This may happen as a result of the following:
           </p>
+          <ul>
+            <li>
+              Javascript is disabled or blocked by an extension (ad blockers for example)
+            </li>
+            <li>
+              Your browser does not support cookies
+            </li>
+          </ul>
           <p>
-            If you think you have been blocked by mistake, please contact the website administrator with the reference ID below.
+            Please make sure that Javascript and cookies are enabled on your browser and that you are not blocking them from loading.
           </p>
           <p>
             Reference ID: #{{refId}}
@@ -138,9 +154,32 @@
        } ()
       );
     </script>
+    <!-- Captcha -->
+    <script>
+      window.px_vid = '{{vid}}';
+      function handleCaptcha(response){
+        var vid = '{{vid}}';
+        var uuid = '{{uuid}}';
+        var name = "_pxCaptcha";
+
+        var expiryUtc = new Date(Date.now()+1000*10).toUTCString();
+
+        var cookieParts = [
+          name,
+          "=",
+          response+":"+vid+":"+uuid,
+          "; expires=",
+          expiryUtc,
+          "; path=/"
+        ];
+
+        document.cookie = cookieParts.join("");
+        location.reload();
+      }
+    </script>
     <!-- Custom Script -->
-    {{# jsRef }}
+    {{#jsRef}}
       <script src="{{jsRef}}"></script>
-    {{/ jsRef }}
+    {{/jsRef}}
   </body>
 </html>
