@@ -99,7 +99,7 @@ namespace PerimeterX
 			}
 
 			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
-			var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConfig.BaseUri + PxConstants.RISK_API_V2)
+			var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConstants.FormatBaseUri(config) + PxConstants.RISK_API_V2)
 			{
 				Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
 			};

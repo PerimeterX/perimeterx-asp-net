@@ -75,7 +75,7 @@ namespace PerimeterX
 				// allocate reporter if needed
 				if (config != null && (config.SendBlockActivites || config.SendPageActivites))
 				{
-					reporter = new ActivityReporter(config.BaseUri, config.ActivitiesCapacity, config.ActivitiesBulkSize, config.ReporterApiTimeout);
+					reporter = new ActivityReporter(PxConstants.FormatBaseUri(config), config.ActivitiesCapacity, config.ActivitiesBulkSize, config.ReporterApiTimeout);
 				}
 				else
 				{

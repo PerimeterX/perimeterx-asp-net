@@ -30,5 +30,10 @@ namespace PerimeterX
 			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 			return fvi.FileVersion;
 		}
+
+		public static string FormatBaseUri(PxModuleConfigurationSection config)
+		{
+			return string.Format(config.BaseUri, config.AppId);
+		}
 	}
 }

@@ -165,7 +165,7 @@ namespace PerimeterX
 		{
 			get
 			{
-				return string.Format((string)this["baseUri"], (string)this["appId"]);
+				return (string)this["baseUri"];
 			}
 			set
 			{
