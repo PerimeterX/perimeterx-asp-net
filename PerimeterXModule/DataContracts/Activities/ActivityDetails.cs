@@ -10,6 +10,12 @@ namespace PerimeterX
 
 		[DataMember(Name = "block_uuid")]
 		public string BlockUuid;
+
+		[DataMember(Name = "module_version")]
+		public string ModuleVersion;
+
+		[DataMember(Name = "risk_score")]
+		public double RiskScore;
 	}
 
 }

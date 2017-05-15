@@ -227,7 +227,11 @@ namespace PerimeterX
 		{
 			if (sendPageActivites)
 			{
-				PostActivity(pxContext, "page_requested");
+				PostActivity(pxContext, "page_requested", new ActivityDetails
+				{
+					ModuleVersion = PxConstants.MODULE_VERSION,
+					RiskScore = pxContext.Score
+				});
 			}
 		}
 
@@ -238,7 +242,10 @@ namespace PerimeterX
 				PostActivity(pxContext, "block", new ActivityDetails
 				{
 					BlockReason = pxContext.BlockReason,
-					BlockUuid = pxContext.UUID
+					BlockUuid = pxContext.UUID,
+					ModuleVersion = PxConstants.MODULE_VERSION,
+					RiskScore = pxContext.Score
+					
 				});
 			}
 		}
