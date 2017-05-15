@@ -58,24 +58,7 @@ namespace PerimeterX
 			}
 
 			// Get Headers
-			Headers = new List<RiskRequestHeader>();
-
-			foreach (string header in context.Request.Headers.Keys)
-			{
-				if (!pxConfiguration.SensitiveHeaders.Contains(header))
-				{
-					RiskRequestHeader riskHeader = new RiskRequestHeader
-					{
-						Name = header,
-						Value = context.Request.Headers.Get(header)
-					};
-
-					Headers.Add(riskHeader);
-				}
-			}
-
-			Hostname = context.Request.Url.Host;
-
+			
 			// if userAgentOverride is present override the default user-agent
 			string userAgentOverride = pxConfiguration.UserAgentOverride;
 			if (!string.IsNullOrEmpty(userAgentOverride))
@@ -88,6 +71,26 @@ namespace PerimeterX
 				UserAgent = context.Request.Headers["user-agent"];
 			}
 
+			Headers = new List<RiskRequestHeader>();
+
+			foreach (string header in context.Request.Headers.Keys)
+			{
+				if (!pxConfiguration.SensitiveHeaders.Contains(header))
+				{
+					RiskRequestHeader riskHeader = new RiskRequestHeader
+					{
+						Name = header,
+						Value = context.Request.Headers.Get(header)
+					};
+					if (header.ToLower() == "user-agent")
+					{
+						riskHeader.Value = UserAgent;
+					}
+					Headers.Add(riskHeader);
+				}
+			}
+
+			Hostname = context.Request.Url.Host;
 
 			Uri = context.Request.Url.PathAndQuery;
 			FullUrl = context.Request.Url.ToString();
