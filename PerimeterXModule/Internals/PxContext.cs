@@ -75,6 +75,7 @@ namespace PerimeterX
 			}
 
 			Hostname = context.Request.UserHostAddress;
+			Hostname = "localhost";
 
 			// if userAgentOverride is present override the default user-agent
 			string userAgentOverride = pxConfiguration.UserAgentOverride;

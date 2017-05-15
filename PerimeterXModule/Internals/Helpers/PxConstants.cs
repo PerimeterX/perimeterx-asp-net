@@ -28,7 +28,7 @@ namespace PerimeterX
 		{
 			System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 			FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-			return fvi.FileVersion;
+			return "ASP.NET v" + fvi.FileVersion;
 		}
 
 		public static string FormatBaseUri(PxModuleConfigurationSection config)
