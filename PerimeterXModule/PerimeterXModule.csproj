@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.props" Condition="Exists('..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -12,6 +13,10 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <PackageId>PxModule</PackageId>
+    <PackageVersion>1.2.1</PackageVersion>
+    <Authors>Nitzan Goldfeder</Authors>
+    <Description>PxModule for ASP/.NET</Description>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +35,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Jil, Version=2.15.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -55,6 +62,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internals\Cookies\PxCookieUtils.cs" />
+    <Compile Include="DataContracts\Cookies\DecodedCookieV3.cs" />
+    <Compile Include="DataContracts\Cookies\RiskCookieScores.cs" />
+    <Compile Include="Internals\Cookies\Interface\IPxCookie.cs" />
+    <Compile Include="Internals\Cookies\PxCookieV1.cs" />
+    <Compile Include="Internals\Cookies\PxCookieV3.cs" />
+    <Compile Include="DataContracts\Cookies\DecodedCookieV1.cs" />
+    <Compile Include="Internals\Enums\BlockReasonEnum.cs" />
+    <Compile Include="Internals\Enums\ModuleMode.cs" />
+    <Compile Include="Internals\Enums\RiskRequestReasonEnum.cs" />
+    <Compile Include="Internals\Helpers\PxConstants.cs" />
+    <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
+    <Compile Include="Internals\Validators\Interfaces\IPXCaptchaValidator.cs" />
+    <Compile Include="Internals\Validators\Interfaces\IPXS2SValidator.cs" />
+    <Compile Include="Internals\Validators\PXCaptchaValidator.cs" />
+    <Compile Include="Internals\Validators\PXCookieValidator.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -65,17 +88,27 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="TemplateFactory.cs" />
+    <Compile Include="Internals\PxContext.cs" />
+    <Compile Include="Internals\TemplateFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CookieDecoder.cs" />
+    <Compile Include="Internals\CookieDecoder.cs" />
     <Compile Include="PxModule.cs" />
     <Compile Include="PxModuleConfigurationSection.cs" />
-    <Compile Include="DataContracts.cs" />
-    <Compile Include="ActivityReporter.cs" />
+    <Compile Include="Internals\ActivityReporter.cs" />
+    <Compile Include="DataContracts\Requests\RiskRequestHeader.cs" />
+    <Compile Include="DataContracts\Requests\Additional.cs" />
+    <Compile Include="DataContracts\Requests\CaptchaRequest.cs" />
+    <Compile Include="DataContracts\Responses\CaptchaResponse.cs" />
+    <Compile Include="DataContracts\Requests\RiskRequest.cs" />
+    <Compile Include="DataContracts\Requests\Request.cs" />
+    <Compile Include="Internals\Validators\PXS2SValidator.cs" />
+    <Compile Include="DataContracts\Responses\RiskResponse.cs" />
+    <Compile Include="DataContracts\Activities\Activity.cs" />
+    <Compile Include="DataContracts\Activities\ActivityDetails.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="block.mustache" />
-    <EmbeddedResource Include="captcha.mustache" />
+    <EmbeddedResource Include="Internals\Templates\block.mustache" />
+    <EmbeddedResource Include="Internals\Templates\captcha.mustache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -84,9 +117,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets" Condition="Exists('..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets')" />
 </Project>

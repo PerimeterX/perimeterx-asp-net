@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+##[2.0] - 2017-15-05
+### Added
+	- Block/Page Requested Activities now sends module_verison and risk_socre
+	- Support Cookie v3
+	- Support RiskAPI v2
+	
+### Changed
+	- Moved PxModule verification code, request state, api calls to managable files
+	- New classes, Validators, DataContracts (Cookies, Activities, Requests etc...)
+	- Refactor module to work with PxContext
+	- Reordered library into folders
+	
+
 ##[1.2.0] - 2017-24-04
 - Support custom header for user-agent
 
@@ -16,8 +29,3 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 - New design for block pages
 - Block page customisation 
 - Support for classic pipeline mode
-
-##[1.0] - 2016-11-01
-- Initial public release
-
-[1.0]: https://github.com/PerimeterX/perimeterx-asp-net/releases/tag/v1.0
