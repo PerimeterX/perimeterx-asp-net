@@ -16,8 +16,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 	- Refactor module to work with PxContext
 	- Reordered library into folders
 	
-##[1.0] - 2016-11-01
-- Initial public release
 
-[1.0]: https://github.com/PerimeterX/perimeterx-asp-net/releases/tag/v1.0
-"L9xJKFqnIiAzyDShn6SGCzgUfQkl93PiO/h9QeXeUbZyv0muPg/97m6afdwDDE+n5i1rsg9kR8c4zTqh5rHF5A==:1000:vN57HeO12DOF9E11u8qlu4wfBaanYTXZQOD96m5y1fXKU0LnXybELAkyYI8NmUCSWDPKTEX6vyKO2cQOVNd9bJ0cJoJEoIQmuuio+v7DKyZMtvK/dcaTedq6jINkn/iJ1Z19z0EBsaOshyF0L9c5xE0wbz8LvA+wmRhS08yN/FBZmzugn4NGzydmbvnCUD/CaujBZ1uMtgouc3WlZhHBTtkTnGVUwx0u/jW8cl1yXDra9A8aSVkopOLQxK3pBZT/jf+TCxCQGnor5gk5vMg5hA=="
+##[1.2.0] - 2017-24-04
+- Support custom header for user-agent
+
+##[1.1.1] - 2017-20-04 
+- added .axd files to whitelist files
+- sending px_orig_value when decryption fails
+
+##[1.1] - 2017-28-03
+- Moved server url to new URL
+- New design for block pages
+- Block page customisation 
+- Support for classic pipeline mode

@@ -41,7 +41,6 @@ using System.Collections;
 
 namespace PerimeterX
 {
-
 	public class PxModule : IHttpModule
 	{
 		private HttpClient httpClient;
@@ -245,7 +244,7 @@ namespace PerimeterX
 					BlockUuid = pxContext.UUID,
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					RiskScore = pxContext.Score
-					
+
 				});
 			}
 		}
