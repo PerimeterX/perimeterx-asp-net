@@ -365,7 +365,7 @@ namespace PerimeterX
 			}
 
 			// validate using server risk api
-			return config.BlockingScore >= pxContext.Score;
+			return config.BlockingScore > pxContext.Score;
 		}
 
 		private static string ByteArrayToHexString(byte[] input)
