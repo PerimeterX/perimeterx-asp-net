@@ -4,12 +4,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-##[2.0] - 2017-15-05
+##[2.0.1] - 2017-15-05
+### Fixed
+	- Collect right Hostname in context
+	- Renamed module_version
 ### Added
 	- Block/Page Requested Activities now sends module_verison and risk_socre
 	- Support Cookie v3
 	- Support RiskAPI v2
-	
 ### Changed
 	- Moved PxModule verification code, request state, api calls to managable files
 	- New classes, Validators, DataContracts (Cookies, Activities, Requests etc...)
