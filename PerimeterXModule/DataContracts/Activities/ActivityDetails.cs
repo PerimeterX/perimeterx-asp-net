@@ -14,7 +14,7 @@ namespace PerimeterX
 		[DataMember(Name = "module_version")]
 		public string ModuleVersion;
 
-		[DataMember(Name = "risk_score")]
+		[DataMember(Name = "block_score")]
 		public double RiskScore;
 	}
 
