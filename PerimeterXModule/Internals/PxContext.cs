@@ -2,6 +2,7 @@
 using System.Web;
 using System;
 using System.Net;
+using System.Collections.Specialized;
 
 namespace PerimeterX
 {
@@ -29,6 +30,7 @@ namespace PerimeterX
 		public string BlockAction { get; set; }
 		public string BlockData { get; set; }
 		public HttpContext ApplicationContext { get; private set; }
+		public bool SensitiveRoute { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -117,6 +119,19 @@ namespace PerimeterX
 
 			HttpVersion = ExtractHttpVersion(context);
 			HttpMethod = context.Request.HttpMethod;
+
+			SensitiveRoute = CheckSensitiveRoute(pxConfiguration.SensitiveRoutes, Uri);
+		}
+
+		private bool CheckSensitiveRoute(StringCollection sensitiveRoutes, string uri)
+		{
+			foreach( string sensitiveRoute in sensitiveRoutes) {
+				if (uri.StartsWith(sensitiveRoute))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private string ExtractHttpVersion(HttpContext context)
@@ -141,7 +156,5 @@ namespace PerimeterX
 			}
 			return PxCookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX) ? PxCookies[PxConstants.COOKIE_V3_PREFIX] : PxCookies[PxConstants.COOKIE_V1_PREFIX];
 		}
-
-
 	}
 }
