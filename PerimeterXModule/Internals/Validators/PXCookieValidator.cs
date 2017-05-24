@@ -73,6 +73,7 @@ namespace PerimeterX
 					return false;
 				}
 
+				context.PassReason = PassReasonEnum.COOKIE;
 				context.S2SCallReason = RiskRequestReasonEnum.NONE;
 				return true;
 			}
