@@ -10,7 +10,7 @@ namespace PerimeterX
 	[DataContract]
 	public enum BlockReasonEnum
 	{
-		[EnumMember(Value = "none")]
+		[EnumMember]
 		NONE,
 		[EnumMember(Value = "cookie_high_score")]
 		COOKIE_HIGH_SCORE,

@@ -31,6 +31,8 @@ namespace PerimeterX
 		public string BlockData { get; set; }
 		public HttpContext ApplicationContext { get; private set; }
 		public bool SensitiveRoute { get; set; }
+		public PassReasonEnum PassReason { get; set; }
+		public double RiskRoundtripTime { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -97,8 +99,9 @@ namespace PerimeterX
 			Uri = context.Request.Url.PathAndQuery;
 			FullUrl = context.Request.Url.ToString();
 			Score = 0;
+			RiskRoundtripTime = 0;
 			BlockReason = BlockReasonEnum.NONE;
-
+			PassReason = PassReasonEnum.NONE;
 
 			Ip = context.Request.UserHostAddress;
 			// Get IP from custom header

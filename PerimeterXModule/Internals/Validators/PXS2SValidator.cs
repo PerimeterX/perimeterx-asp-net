@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PerimeterX
 {
@@ -20,6 +21,7 @@ namespace PerimeterX
 
 		public bool VerifyS2S(PxContext PxContext)
 		{
+			var riskRttStart = Stopwatch.StartNew();
 			try
 			{
 				RiskResponse riskResponse = this.SendRiskResponse(PxContext);
@@ -40,6 +42,7 @@ namespace PerimeterX
 
 				if (!string.IsNullOrEmpty(riskResponse.ErrorMessage))
 				{
+					PxContext.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
 					PxContext.S2SHttpErrorMessage = riskResponse.ErrorMessage;
 					return false;
 				}
@@ -48,8 +51,16 @@ namespace PerimeterX
 			catch (Exception ex)
 			{
 				Debug.WriteLine("Failed to verify S2S: " + ex.Message, PxConstants.LOG_CATEGORY);
+				PxContext.PassReason = PassReasonEnum.ERROR;
+				if (ex.InnerException is TaskCanceledException)
+				{
+					PxContext.PassReason = PassReasonEnum.S2S_TIMEOUT;
+				}
+				PxContext.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
 				return false;
 			}
+			PxContext.PassReason = PassReasonEnum.S2S;
+			PxContext.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
 			return true;
 		}
 
