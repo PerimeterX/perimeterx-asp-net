@@ -22,14 +22,15 @@ namespace PerimeterX
 		public bool VerifyS2S(PxContext PxContext)
 		{
 			var riskRttStart = Stopwatch.StartNew();
+			bool retVal = false;
 			try
 			{
-				RiskResponse riskResponse = this.SendRiskResponse(PxContext);
+				RiskResponse riskResponse = SendRiskResponse(PxContext);
 				PxContext.MadeS2SCallReason = true;
 
-				if (!double.IsNaN(riskResponse.Score) && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
+				if (riskResponse.Score >= 0 && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
 				{
-					double score = riskResponse.Score;
+					int score = riskResponse.Score;
 					PxContext.Score = score;
 					PxContext.UUID = riskResponse.Uuid;
 					PxContext.BlockAction = riskResponse.RiskResponseAction;
@@ -38,15 +39,17 @@ namespace PerimeterX
 					{
 						PxContext.BlockReason = BlockReasonEnum.RISK_HIGH_SCORE;
 					}
+					else
+					{
+						PxContext.PassReason = PassReasonEnum.S2S;
+					}
+					retVal = true;
 				}
-
-				if (!string.IsNullOrEmpty(riskResponse.ErrorMessage))
+				else
 				{
-					PxContext.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
 					PxContext.S2SHttpErrorMessage = riskResponse.ErrorMessage;
-					return false;
+					retVal = false;
 				}
-
 			}
 			catch (Exception ex)
 			{
@@ -56,12 +59,11 @@ namespace PerimeterX
 				{
 					PxContext.PassReason = PassReasonEnum.S2S_TIMEOUT;
 				}
-				PxContext.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
-				return false;
+				retVal = false;
 			}
-			PxContext.PassReason = PassReasonEnum.S2S;
 			PxContext.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
-			return true;
+			riskRttStart.Stop();
+			return retVal;
 		}
 
 		public RiskResponse SendRiskResponse(PxContext PxContext)

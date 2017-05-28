@@ -21,7 +21,7 @@ namespace PerimeterX
 		public string UserAgent { get; set; }
 		public string FullUrl { get; set; }
 		public RiskRequestReasonEnum S2SCallReason { get; set; }
-		public double Score { get; set; }
+		public int Score { get; set; }
 		public string Vid { get; set; }
 		public string UUID { get; set; }
 		public BlockReasonEnum BlockReason { get; set; }
@@ -32,7 +32,7 @@ namespace PerimeterX
 		public HttpContext ApplicationContext { get; private set; }
 		public bool SensitiveRoute { get; set; }
 		public PassReasonEnum PassReason { get; set; }
-		public double RiskRoundtripTime { get; set; }
+		public long RiskRoundtripTime { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{

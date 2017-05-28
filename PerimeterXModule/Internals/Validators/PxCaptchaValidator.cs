@@ -23,6 +23,7 @@ namespace PerimeterX
 		public bool CaptchaVerify(PxContext context)
 		{
 			Debug.WriteLine(string.Format("Check captcha cookie {0} for {1}", context.PxCaptcha, context.Vid ?? ""), PxConstants.LOG_CATEGORY);
+			bool retVal = false;
 			var riskRttStart = Stopwatch.StartNew();
 			try
 			{
@@ -38,25 +39,28 @@ namespace PerimeterX
 				{
 					Debug.WriteLine("Captcha API call to server was successful", PxConstants.LOG_CATEGORY);
 					context.PassReason = PassReasonEnum.CAPTCHA;
-					context.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
-					return true;
+					retVal = true;
+				}else
+				{
+					Debug.WriteLine(string.Format("Captcha API call to server failed - {0}", response), PxConstants.LOG_CATEGORY);
+					retVal = false;
 				}
-				Debug.WriteLine(string.Format("Captcha API call to server failed - {0}", response), PxConstants.LOG_CATEGORY);
-				context.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
-				return false;
+				
 			}
 			catch (Exception ex)
 			{
 				context.PassReason = PassReasonEnum.ERROR;
-				context.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
 				if (ex.InnerException is TaskCanceledException)
 				{
 					context.PassReason = PassReasonEnum.CAPTCHA_TIMEOUT;
 				}
 				Debug.WriteLine(string.Format("Captcha API call to server failed with exception {0} - {1}", ex.Message, context.Uri), PxConstants.LOG_CATEGORY);
 				// In any case of exception, request should pass
-				return true;
+				retVal = true;
 			}
+			context.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
+			riskRttStart.Stop();
+			return retVal;
 
 		}
 
