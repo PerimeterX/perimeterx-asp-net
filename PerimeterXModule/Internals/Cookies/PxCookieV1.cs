@@ -9,7 +9,7 @@ namespace PerimeterX.DataContracts.Cookies
 		private ICookieDecoder cookieDecoder;
 		private string rawCookie;
 
-		double IPxCookie.Score
+		int IPxCookie.Score
 		{
 			get
 			{

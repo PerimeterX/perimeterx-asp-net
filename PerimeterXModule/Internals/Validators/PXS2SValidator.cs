@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PerimeterX
 {
@@ -20,14 +21,16 @@ namespace PerimeterX
 
 		public bool VerifyS2S(PxContext PxContext)
 		{
+			var riskRttStart = Stopwatch.StartNew();
+			bool retVal = false;
 			try
 			{
-				RiskResponse riskResponse = this.SendRiskResponse(PxContext);
+				RiskResponse riskResponse = SendRiskResponse(PxContext);
 				PxContext.MadeS2SCallReason = true;
 
-				if (!double.IsNaN(riskResponse.Score) && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
+				if (riskResponse.Score >= 0 && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
 				{
-					double score = riskResponse.Score;
+					int score = riskResponse.Score;
 					PxContext.Score = score;
 					PxContext.UUID = riskResponse.Uuid;
 					PxContext.BlockAction = riskResponse.RiskResponseAction;
@@ -36,21 +39,31 @@ namespace PerimeterX
 					{
 						PxContext.BlockReason = BlockReasonEnum.RISK_HIGH_SCORE;
 					}
+					else
+					{
+						PxContext.PassReason = PassReasonEnum.S2S;
+					}
+					retVal = true;
 				}
-
-				if (!string.IsNullOrEmpty(riskResponse.ErrorMessage))
+				else
 				{
 					PxContext.S2SHttpErrorMessage = riskResponse.ErrorMessage;
-					return false;
+					retVal = false;
 				}
-
 			}
 			catch (Exception ex)
 			{
 				Debug.WriteLine("Failed to verify S2S: " + ex.Message, PxConstants.LOG_CATEGORY);
-				return false;
+				PxContext.PassReason = PassReasonEnum.ERROR;
+				if (ex.InnerException is TaskCanceledException)
+				{
+					PxContext.PassReason = PassReasonEnum.S2S_TIMEOUT;
+				}
+				retVal = false;
 			}
-			return true;
+			PxContext.RiskRoundtripTime = riskRttStart.ElapsedMilliseconds;
+			riskRttStart.Stop();
+			return retVal;
 		}
 
 		public RiskResponse SendRiskResponse(PxContext PxContext)

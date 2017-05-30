@@ -19,6 +19,7 @@ Table of Contents
   *   [Extracting Real IP Address](#real-ip)
   *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
+  *   [Sensitive Routes](#sensitive-routes)
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
   *   [Debug Mode](#debug-mode)
@@ -167,6 +168,19 @@ A user can define a list of sensitive header he want to prevent from being send 
 ```xml
 	..
     sensitiveHeaders="cookie,cookies"
+    ..
+```
+
+#### <a name="sensitive-routes"></a> Sensitive Routes
+
+List of routes prefix. The Perimeterx module will always match request uri by this prefix list and if match was found will create a server-to-server call for, even if the cookie score is low and valid.
+
+
+**default: None**
+
+```xml
+	..
+    sensitiveRoutes="/login,/user/profile"
     ..
 ```
 

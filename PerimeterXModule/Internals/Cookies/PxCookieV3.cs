@@ -10,7 +10,7 @@ namespace PerimeterX.DataContracts.Cookies
 
 		public string Hmac { set; get; }
 
-		public double Score
+		public int Score
 		{
 			get
 			{
