@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 ##[2.1.0] - 2017-04-06
 ### Fixed
 	- Renamed risk_score to block_score in activity details
-	- Fixed block score threshols
+	- Fixed block score threshold
 ## Added
 	- Support for sensitive routes
 	- Log page requested reason
