@@ -15,7 +15,7 @@ namespace PerimeterX
 		public string Uuid;
 
 		[DataMember(Name = "score")]
-		public double Score;
+		public int Score;
 
 		[DataMember(Name = "action")]
 		public string RiskResponseAction;

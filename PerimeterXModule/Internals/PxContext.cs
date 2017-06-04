@@ -2,6 +2,7 @@
 using System.Web;
 using System;
 using System.Net;
+using System.Collections.Specialized;
 
 namespace PerimeterX
 {
@@ -20,7 +21,7 @@ namespace PerimeterX
 		public string UserAgent { get; set; }
 		public string FullUrl { get; set; }
 		public RiskRequestReasonEnum S2SCallReason { get; set; }
-		public double Score { get; set; }
+		public int Score { get; set; }
 		public string Vid { get; set; }
 		public string UUID { get; set; }
 		public BlockReasonEnum BlockReason { get; set; }
@@ -29,6 +30,9 @@ namespace PerimeterX
 		public string BlockAction { get; set; }
 		public string BlockData { get; set; }
 		public HttpContext ApplicationContext { get; private set; }
+		public bool SensitiveRoute { get; set; }
+		public PassReasonEnum PassReason { get; set; }
+		public long RiskRoundtripTime { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -95,8 +99,9 @@ namespace PerimeterX
 			Uri = context.Request.Url.PathAndQuery;
 			FullUrl = context.Request.Url.ToString();
 			Score = 0;
+			RiskRoundtripTime = 0;
 			BlockReason = BlockReasonEnum.NONE;
-
+			PassReason = PassReasonEnum.NONE;
 
 			Ip = context.Request.UserHostAddress;
 			// Get IP from custom header
@@ -117,6 +122,19 @@ namespace PerimeterX
 
 			HttpVersion = ExtractHttpVersion(context);
 			HttpMethod = context.Request.HttpMethod;
+
+			SensitiveRoute = CheckSensitiveRoute(pxConfiguration.SensitiveRoutes, Uri);
+		}
+
+		private bool CheckSensitiveRoute(StringCollection sensitiveRoutes, string uri)
+		{
+			foreach( string sensitiveRoute in sensitiveRoutes) {
+				if (uri.StartsWith(sensitiveRoute))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		private string ExtractHttpVersion(HttpContext context)
@@ -141,7 +159,5 @@ namespace PerimeterX
 			}
 			return PxCookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX) ? PxCookies[PxConstants.COOKIE_V3_PREFIX] : PxCookies[PxConstants.COOKIE_V1_PREFIX];
 		}
-
-
 	}
 }

@@ -6,7 +6,7 @@
 
 		bool IsSecured(string cookieKey, string[] additionalFields);
 
-		double Score { get; }
+		int Score { get; }
 		string Uuid { get; }
 		string Vid { get; }
 		string BlockAction { get; }

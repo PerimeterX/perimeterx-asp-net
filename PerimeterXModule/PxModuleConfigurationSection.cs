@@ -399,5 +399,19 @@ namespace PerimeterX
 				this["monitorMode"] = value;
 			}
 		}
+
+		[ConfigurationProperty("sensitiveRoutes", DefaultValue = "")]
+		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+		public StringCollection SensitiveRoutes
+		{
+			get
+			{
+				return (StringCollection)this["sensitiveRoutes"];
+			}
+			set
+			{
+				this["sensitiveRoutes"] = value;
+			}
+		}
 	}
 }

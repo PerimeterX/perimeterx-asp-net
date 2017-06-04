@@ -11,7 +11,7 @@ namespace PerimeterX
 		[DataMember(Name = "t")]
 		public double Time { get; set; }
 		[DataMember(Name = "s")]
-		public double Score;
+		public int Score;
 		[DataMember(Name = "a")]
 		public string Action;
 	}

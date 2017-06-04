@@ -21,6 +21,8 @@ namespace PerimeterX
 		[EnumMember(Value = "cookie_decryption_failed")]
 		DECRYPTION_FAILED,
 		[EnumMember(Value = "cookie_validation_failed")]
-		VALIDATION_FAILED
+		VALIDATION_FAILED,
+		[EnumMember(Value = "sensitive_route")]
+		SENSITIVE_ROUTE
 	}
 }

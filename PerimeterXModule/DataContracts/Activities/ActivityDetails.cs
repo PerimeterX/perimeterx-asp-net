@@ -5,8 +5,8 @@ namespace PerimeterX
 	[DataContract]
 	public class ActivityDetails
 	{
-		[DataMember(Name = "block_reason")]
-		public BlockReasonEnum BlockReason;
+		[DataMember(Name = "block_reason", EmitDefaultValue = true)]
+		public BlockReasonEnum? BlockReason;
 
 		[DataMember(Name = "block_uuid")]
 		public string BlockUuid;
@@ -14,8 +14,13 @@ namespace PerimeterX
 		[DataMember(Name = "module_version")]
 		public string ModuleVersion;
 
-		[DataMember(Name = "risk_score")]
-		public double RiskScore;
-	}
+		[DataMember(Name = "block_score")]
+		public int RiskScore;
 
+		[DataMember(Name = "pass_reason", EmitDefaultValue = true)]
+		public PassReasonEnum? PassReason;
+
+		[DataMember(Name = "risk_rtt")]
+		public long RiskRoundtripTime;
+	}
 }

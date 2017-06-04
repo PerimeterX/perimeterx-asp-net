@@ -65,6 +65,15 @@ namespace PerimeterX
 					context.S2SCallReason = RiskRequestReasonEnum.VALIDATION_FAILED;
 					return false;
 				}
+
+				if (context.SensitiveRoute)
+				{
+					Debug.WriteLine(string.Format("Cookie is valid but is a sensitive route {0}", context.Uri), PxConstants.LOG_CATEGORY);
+					context.S2SCallReason = RiskRequestReasonEnum.SENSITIVE_ROUTE;
+					return false;
+				}
+
+				context.PassReason = PassReasonEnum.COOKIE;
 				context.S2SCallReason = RiskRequestReasonEnum.NONE;
 				return true;
 			}

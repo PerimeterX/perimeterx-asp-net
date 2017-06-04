@@ -71,6 +71,7 @@
     <Compile Include="DataContracts\Cookies\DecodedCookieV1.cs" />
     <Compile Include="Internals\Enums\BlockReasonEnum.cs" />
     <Compile Include="Internals\Enums\ModuleMode.cs" />
+    <Compile Include="Internals\Enums\PassReasonEnum.cs" />
     <Compile Include="Internals\Enums\RiskRequestReasonEnum.cs" />
     <Compile Include="Internals\Helpers\PxConstants.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />

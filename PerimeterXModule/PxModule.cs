@@ -229,7 +229,8 @@ namespace PerimeterX
 				PostActivity(pxContext, "page_requested", new ActivityDetails
 				{
 					ModuleVersion = PxConstants.MODULE_VERSION,
-					RiskScore = pxContext.Score
+					PassReason = pxContext.PassReason,
+					RiskRoundtripTime = pxContext.RiskRoundtripTime
 				});
 			}
 		}
@@ -243,8 +244,8 @@ namespace PerimeterX
 					BlockReason = pxContext.BlockReason,
 					BlockUuid = pxContext.UUID,
 					ModuleVersion = PxConstants.MODULE_VERSION,
-					RiskScore = pxContext.Score
-
+					RiskScore = pxContext.Score,
+					RiskRoundtripTime = pxContext.RiskRoundtripTime
 				});
 			}
 		}
@@ -348,24 +349,32 @@ namespace PerimeterX
 
 		private bool VerifyRequest(HttpContext applicationContext)
 		{
-			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-			pxContext = new PxContext(applicationContext, config);
-
-			// check captcha after cookie validation to capture vid
-			if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && PxCaptchaValidator.CaptchaVerify(pxContext))
+			try
 			{
-				return true;
-			}
+				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+				pxContext = new PxContext(applicationContext, config);
 
-			// validate using risk cookie
-			IPxCookie pxCookie = PxCookieUtils.BuildCookie(config, pxContext, cookieDecoder);
-			if (!PxCookieValidator.CookieVerify(pxContext, pxCookie))
-			{
-				PxS2SValidator.VerifyS2S(pxContext);
-			}
+				// check captcha after cookie validation to capture vid
+				if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && PxCaptchaValidator.CaptchaVerify(pxContext))
+				{
+					return true;
+				}
 
-			// validate using server risk api
-			return config.BlockingScore >= pxContext.Score;
+				// validate using risk cookie
+				IPxCookie pxCookie = PxCookieUtils.BuildCookie(config, pxContext, cookieDecoder);
+				if (!PxCookieValidator.CookieVerify(pxContext, pxCookie))
+				{
+					// validate using server risk api
+					PxS2SValidator.VerifyS2S(pxContext);
+				}
+
+				return config.BlockingScore > pxContext.Score;
+			}
+			catch (Exception ex) {
+				Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
+				pxContext.PassReason = PassReasonEnum.ERROR;
+				return true; //true pass request
+			}
 		}
 
 		private static string ByteArrayToHexString(byte[] input)
