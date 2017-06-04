@@ -4,7 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-##[2.0.1] - 2017-15-05
+##[2.1.0] - 2017-04-06
+### Fixed
+	- Renamed risk_score to block_score in activity details
+	- Fixed block score threshols
+## Added
+	- Support for sensitive routes
+	- Log page requested reason
+	- Mesure risk rout trip time
+
+
+##[2.0.3] - 2017-15-05
 ### Fixed
 	- Collect right Hostname in context
 	- Renamed module_version
