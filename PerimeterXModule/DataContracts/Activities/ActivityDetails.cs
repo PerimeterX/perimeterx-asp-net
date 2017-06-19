@@ -22,5 +22,8 @@ namespace PerimeterX
 
 		[DataMember(Name = "risk_rtt")]
 		public long RiskRoundtripTime;
+
+		[DataMember(Name = "client_uuid")]
+		public string ClientUuid;
 	}
 }
