@@ -226,11 +226,12 @@ namespace PerimeterX
 		{
 			if (sendPageActivites)
 			{
-				PostActivity(pxContext, "page_requested", new ActivityDetails
-				{
-					ModuleVersion = PxConstants.MODULE_VERSION,
-					PassReason = pxContext.PassReason,
-					RiskRoundtripTime = pxContext.RiskRoundtripTime
+                		PostActivity(pxContext, "page_requested", new ActivityDetails
+		                {
+                		    ModuleVersion = PxConstants.MODULE_VERSION,
+		                    PassReason = pxContext.PassReason,
+                		    RiskRoundtripTime = pxContext.RiskRoundtripTime,
+		                    ClientUuid = pxContext.UUID
 				});
 			}
 		}
