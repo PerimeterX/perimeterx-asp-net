@@ -10,10 +10,10 @@ namespace PerimeterX
 	public class PXS2SValidator : IPXS2SValidator
 	{
 
-		private readonly PxModuleConfigurationSection PxConfig;
+		private readonly PXConfigurationWrapper PxConfig;
 		private readonly HttpClient HttpClient;
 
-		public PXS2SValidator(PxModuleConfigurationSection PxConfig, HttpClient HttpClient)
+        public PXS2SValidator(PXConfigurationWrapper PxConfig, HttpClient HttpClient)
 		{
 			this.PxConfig = PxConfig;
 			this.HttpClient = HttpClient;
@@ -114,8 +114,8 @@ namespace PerimeterX
 			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
 			var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConstants.FormatBaseUri(PxConfig) + PxConstants.RISK_API_V2)
 			{
-				Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
-			};
+				Content = new StringContent(requestJson, Encoding.UTF8, "application/json"),
+            };
 
 			var httpResponse = HttpClient.SendAsync(requestMessage).Result;
 			httpResponse.EnsureSuccessStatusCode();

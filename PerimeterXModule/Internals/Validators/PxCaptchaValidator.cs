@@ -10,10 +10,10 @@ namespace PerimeterX
 
 	class PXCaptchaValidator : IPXCaptchaValidator
 	{
-		private PxModuleConfigurationSection PxConfig;
+		private PXConfigurationWrapper PxConfig;
 		private HttpClient HttpClient;
 
-		public PXCaptchaValidator(PxModuleConfigurationSection PxConfig, HttpClient HttpClient)
+		public PXCaptchaValidator(PXConfigurationWrapper PxConfig, HttpClient HttpClient)
 		{
 			this.PxConfig = PxConfig;
 			this.HttpClient = HttpClient;
