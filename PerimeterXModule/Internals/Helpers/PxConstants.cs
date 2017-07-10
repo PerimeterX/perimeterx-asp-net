@@ -19,7 +19,7 @@ namespace PerimeterX
 		public static readonly string LOG_CATEGORY = "PxModule";
 		public static readonly string MODULE_VERSION = GetAssemblyVersion();
 		public static readonly Options JSON_OPTIONS = new Options(prettyPrint: false, excludeNulls: true, includeInherited: true);
-        public static readonly string REMOTE_CONFIGURATION_SERVER = "http://px-conf-mgmt-stg.perimeterx.net";
+        public static readonly string REMOTE_CONFIGURATION_SERVER = "https://px-conf.perimeterx.net";
         public static readonly string REMOTE_CONFIGURATION_PATH = "/module";
 
 		// Endpoints

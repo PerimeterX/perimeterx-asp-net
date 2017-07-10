@@ -34,25 +34,28 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Reflection;
 using System.Collections;
-using System.Threading;
+using System.Timers;
 
 namespace PerimeterX
 {
 	public class PxModule : IHttpModule
 	{
-		private HttpClient httpClient;
-		private PxContext pxContext;
 		private static IActivityReporter reporter;
+        private static RemoteConfigurationManager remoteConfigurationManager;
+        private static PXConfigurationWrapper pxConfig;
+        private static TimerConfigUpdater timerConfigUpdater;
+		private static HttpClient httpClient;
+        private static DefaultPxClient pxClient;
+
+        private PxContext pxContext;
 		private readonly string validationMarker;
-		private readonly ICookieDecoder cookieDecoder;
+        private readonly ICookieDecoder cookieDecoder;
         private readonly IPXCaptchaValidator pxCaptchaValidator;
         private readonly IPXCookieValidator pxCookieValidator;
         private readonly IPXS2SValidator pxS2SValidator;
-        private readonly RemoteConfigurationManager remoteConfigurationManager;
-        private PXConfigurationWrapper pxConfig;
-        private Timer remoteConfigurationTask;
         private readonly VerificationHandler verificationHandler;
 
+        // Set here everything that need to have single instance/Singleton
 		static PxModule()
 		{
 			try
@@ -60,15 +63,25 @@ namespace PerimeterX
                 Debug.WriteLine("PerimeterX Static block executed");
                 var moduleConfiguration = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				// allocate reporter if needed
-				if (moduleConfiguration != null && (moduleConfiguration.SendBlockActivites || moduleConfiguration.SendPageActivites))
-				{
-					var pxConfig = new PXConfigurationWrapper(moduleConfiguration);
+				pxConfig = new PXConfigurationWrapper(moduleConfiguration);
+                if (moduleConfiguration != null && (moduleConfiguration.SendBlockActivites || moduleConfiguration.SendPageActivites))
+                {
 					reporter = new ActivityReporter(PxConstants.FormatBaseUri(pxConfig), pxConfig.ActivitiesCapacity, pxConfig.ActivitiesBulkSize, pxConfig.ReporterApiTimeout);
 				}
 				else
 				{
 					reporter = new NullActivityMonitor();
 				}
+
+				var pxDefaultClient = new DefaultPxClient(pxConfig);
+
+                if (pxConfig.RemoteConfigurationEnabled)
+				{
+                    remoteConfigurationManager = new DefaultRemoteConfigurationManager(pxConfig, pxDefaultClient);
+                    timerConfigUpdater = new TimerConfigUpdater(remoteConfigurationManager);
+                    timerConfigUpdater.Schedule();
+				}
+
 			}
 			catch (Exception ex)
 			{
@@ -79,12 +92,6 @@ namespace PerimeterX
 		public PxModule()
 		{
             Debug.WriteLine("PerimeterX Module Initalize");
-            var moduleConfiguration = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-			if (moduleConfiguration == null)
-			{
-				throw new ConfigurationErrorsException("Missing PerimeterX module configuration section " + PxConstants.CONFIG_SECTION);
-			}
-            pxConfig = new PXConfigurationWrapper(moduleConfiguration);
 
 			// Set Decoder
 			if (pxConfig.EncryptionEnabled)
@@ -95,38 +102,17 @@ namespace PerimeterX
 			{
 				cookieDecoder = new CookieDecoder();
 			}
-
-			var webRequestHandler = new WebRequestHandler
-			{
-				AllowPipelining = true,
-				UseDefaultCredentials = true,
-				UnsafeAuthenticatedConnectionSharing = true
-			};
-			httpClient = new HttpClient(webRequestHandler, true)
-			{
-				Timeout = TimeSpan.FromMilliseconds(pxConfig.ApiTimeout)
-			};
-			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", pxConfig.ApiToken);
-			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			httpClient.DefaultRequestHeaders.ExpectContinue = false;
-
-			if (pxConfig.RemoteConfigurationEnabled)
-			{
-				remoteConfigurationManager = new DefaultRemoteConfigurationManager(pxConfig, httpClient);
-                //RemoteConfigurationManager.GetConfigurationFromServer();
-                ScheduleTask();
-			}
-
+			
 			using (var hasher = new SHA256Managed())
 			{
 				validationMarker = ByteArrayToHexString(hasher.ComputeHash(Encoding.UTF8.GetBytes(pxConfig.CookieKey)));
 			}
 
-			// Set Validators
-			pxS2SValidator = new PXS2SValidator(pxConfig, httpClient);
-			pxCaptchaValidator = new PXCaptchaValidator(pxConfig, httpClient);
-			pxCookieValidator = new PXCookieValidator(pxConfig);
-
+            // Set Validators
+			pxClient = new DefaultPxClient(pxConfig);
+            pxS2SValidator = new PXS2SValidator(pxConfig, pxClient);
+            pxCaptchaValidator = new PXCaptchaValidator(pxConfig, pxClient);
+            pxCookieValidator = new PXCookieValidator(pxConfig);
             verificationHandler = new DefaultVerificationHandler(reporter);
 
 			Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
@@ -226,6 +212,7 @@ namespace PerimeterX
 
 		public void Dispose()
 		{
+            Debug.WriteLine("Shutting down Px Module");
 			if (httpClient != null)
 			{
 				httpClient.Dispose();
@@ -280,15 +267,6 @@ namespace PerimeterX
 			}
 			return sb.ToString();
 		}
-
-        private void ScheduleTask() {
-            remoteConfigurationTask = new Timer(
-                remoteConfigurationManager.GetConfigurationFromServer,
-                null,
-                pxConfig.RemoteConfigurationDelay,
-                pxConfig.RemoteConfigurationInterval
-            );
-        }
 
 	}
 }

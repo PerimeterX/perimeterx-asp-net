@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace PerimeterX
 {
     public class PXConfigurationWrapper
     {
-        public PXConfigurationWrapper(PxModuleConfigurationSection config){
+        public PXConfigurationWrapper(PxModuleConfigurationSection config)
+        {
             Enabled = config.Enabled;
 			AppId = config.AppId;
 			CookieName = config.CookieName;
@@ -19,7 +21,7 @@ namespace PerimeterX
 			BaseUri = config.BaseUri;
 			ApiTimeout = config.ApiTimeout;
 			ReporterApiTimeout = config.ReporterApiTimeout;
-			SocketIpHeader = config.SocketIpHeader;
+			SocketIpHeader = config.SocketIpHeaders;
 			SuppressContentBlock = config.SuppressContentBlock;
 			ActivitiesCapacity = config.ActivitiesCapacity;
 			ActivitiesBulkSize = config.ActivitiesBulkSize;
@@ -40,18 +42,18 @@ namespace PerimeterX
             RemoteConfigurationDelay = config.RemoteConfigurationDelay;
         }
 
-        public void Update(PXDynamicConfiguration configurationStub)
+        public void Update(PXDynamicConfiguration dynamicConfig)
         {
-			// update all configs
-			AppId = configurationStub.AppId;
-			Enabled = configurationStub.ModuleEnabled;
-			CookieKey = configurationStub.CookieKey;
-			BlockingScore = configurationStub.BlockingScore;
-			MonitorMode = configurationStub.ModuleMode.Equals("monitoring");
-			SocketIpHeader = PxConstants.ArrayToStringCollection(configurationStub.IpHeaders);
-			SensitiveHeaders = PxConstants.ArrayToStringCollection(configurationStub.SensitiveHeaders);
-			ApiTimeout = configurationStub.RiskTimeout;
-			Checksum = configurationStub.Checksum;  
+            Debug.WriteLine("New configurations were found, updating configuration");
+			AppId = dynamicConfig.AppId;
+			Enabled = dynamicConfig.ModuleEnabled;
+			CookieKey = dynamicConfig.CookieKey;
+			BlockingScore = dynamicConfig.BlockingScore;
+			MonitorMode = dynamicConfig.ModuleMode.Equals("monitoring");
+			SocketIpHeader = PxConstants.ArrayToStringCollection(dynamicConfig.IpHeaders);
+			SensitiveHeaders = PxConstants.ArrayToStringCollection(dynamicConfig.SensitiveHeaders);
+			ApiTimeout = dynamicConfig.RiskTimeout;
+			Checksum = dynamicConfig.Checksum;  
         }
 
 		public bool Enabled { get; set; }

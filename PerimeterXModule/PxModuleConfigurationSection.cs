@@ -199,17 +199,17 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("socketIpHeader")]
+        [ConfigurationProperty("socketIpHeaders")]
 		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
-		public StringCollection SocketIpHeader
+		public StringCollection SocketIpHeaders
         {
             get
             {
-                return (StringCollection)this["socketIpHeader"];
+                return (StringCollection)this["socketIpHeaders"];
             }
             set
             {
-                this["socketIpHeader"] = value;
+                this["socketIpHeaders"] = value;
             }
         }
 
@@ -401,7 +401,7 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("sensitiveRoutes", DefaultValue = "")]
+        [ConfigurationProperty("sensitiveRoutes")]
         [TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
         public StringCollection SensitiveRoutes
         {
