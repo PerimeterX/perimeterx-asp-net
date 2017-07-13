@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Jil;
+using System.Threading;
 
 namespace PerimeterX
 {
@@ -22,10 +23,7 @@ namespace PerimeterX
 				UseDefaultCredentials = true,
 				UnsafeAuthenticatedConnectionSharing = true
 			};
-			httpClient = new HttpClient(webRequestHandler, true)
-			{
-				Timeout = TimeSpan.FromMilliseconds(pxConfig.ApiTimeout)
-			};
+			httpClient = new HttpClient(webRequestHandler, true);
 
 			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", pxConfig.ApiToken);
 			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -39,8 +37,9 @@ namespace PerimeterX
 
 			// Set request
 			var requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUrl);
-            httpClient.Timeout = TimeSpan.FromMilliseconds(pxConfig.ApiTimeout);
-			var httpResponse = httpClient.SendAsync(requestMessage).Result;
+			CancellationTokenSource source = new CancellationTokenSource(TimeSpan.FromMilliseconds(pxConfig.ApiTimeout));
+			CancellationToken cancellationToken = source.Token;
+			var httpResponse = httpClient.SendAsync(requestMessage, cancellationToken).Result;
 
             Debug.WriteLine(string.Format("response for {0} received status code {1}", requestUrl, httpResponse.StatusCode));
 
@@ -66,7 +65,9 @@ namespace PerimeterX
 			{
 				Content = new StringContent(requestJson, Encoding.UTF8, "application/json"),
             };
-			var httpResponse = httpClient.SendAsync(requestMessage).Result;
+			CancellationTokenSource source = new CancellationTokenSource(TimeSpan.FromMilliseconds(pxConfig.ApiTimeout));
+			CancellationToken cancellationToken = source.Token;
+			var httpResponse = httpClient.SendAsync(requestMessage, cancellationToken).Result;
 			httpResponse.EnsureSuccessStatusCode();
 			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
 			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.JSON_OPTIONS, requestJson, responseJson), PxConstants.LOG_CATEGORY);
@@ -80,8 +81,9 @@ namespace PerimeterX
 			{
 				Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
 			};
-
-			var httpResponse = httpClient.SendAsync(requestMessage).Result;
+			CancellationTokenSource source = new CancellationTokenSource(TimeSpan.FromMilliseconds(pxConfig.ApiTimeout));
+			CancellationToken cancellationToken = source.Token;
+			var httpResponse = httpClient.SendAsync(requestMessage, cancellationToken).Result;
 			httpResponse.EnsureSuccessStatusCode();
 			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
 			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.RISK_API_V2, requestJson, responseJson), PxConstants.LOG_CATEGORY);
