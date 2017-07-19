@@ -23,7 +23,7 @@ namespace PerimeterX
 			this.pxClient = pxClient;
 		}
 
-		public void GetConfigurationFromServer(object state)
+		public void GetConfigurationFromServer()
 		{
 			try
 			{
@@ -39,14 +39,14 @@ namespace PerimeterX
 
 				if (dynamicConfig != null)
 				{
-					pxConfig.Update(dynamicConfig);
+					
 				}
 
 			}
 
 			catch (AggregateException ex)
 			{
-				if ((ex.InnerException is TaskCanceledException) && (string.IsNullOrEmpty(pxConfig.Checksum)))
+				if (string.IsNullOrEmpty(pxConfig.Checksum))
 				{
 					DisableModuleOnError();
 				}
@@ -54,8 +54,12 @@ namespace PerimeterX
 
 		}
 
+		public void UpdateConfiguration(PXDynamicConfiguration dynamicConfig)
+		{
+			pxConfig.Update(dynamicConfig);
+		}
 
-		private void DisableModuleOnError()
+		public void DisableModuleOnError()
 		{
 			if (string.IsNullOrEmpty(pxConfig.Checksum) && !pxConfig.Enabled)
 			{

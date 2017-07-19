@@ -3,6 +3,8 @@ namespace PerimeterX
 {
 	public interface RemoteConfigurationManager
 	{
-		void GetConfigurationFromServer(object state);
+		PXDynamicConfiguration GetConfiguration();
+		void UpdateConfiguration(PXDynamicConfiguration dynamicConfig);
+		void DisableModuleOnError();
 	}
 }
