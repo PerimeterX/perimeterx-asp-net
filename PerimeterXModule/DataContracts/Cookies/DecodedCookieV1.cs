@@ -2,6 +2,7 @@
 
 namespace PerimeterX
 {
+	[DataContract]
 	public class DecodedCookieV1
 	{
 		[DataMember(Name = "u")]

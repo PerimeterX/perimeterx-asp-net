@@ -21,21 +21,23 @@ namespace PerimeterX
 
 	public class EncryptedCookieDecoder : ICookieDecoder
 	{
-		private byte[] cookieKey;
+		private PXConfigurationWrapper pxConfig;
+
 		private const int KEY_SIZE_BITS = 256;
 		private const int IV_SIZE_BITS = 128;
 
-		public EncryptedCookieDecoder(byte[] cookieKey)
+		public EncryptedCookieDecoder(PXConfigurationWrapper pxConfig)
 		{
-			if (cookieKey == null)
+			if (pxConfig == null)
 			{
-				throw new NullReferenceException("cookieKey");
+				throw new NullReferenceException("PXConfigurationWrapper");
 			}
-			this.cookieKey = cookieKey;
+			this.pxConfig = pxConfig;
 		}
 
 		public string Decode(string cookie)
 		{
+			var cookieKeyBytes = Encoding.UTF8.GetBytes(pxConfig.CookieKey);
 			if (cookie == null)
 			{
 				throw new ArgumentNullException("cookie");
@@ -61,7 +63,7 @@ namespace PerimeterX
 			{
 				var key = new byte[KEY_SIZE_BITS / 8];
 				var iv = new byte[IV_SIZE_BITS / 8];
-				var dk = PBKDF2Sha256GetBytes(key.Length + iv.Length, this.cookieKey, salt, iterations);
+				var dk = PBKDF2Sha256GetBytes(key.Length + iv.Length, cookieKeyBytes, salt, iterations);
 				Array.Copy(dk, key, key.Length);
 				Array.Copy(dk, key.Length, iv, 0, iv.Length);
 

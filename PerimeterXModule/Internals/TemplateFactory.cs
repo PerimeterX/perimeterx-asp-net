@@ -9,7 +9,7 @@ namespace PerimeterX
 	abstract class TemplateFactory
 	{
 
-		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid)
+		public static string getTemplate(string template, PXConfigurationWrapper pxConfiguration, string uuid, string vid)
 		{
 			string templateStr = getTemplateString(template);
 			return Render.StringToString(templateStr, getProps(pxConfiguration, uuid, vid));
@@ -34,7 +34,7 @@ namespace PerimeterX
 			return templateStr;
 		}
 
-		private static IDictionary<String, String> getProps(PxModuleConfigurationSection pxConfiguration, string uuid, string vid)
+		private static IDictionary<String, String> getProps(PXConfigurationWrapper pxConfiguration, string uuid, string vid)
 		{
 			IDictionary<String, String> props = new Dictionary<String, String>();
 			props.Add("refId", uuid);

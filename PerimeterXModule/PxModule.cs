@@ -27,59 +27,61 @@ using System;
 using System.Web;
 using System.Security.Cryptography;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Net.Http.Headers;
 using System.Configuration;
 using System.Diagnostics;
-using System.Collections.Specialized;
-using System.Net;
-using System.Linq;
 using System.Reflection;
 using System.Collections;
+using System.Timers;
 
 namespace PerimeterX
 {
 	public class PxModule : IHttpModule
 	{
-		private HttpClient httpClient;
-		private PxContext pxContext;
 		private static IActivityReporter reporter;
+		private static RemoteConfigurationManager remoteConfigurationManager;
+		private static PXConfigurationWrapper pxConfig;
+		private static TimerConfigUpdater timerConfigUpdater;
+		private static HttpClient httpClient;
+		private static DefaultPxClient pxClient;
+
+		private PxContext pxContext;
 		private readonly string validationMarker;
 		private readonly ICookieDecoder cookieDecoder;
-		private readonly IPXCaptchaValidator PxCaptchaValidator;
-		private readonly IPXCookieValidator PxCookieValidator;
-		private readonly IPXS2SValidator PxS2SValidator;
+		private readonly IPXCaptchaValidator pxCaptchaValidator;
+		private readonly IPXCookieValidator pxCookieValidator;
+		private readonly IPXS2SValidator pxS2SValidator;
+		private readonly VerificationHandler verificationHandler;
 
-		private readonly bool enabled;
-		private readonly bool sendPageActivites;
-		private readonly bool sendBlockActivities;
-		private readonly int blockingScore;
-		private readonly string appId;
-		private readonly bool suppressContentBlock;
-		private readonly bool captchaEnabled;
-		private readonly string[] sensetiveHeaders;
-		private readonly StringCollection fileExtWhitelist;
-		private readonly StringCollection routesWhitelist;
-		private readonly StringCollection useragentsWhitelist;
-		private readonly string cookieKey;
-		private readonly byte[] cookieKeyBytes;
-
+		// Set here everything that need to have single instance/Singleton
 		static PxModule()
 		{
 			try
 			{
-				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+				Debug.WriteLine("PerimeterX Static block executed");
+				var moduleConfiguration = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				// allocate reporter if needed
-				if (config != null && (config.SendBlockActivites || config.SendPageActivites))
+				pxConfig = new PXConfigurationWrapper(moduleConfiguration);
+				if (moduleConfiguration != null && (moduleConfiguration.SendBlockActivites || moduleConfiguration.SendPageActivites))
 				{
-					reporter = new ActivityReporter(PxConstants.FormatBaseUri(config), config.ActivitiesCapacity, config.ActivitiesBulkSize, config.ReporterApiTimeout);
+					reporter = new ActivityReporter(PxConstants.FormatBaseUri(pxConfig), pxConfig.ActivitiesCapacity, pxConfig.ActivitiesBulkSize, pxConfig.ReporterApiTimeout);
 				}
 				else
 				{
 					reporter = new NullActivityMonitor();
 				}
+
+				var pxDefaultClient = new DefaultPxClient(pxConfig);
+
+				if (pxConfig.RemoteConfigurationEnabled)
+				{
+					remoteConfigurationManager = new DefaultRemoteConfigurationManager(pxConfig, pxDefaultClient);
+					timerConfigUpdater = new TimerConfigUpdater(pxConfig, remoteConfigurationManager);
+					timerConfigUpdater.Schedule();
+				}
+
 			}
 			catch (Exception ex)
 			{
@@ -89,61 +91,29 @@ namespace PerimeterX
 
 		public PxModule()
 		{
-			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-			if (config == null)
-			{
-				throw new ConfigurationErrorsException("Missing PerimeterX module configuration section " + PxConstants.CONFIG_SECTION);
-			}
-
-			// load configuration
-			enabled = config.Enabled;
-			sendPageActivites = config.SendPageActivites;
-			sendBlockActivities = config.SendBlockActivites;
-			cookieKey = config.CookieKey;
-			cookieKeyBytes = Encoding.UTF8.GetBytes(cookieKey);
-			blockingScore = config.BlockingScore;
-			appId = config.AppId;
-			suppressContentBlock = config.SuppressContentBlock;
-			captchaEnabled = config.CaptchaEnabled;
-			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
-			fileExtWhitelist = config.FileExtWhitelist;
-			routesWhitelist = config.RoutesWhitelist;
-			useragentsWhitelist = config.UseragentsWhitelist;
+			Debug.WriteLine("PerimeterX Module Initalize");
 
 			// Set Decoder
-			if (config.EncryptionEnabled)
+			if (pxConfig.EncryptionEnabled)
 			{
-				cookieDecoder = new EncryptedCookieDecoder(cookieKeyBytes);
+				cookieDecoder = new EncryptedCookieDecoder(pxConfig);
 			}
 			else
 			{
 				cookieDecoder = new CookieDecoder();
 			}
 
-			var webRequestHandler = new WebRequestHandler
-			{
-				AllowPipelining = true,
-				UseDefaultCredentials = true,
-				UnsafeAuthenticatedConnectionSharing = true
-			};
-			this.httpClient = new HttpClient(webRequestHandler, true)
-			{
-				Timeout = TimeSpan.FromMilliseconds(config.ApiTimeout)
-			};
-			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.ApiToken);
-			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			httpClient.DefaultRequestHeaders.ExpectContinue = false;
-
 			using (var hasher = new SHA256Managed())
 			{
-				validationMarker = ByteArrayToHexString(hasher.ComputeHash(cookieKeyBytes));
+				validationMarker = ByteArrayToHexString(hasher.ComputeHash(Encoding.UTF8.GetBytes(pxConfig.CookieKey)));
 			}
 
 			// Set Validators
-
-			PxS2SValidator = new PXS2SValidator(config, httpClient);
-			PxCaptchaValidator = new PXCaptchaValidator(config, httpClient);
-			PxCookieValidator = new PXCookieValidator(config);
+			pxClient = new DefaultPxClient(pxConfig);
+			pxS2SValidator = new PXS2SValidator(pxConfig, pxClient);
+			pxCaptchaValidator = new PXCaptchaValidator(pxConfig, pxClient);
+			pxCookieValidator = new PXCookieValidator(pxConfig);
+			verificationHandler = new DefaultVerificationHandler(reporter);
 
 			Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
 		}
@@ -202,19 +172,7 @@ namespace PerimeterX
 					ro.SetValue(headers, true, null);
 				}
 
-				if (VerifyRequest(applicationContext))
-				{
-					Debug.WriteLine("Valid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
-					PostPageRequestedActivity(pxContext);
-
-				}
-				else
-				{
-					Debug.WriteLine("Invalid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
-					PostBlockActivity(pxContext);
-					BlockRequest(pxContext);
-					application.CompleteRequest();
-				}
+				VerifyRequest(application);
 			}
 			catch (Exception ex)
 			{
@@ -222,87 +180,39 @@ namespace PerimeterX
 			}
 		}
 
-		private void PostPageRequestedActivity(PxContext pxContext)
+		private bool VerifyRequest(HttpApplication application)
 		{
-			if (sendPageActivites)
+			try
 			{
-				PostActivity(pxContext, "page_requested", new ActivityDetails
+				pxContext = new PxContext(application.Context, pxConfig);
+
+				// check captcha after cookie validation to capture vid
+				if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && pxCaptchaValidator.CaptchaVerify(pxContext))
 				{
-					ModuleVersion = PxConstants.MODULE_VERSION,
-					PassReason = pxContext.PassReason,
-					RiskRoundtripTime = pxContext.RiskRoundtripTime
-				});
-			}
-		}
+					return true;
+				}
 
-		private void PostBlockActivity(PxContext pxContext)
-		{
-			if (sendBlockActivities)
-			{
-				PostActivity(pxContext, "block", new ActivityDetails
+				// validate using risk cookie
+				IPxCookie pxCookie = PxCookieUtils.BuildCookie(pxConfig, pxContext, cookieDecoder);
+				if (!pxCookieValidator.CookieVerify(pxContext, pxCookie))
 				{
-					BlockReason = pxContext.BlockReason,
-					BlockUuid = pxContext.UUID,
-					ModuleVersion = PxConstants.MODULE_VERSION,
-					RiskScore = pxContext.Score,
-					RiskRoundtripTime = pxContext.RiskRoundtripTime
-				});
+					// validate using server risk api
+					pxS2SValidator.VerifyS2S(pxContext);
+				}
+
+				return verificationHandler.HandleVerificatoin(pxConfig, pxContext, application);
 			}
-		}
-
-		private void PostActivity(PxContext pxContext, string eventType, ActivityDetails details = null)
-		{
-			var activity = new Activity
+			catch (Exception ex)
 			{
-				Type = eventType,
-				Timestamp = Math.Round(DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds, MidpointRounding.AwayFromZero),
-				AppId = appId,
-				SocketIP = pxContext.Ip,
-				Url = pxContext.FullUrl,
-				Details = details
-			};
-
-			activity.Headers = new Dictionary<string, string>();
-
-			foreach (RiskRequestHeader riskHeader in pxContext.Headers)
-			{
-				var key = riskHeader.Name;
-				activity.Headers.Add(key, riskHeader.Value);
+				Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
+				pxContext.PassReason = PassReasonEnum.ERROR;
+				return verificationHandler.HandleVerificatoin(pxConfig, pxContext, application);
 			}
-
-			reporter.Post(activity);
-		}
-
-		private void BlockRequest(PxContext pxContext)
-		{
-			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-			pxContext.ApplicationContext.Response.TrySkipIisCustomErrors = true;
-			if (suppressContentBlock)
-			{
-				pxContext.ApplicationContext.Response.SuppressContent = true;
-			}
-			else
-			{
-				ResponseBlockPage(pxContext);
-			}
-		}
-
-		private void ResponseBlockPage(PxContext pxContext)
-		{
-			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-			string template = "block";
-			string content;
-			if (captchaEnabled)
-			{
-				template = "captcha";
-			}
-			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
-			content = TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
-			pxContext.ApplicationContext.Response.Write(content);
 		}
 
 		public void Dispose()
 		{
+			Debug.WriteLine("Shutting down Px Module");
 			if (httpClient != null)
 			{
 				httpClient.Dispose();
@@ -312,7 +222,7 @@ namespace PerimeterX
 
 		private bool IsFilteredRequest(HttpContext context)
 		{
-			if (!enabled)
+			if (!pxConfig.Enabled)
 			{
 				return true;
 			}
@@ -320,16 +230,16 @@ namespace PerimeterX
 
 			// whitelist file extension
 			var ext = Path.GetExtension(context.Request.Url.AbsolutePath).ToLowerInvariant();
-			if (fileExtWhitelist != null && fileExtWhitelist.Contains(ext))
+			if (pxConfig.FileExtWhitelist != null && pxConfig.FileExtWhitelist.Contains(ext))
 			{
 				return true;
 			}
 
 			// whitelist routes prefix
 			var url = context.Request.Url.AbsolutePath;
-			if (routesWhitelist != null)
+			if (pxConfig.RoutesWhitelist != null)
 			{
-				foreach (var prefix in routesWhitelist)
+				foreach (var prefix in pxConfig.RoutesWhitelist)
 				{
 					if (url.StartsWith(prefix))
 					{
@@ -339,42 +249,12 @@ namespace PerimeterX
 			}
 
 			// whitelist user-agent
-			if (useragentsWhitelist != null && useragentsWhitelist.Contains(context.Request.UserAgent))
+			if (pxConfig.UseragentsWhitelist != null && pxConfig.UseragentsWhitelist.Contains(context.Request.UserAgent))
 			{
 				return true;
 			}
 
 			return false;
-		}
-
-		private bool VerifyRequest(HttpContext applicationContext)
-		{
-			try
-			{
-				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-				pxContext = new PxContext(applicationContext, config);
-
-				// check captcha after cookie validation to capture vid
-				if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && PxCaptchaValidator.CaptchaVerify(pxContext))
-				{
-					return true;
-				}
-
-				// validate using risk cookie
-				IPxCookie pxCookie = PxCookieUtils.BuildCookie(config, pxContext, cookieDecoder);
-				if (!PxCookieValidator.CookieVerify(pxContext, pxCookie))
-				{
-					// validate using server risk api
-					PxS2SValidator.VerifyS2S(pxContext);
-				}
-
-				return config.BlockingScore > pxContext.Score;
-			}
-			catch (Exception ex) {
-				Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
-				pxContext.PassReason = PassReasonEnum.ERROR;
-				return true; //true pass request
-			}
 		}
 
 		private static string ByteArrayToHexString(byte[] input)

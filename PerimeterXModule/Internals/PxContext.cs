@@ -34,7 +34,7 @@ namespace PerimeterX
 		public PassReasonEnum PassReason { get; set; }
 		public long RiskRoundtripTime { get; set; }
 
-		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
+		public PxContext(HttpContext context, PXConfigurationWrapper pxConfiguration)
 		{
 			ApplicationContext = context;
 
@@ -62,7 +62,7 @@ namespace PerimeterX
 			}
 
 			// Get Headers
-			
+
 			// if userAgentOverride is present override the default user-agent
 			string userAgentOverride = pxConfiguration.UserAgentOverride;
 			if (!string.IsNullOrEmpty(userAgentOverride))
@@ -105,21 +105,27 @@ namespace PerimeterX
 
 			Ip = context.Request.UserHostAddress;
 			// Get IP from custom header
-			string socketIpHeader = pxConfiguration.SocketIpHeader;
-			if (!string.IsNullOrEmpty(socketIpHeader))
+			var socketIpHeaders = pxConfiguration.SocketIpHeader;
+			if (socketIpHeaders != null)
 			{
-				var headerVal = context.Request.Headers[socketIpHeader];
-				if (headerVal != null)
+				foreach (string socketIpHeader in socketIpHeaders)
 				{
-					var ips = headerVal.Split(new char[] { ',', ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-					IPAddress firstIpAddress;
-					if (ips.Length > 0 && IPAddress.TryParse(ips[0], out firstIpAddress))
+					if (!string.IsNullOrEmpty(socketIpHeader))
 					{
-						Ip = ips[0];
+						var headerVal = context.Request.Headers[socketIpHeader];
+						if (headerVal != null)
+						{
+							var ips = headerVal.Split(new char[] { ',', ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+							IPAddress firstIpAddress;
+							if (ips.Length > 0 && IPAddress.TryParse(ips[0], out firstIpAddress))
+							{
+								Ip = ips[0];
+							}
+						}
 					}
+
 				}
 			}
-
 			HttpVersion = ExtractHttpVersion(context);
 			HttpMethod = context.Request.HttpMethod;
 
@@ -128,10 +134,14 @@ namespace PerimeterX
 
 		private bool CheckSensitiveRoute(StringCollection sensitiveRoutes, string uri)
 		{
-			foreach( string sensitiveRoute in sensitiveRoutes) {
-				if (uri.StartsWith(sensitiveRoute))
+			if (sensitiveRoutes != null)
+			{
+				foreach (string sensitiveRoute in sensitiveRoutes)
 				{
-					return true;
+					if (uri.StartsWith(sensitiveRoute))
+					{
+						return true;
+					}
 				}
 			}
 			return false;

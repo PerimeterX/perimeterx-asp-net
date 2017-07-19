@@ -199,16 +199,17 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("socketIpHeader")]
-		public string SocketIpHeader
+		[ConfigurationProperty("socketIpHeaders")]
+		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+		public StringCollection SocketIpHeaders
 		{
 			get
 			{
-				return (string)this["socketIpHeader"];
+				return (StringCollection)this["socketIpHeaders"];
 			}
 			set
 			{
-				this["socketIpHeader"] = value;
+				this["socketIpHeaders"] = value;
 			}
 		}
 
@@ -251,7 +252,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sendPageActivities", DefaultValue = false)]
+		[ConfigurationProperty("sendPageActivities", DefaultValue = true)]
 		public bool SendPageActivites
 		{
 			get
@@ -400,7 +401,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sensitiveRoutes", DefaultValue = "")]
+		[ConfigurationProperty("sensitiveRoutes")]
 		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
 		public StringCollection SensitiveRoutes
 		{
@@ -413,5 +414,46 @@ namespace PerimeterX
 				this["sensitiveRoutes"] = value;
 			}
 		}
+
+		[ConfigurationProperty("remoteConfigurationEnabled", DefaultValue = false)]
+		public bool RemoteConfigurationEnabled
+		{
+			get
+			{
+				return (bool)this["remoteConfigurationEnabled"];
+			}
+			set
+			{
+				this["remoteConfigurationEnabled"] = value;
+			}
+		}
+
+		[ConfigurationProperty("remoteConfigurationInterval", DefaultValue = 5000)]
+		public int RemoteConfigurationInterval
+		{
+			get
+			{
+				return (int)this["remoteConfigurationInterval"];
+			}
+			set
+			{
+				this["remoteConfigurationInterval"] = value;
+			}
+		}
+
+		[ConfigurationProperty("remoteConfigurationDelay", DefaultValue = 0)]
+		public int RemoteConfigurationDelay
+		{
+			get
+			{
+				return (int)this["remoteConfigurationDelay"];
+			}
+			set
+			{
+				this["remoteConfigurationDelay"] = value;
+			}
+		}
+
+
 	}
 }

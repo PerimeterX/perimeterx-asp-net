@@ -5,11 +5,11 @@ namespace PerimeterX
 {
 	class PXCookieValidator : IPXCookieValidator
 	{
-		private PxModuleConfigurationSection config;
+		private PXConfigurationWrapper pxConfig;
 
-		public PXCookieValidator(PxModuleConfigurationSection config)
+		public PXCookieValidator(PXConfigurationWrapper config)
 		{
-			this.config = config;
+			this.pxConfig = config;
 		}
 
 		public bool CookieVerify(PxContext context, IPxCookie pxCookie)
@@ -45,7 +45,7 @@ namespace PerimeterX
 					return false;
 				}
 
-				if (pxCookie.Score >= config.BlockingScore)
+				if (pxCookie.Score >= pxConfig.BlockingScore)
 				{
 					context.BlockReason = BlockReasonEnum.COOKIE_HIGH_SCORE;
 					Debug.WriteLine(string.Format("Request blocked by risk cookie UUID {0}, VID {1}", pxCookie.Uuid, pxCookie.Vid), PxConstants.LOG_CATEGORY);
@@ -59,7 +59,7 @@ namespace PerimeterX
 					return false;
 				}
 
-				if (!pxCookie.IsSecured(config.CookieKey, getAdditionalSignedFields(context)))
+				if (!pxCookie.IsSecured(pxConfig.CookieKey, getAdditionalSignedFields(context)))
 				{
 					Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.Hmac, context.Uri), PxConstants.LOG_CATEGORY);
 					context.S2SCallReason = RiskRequestReasonEnum.VALIDATION_FAILED;
@@ -87,7 +87,7 @@ namespace PerimeterX
 
 		private string[] getAdditionalSignedFields(PxContext context)
 		{
-			return config.SignedWithIP ?
+			return pxConfig.SignedWithIP ?
 				new string[] { context.Ip, context.UserAgent } :
 				new string[] { context.UserAgent };
 		}

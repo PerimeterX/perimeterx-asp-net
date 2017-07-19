@@ -106,6 +106,15 @@
     <Compile Include="DataContracts\Responses\RiskResponse.cs" />
     <Compile Include="DataContracts\Activities\Activity.cs" />
     <Compile Include="DataContracts\Activities\ActivityDetails.cs" />
+    <Compile Include="Internals\RemoteConfiguration\Interface\RemoteConfigurationManager.cs" />
+    <Compile Include="Internals\RemoteConfiguration\DefaultRemoteConfigurationManager.cs" />
+    <Compile Include="DataContracts\Configuration\PXDynamicConfiguration.cs" />
+    <Compile Include="DataContracts\Configuration\PXConfigurationWrapper.cs" />
+    <Compile Include="Internals\VerificationHandlers\Interface\VerificationHandler.cs" />
+    <Compile Include="Internals\VerificationHandlers\DefaultVerificationHandler.cs" />
+    <Compile Include="Internals\PXClient\Interface\PxClient.cs" />
+    <Compile Include="Internals\PXClient\DefaultPxClient.cs" />
+    <Compile Include="Internals\RemoteConfiguration\TimerConfigUpdater.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Internals\Templates\block.mustache" />
@@ -124,6 +133,15 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Internals\RemoteConfiguration\" />
+    <Folder Include="Internals\RemoteConfiguration\Interface\" />
+    <Folder Include="DataContracts\Configuration\" />
+    <Folder Include="Internals\VerificationHandlers\" />
+    <Folder Include="Internals\VerificationHandlers\Interface\" />
+    <Folder Include="Internals\PXClient\" />
+    <Folder Include="Internals\PXClient\Interface\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets" Condition="Exists('..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets')" />
 </Project>
