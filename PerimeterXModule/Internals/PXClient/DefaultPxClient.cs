@@ -33,7 +33,7 @@ namespace PerimeterX
 		public PXDynamicConfiguration GetConfigurationRequest()
 		{
 			string checksumParam = "";
-			if (string.IsNullOrEmpty(pxConfig.Checksum))
+			if (!string.IsNullOrEmpty(pxConfig.Checksum))
 			{
 				checksumParam = "?checksum=" + pxConfig.Checksum;
 			}
