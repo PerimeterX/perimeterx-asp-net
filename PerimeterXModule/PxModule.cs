@@ -78,7 +78,7 @@ namespace PerimeterX
 				if (pxConfig.RemoteConfigurationEnabled)
 				{
 					remoteConfigurationManager = new DefaultRemoteConfigurationManager(pxConfig, pxDefaultClient);
-					timerConfigUpdater = new TimerConfigUpdater(remoteConfigurationManager);
+					timerConfigUpdater = new TimerConfigUpdater(pxConfig, remoteConfigurationManager);
 					timerConfigUpdater.Schedule();
 				}
 

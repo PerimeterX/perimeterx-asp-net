@@ -7,6 +7,6 @@ namespace PerimeterX
 	{
 		RiskResponse SendRiskRequest(RiskRequest riskRequest);
 		CaptchaResponse SendCaptchaRequest(CaptchaRequest captchaRequest);
-		PXDynamicConfiguration GetConfigurationRequest(string checksumParam);
+		PXDynamicConfiguration GetConfigurationRequest();
 	}
 }

@@ -1,21 +1,38 @@
-﻿using System;
-using System.Threading;
+﻿using System.Timers;
 
 namespace PerimeterX
 {
 	public class TimerConfigUpdater
 	{
 		private RemoteConfigurationManager remoteConfigManager;
-		private Timer timer;
+		private PXConfigurationWrapper pxConfiguration;
 
-		public TimerConfigUpdater(RemoteConfigurationManager remoteConfigManager)
+		public TimerConfigUpdater(PXConfigurationWrapper pxConfiguration, RemoteConfigurationManager remoteConfigManager)
 		{
 			this.remoteConfigManager = remoteConfigManager;
+			this.pxConfiguration = pxConfiguration;
 		}
 
 		public void Schedule()
 		{
-			timer = new Timer(remoteConfigManager.GetConfigurationFromServer, null, 0, 5000);
+			Timer timer = new Timer(pxConfiguration.RemoteConfigurationInterval);
+
+			timer.Elapsed += OnTimedEvent;
+			timer.Enabled = true;
 		}
+
+		private void OnTimedEvent(object source, ElapsedEventArgs e)
+		{
+			PXDynamicConfiguration dynamicConfig = remoteConfigManager.GetConfiguration();
+			if (dynamicConfig != null)
+			{
+				remoteConfigManager.UpdateConfiguration(dynamicConfig);
+			}
+			else if (pxConfiguration.Checksum == null)
+			{
+				remoteConfigManager.DisableModuleOnError();
+			}
+		}
+
 	}
 }

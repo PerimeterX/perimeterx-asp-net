@@ -30,9 +30,14 @@ namespace PerimeterX
 			httpClient.DefaultRequestHeaders.ExpectContinue = false;
 		}
 
-		public PXDynamicConfiguration GetConfigurationRequest(string checksumParams)
+		public PXDynamicConfiguration GetConfigurationRequest()
 		{
-			string requestUrl = string.Format("{0}{1}{2}", PxConstants.REMOTE_CONFIGURATION_SERVER, PxConstants.REMOTE_CONFIGURATION_PATH, checksumParams);
+			string checksumParam = "";
+			if (string.IsNullOrEmpty(pxConfig.Checksum))
+			{
+				checksumParam = "?checksum=" + pxConfig.Checksum;
+			}
+			string requestUrl = string.Format("{0}{1}{2}", PxConstants.REMOTE_CONFIGURATION_SERVER, PxConstants.REMOTE_CONFIGURATION_PATH, checksumParam);
 			Debug.WriteLine(string.Format("Get request for {0}", requestUrl), PxConstants.LOG_CATEGORY);
 
 			// Set request
@@ -53,7 +58,7 @@ namespace PerimeterX
 			{
 				var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
 				Debug.WriteLine(string.Format("Post request for {0} ), returned {1}", PxConstants.REMOTE_CONFIGURATION_SERVER, responseJson), PxConstants.LOG_CATEGORY);
-				return JSON.Deserialize<PXDynamicConfiguration>(responseJson, PxConstants.JSON_OPTIONS);
+				pxDynamicConfiguration = JSON.Deserialize<PXDynamicConfiguration>(responseJson, PxConstants.JSON_OPTIONS);
 			}
 			return pxDynamicConfiguration;
 		}

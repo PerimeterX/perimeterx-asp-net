@@ -23,35 +23,9 @@ namespace PerimeterX
 			this.pxClient = pxClient;
 		}
 
-		public void GetConfigurationFromServer()
+		public PXDynamicConfiguration GetConfiguration()
 		{
-			try
-			{
-				Debug.WriteLine(string.Format("DefaultRemoteConfigurationManager[GetConfigurationFromServer]"));
-				// Prepare url params
-				string checksumParam = "";
-				if (!string.IsNullOrEmpty(pxConfig.Checksum))
-				{
-					Debug.WriteLine("DefaultRemoteConfigurationManager[GetConfigurationFromServer]: adding checksum");
-					checksumParam = string.Format("?checksum={0}", pxConfig.Checksum);
-				}
-				var dynamicConfig = pxClient.GetConfigurationRequest(checksumParam);
-
-				if (dynamicConfig != null)
-				{
-					
-				}
-
-			}
-
-			catch (AggregateException ex)
-			{
-				if (string.IsNullOrEmpty(pxConfig.Checksum))
-				{
-					DisableModuleOnError();
-				}
-			}
-
+			return pxClient.GetConfigurationRequest();
 		}
 
 		public void UpdateConfiguration(PXDynamicConfiguration dynamicConfig)
