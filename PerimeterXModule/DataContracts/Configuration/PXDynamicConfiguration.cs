@@ -5,11 +5,11 @@ using System.Runtime.Serialization;
 
 namespace PerimeterX
 {
-    [DataContract]
-    public class PXDynamicConfiguration
-    {
+	[DataContract]
+	public class PXDynamicConfiguration
+	{
 		[DataMember(Name = "moduleEnabled")]
-        public bool ModuleEnabled { get; set; }
+		public bool ModuleEnabled { get; set; }
 
 		[DataMember(Name = "cookieKey")]
 		public string CookieKey { get; set; }
@@ -24,7 +24,7 @@ namespace PerimeterX
 		public string ModuleMode { get; set; }
 
 		[DataMember(Name = "ipHeaders")]
-        public string[] IpHeaders { get; set; }
+		public string[] IpHeaders { get; set; }
 
 		[DataMember(Name = "sensitiveHeaders")]
 		public string[] SensitiveHeaders { get; set; }

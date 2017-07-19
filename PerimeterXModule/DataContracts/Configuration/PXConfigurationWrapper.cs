@@ -4,8 +4,8 @@ using System.Diagnostics;
 
 namespace PerimeterX
 {
-    public class PXConfigurationWrapper
-    {
+	public class PXConfigurationWrapper
+	{
 		public bool Enabled { get; set; }
 		public string AppId { get; set; }
 		public string CookieName { get; set; }
@@ -41,8 +41,8 @@ namespace PerimeterX
 		public int RemoteConfigurationDelay { get; set; }
 
 		public PXConfigurationWrapper(PxModuleConfigurationSection config)
-        {
-            Enabled = config.Enabled;
+		{
+			Enabled = config.Enabled;
 			AppId = config.AppId;
 			CookieName = config.CookieName;
 			CookieKey = config.CookieKey;
@@ -72,13 +72,13 @@ namespace PerimeterX
 			MonitorMode = config.MonitorMode;
 			SensitiveRoutes = config.SensitiveRoutes;
 			RemoteConfigurationEnabled = config.RemoteConfigurationEnabled;
-            RemoteConfigurationInterval = config.RemoteConfigurationInterval;
-            RemoteConfigurationDelay = config.RemoteConfigurationDelay;
-        }
+			RemoteConfigurationInterval = config.RemoteConfigurationInterval;
+			RemoteConfigurationDelay = config.RemoteConfigurationDelay;
+		}
 
-        public void Update(PXDynamicConfiguration dynamicConfig)
-        {
-            Debug.WriteLine("New configurations were found, updating configuration");
+		public void Update(PXDynamicConfiguration dynamicConfig)
+		{
+			Debug.WriteLine("New configurations were found, updating configuration");
 			AppId = dynamicConfig.AppId;
 			Enabled = dynamicConfig.ModuleEnabled;
 			CookieKey = dynamicConfig.CookieKey;
@@ -87,7 +87,7 @@ namespace PerimeterX
 			SocketIpHeader = PxConstants.ArrayToStringCollection(dynamicConfig.IpHeaders);
 			SensitiveHeaders = PxConstants.ArrayToStringCollection(dynamicConfig.SensitiveHeaders);
 			ApiTimeout = dynamicConfig.RiskTimeout;
-			Checksum = dynamicConfig.Checksum;  
-        }
-    }
+			Checksum = dynamicConfig.Checksum;
+		}
+	}
 }

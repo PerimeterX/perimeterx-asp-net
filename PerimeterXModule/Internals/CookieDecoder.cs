@@ -19,25 +19,25 @@ namespace PerimeterX
 		}
 	}
 
-    public class EncryptedCookieDecoder : ICookieDecoder
-    {
-        private PXConfigurationWrapper pxConfig;
+	public class EncryptedCookieDecoder : ICookieDecoder
+	{
+		private PXConfigurationWrapper pxConfig;
 
-        private const int KEY_SIZE_BITS = 256;
+		private const int KEY_SIZE_BITS = 256;
 		private const int IV_SIZE_BITS = 128;
 
-        public EncryptedCookieDecoder(PXConfigurationWrapper pxConfig)
+		public EncryptedCookieDecoder(PXConfigurationWrapper pxConfig)
 		{
 			if (pxConfig == null)
 			{
 				throw new NullReferenceException("PXConfigurationWrapper");
 			}
-            this.pxConfig = pxConfig;
+			this.pxConfig = pxConfig;
 		}
 
 		public string Decode(string cookie)
 		{
-            var cookieKeyBytes = Encoding.UTF8.GetBytes(pxConfig.CookieKey);
+			var cookieKeyBytes = Encoding.UTF8.GetBytes(pxConfig.CookieKey);
 			if (cookie == null)
 			{
 				throw new ArgumentNullException("cookie");

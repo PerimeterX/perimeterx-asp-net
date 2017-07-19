@@ -34,7 +34,7 @@ namespace PerimeterX
 		public PassReasonEnum PassReason { get; set; }
 		public long RiskRoundtripTime { get; set; }
 
-        public PxContext(HttpContext context, PXConfigurationWrapper pxConfiguration)
+		public PxContext(HttpContext context, PXConfigurationWrapper pxConfiguration)
 		{
 			ApplicationContext = context;
 
@@ -62,7 +62,7 @@ namespace PerimeterX
 			}
 
 			// Get Headers
-			
+
 			// if userAgentOverride is present override the default user-agent
 			string userAgentOverride = pxConfiguration.UserAgentOverride;
 			if (!string.IsNullOrEmpty(userAgentOverride))
@@ -106,7 +106,8 @@ namespace PerimeterX
 			Ip = context.Request.UserHostAddress;
 			// Get IP from custom header
 			var socketIpHeaders = pxConfiguration.SocketIpHeader;
-            if (socketIpHeaders != null){
+			if (socketIpHeaders != null)
+			{
 				foreach (string socketIpHeader in socketIpHeaders)
 				{
 					if (!string.IsNullOrEmpty(socketIpHeader))
@@ -122,9 +123,9 @@ namespace PerimeterX
 							}
 						}
 					}
-					
+
 				}
-            }
+			}
 			HttpVersion = ExtractHttpVersion(context);
 			HttpMethod = context.Request.HttpMethod;
 
@@ -133,14 +134,16 @@ namespace PerimeterX
 
 		private bool CheckSensitiveRoute(StringCollection sensitiveRoutes, string uri)
 		{
-            if (sensitiveRoutes != null){
-				foreach( string sensitiveRoute in sensitiveRoutes) {
+			if (sensitiveRoutes != null)
+			{
+				foreach (string sensitiveRoute in sensitiveRoutes)
+				{
 					if (uri.StartsWith(sensitiveRoute))
 					{
 						return true;
 					}
 				}
-            }
+			}
 			return false;
 		}
 

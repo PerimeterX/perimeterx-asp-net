@@ -41,31 +41,31 @@ namespace PerimeterX
 	public class PxModule : IHttpModule
 	{
 		private static IActivityReporter reporter;
-        private static RemoteConfigurationManager remoteConfigurationManager;
-        private static PXConfigurationWrapper pxConfig;
-        private static TimerConfigUpdater timerConfigUpdater;
+		private static RemoteConfigurationManager remoteConfigurationManager;
+		private static PXConfigurationWrapper pxConfig;
+		private static TimerConfigUpdater timerConfigUpdater;
 		private static HttpClient httpClient;
-        private static DefaultPxClient pxClient;
+		private static DefaultPxClient pxClient;
 
-        private PxContext pxContext;
+		private PxContext pxContext;
 		private readonly string validationMarker;
-        private readonly ICookieDecoder cookieDecoder;
-        private readonly IPXCaptchaValidator pxCaptchaValidator;
-        private readonly IPXCookieValidator pxCookieValidator;
-        private readonly IPXS2SValidator pxS2SValidator;
-        private readonly VerificationHandler verificationHandler;
+		private readonly ICookieDecoder cookieDecoder;
+		private readonly IPXCaptchaValidator pxCaptchaValidator;
+		private readonly IPXCookieValidator pxCookieValidator;
+		private readonly IPXS2SValidator pxS2SValidator;
+		private readonly VerificationHandler verificationHandler;
 
-        // Set here everything that need to have single instance/Singleton
+		// Set here everything that need to have single instance/Singleton
 		static PxModule()
 		{
 			try
 			{
-                Debug.WriteLine("PerimeterX Static block executed");
-                var moduleConfiguration = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+				Debug.WriteLine("PerimeterX Static block executed");
+				var moduleConfiguration = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				// allocate reporter if needed
 				pxConfig = new PXConfigurationWrapper(moduleConfiguration);
-                if (moduleConfiguration != null && (moduleConfiguration.SendBlockActivites || moduleConfiguration.SendPageActivites))
-                {
+				if (moduleConfiguration != null && (moduleConfiguration.SendBlockActivites || moduleConfiguration.SendPageActivites))
+				{
 					reporter = new ActivityReporter(PxConstants.FormatBaseUri(pxConfig), pxConfig.ActivitiesCapacity, pxConfig.ActivitiesBulkSize, pxConfig.ReporterApiTimeout);
 				}
 				else
@@ -75,11 +75,11 @@ namespace PerimeterX
 
 				var pxDefaultClient = new DefaultPxClient(pxConfig);
 
-                if (pxConfig.RemoteConfigurationEnabled)
+				if (pxConfig.RemoteConfigurationEnabled)
 				{
-                    remoteConfigurationManager = new DefaultRemoteConfigurationManager(pxConfig, pxDefaultClient);
-                    timerConfigUpdater = new TimerConfigUpdater(remoteConfigurationManager);
-                    timerConfigUpdater.Schedule();
+					remoteConfigurationManager = new DefaultRemoteConfigurationManager(pxConfig, pxDefaultClient);
+					timerConfigUpdater = new TimerConfigUpdater(remoteConfigurationManager);
+					timerConfigUpdater.Schedule();
 				}
 
 			}
@@ -91,7 +91,7 @@ namespace PerimeterX
 
 		public PxModule()
 		{
-            Debug.WriteLine("PerimeterX Module Initalize");
+			Debug.WriteLine("PerimeterX Module Initalize");
 
 			// Set Decoder
 			if (pxConfig.EncryptionEnabled)
@@ -102,18 +102,18 @@ namespace PerimeterX
 			{
 				cookieDecoder = new CookieDecoder();
 			}
-			
+
 			using (var hasher = new SHA256Managed())
 			{
 				validationMarker = ByteArrayToHexString(hasher.ComputeHash(Encoding.UTF8.GetBytes(pxConfig.CookieKey)));
 			}
 
-            // Set Validators
+			// Set Validators
 			pxClient = new DefaultPxClient(pxConfig);
-            pxS2SValidator = new PXS2SValidator(pxConfig, pxClient);
-            pxCaptchaValidator = new PXCaptchaValidator(pxConfig, pxClient);
-            pxCookieValidator = new PXCookieValidator(pxConfig);
-            verificationHandler = new DefaultVerificationHandler(reporter);
+			pxS2SValidator = new PXS2SValidator(pxConfig, pxClient);
+			pxCaptchaValidator = new PXCaptchaValidator(pxConfig, pxClient);
+			pxCookieValidator = new PXCookieValidator(pxConfig);
+			verificationHandler = new DefaultVerificationHandler(reporter);
 
 			Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
 		}
@@ -172,7 +172,7 @@ namespace PerimeterX
 					ro.SetValue(headers, true, null);
 				}
 
-                VerifyRequest(application);
+				VerifyRequest(application);
 			}
 			catch (Exception ex)
 			{
@@ -180,11 +180,11 @@ namespace PerimeterX
 			}
 		}
 
-        private bool VerifyRequest(HttpApplication application)
+		private bool VerifyRequest(HttpApplication application)
 		{
 			try
 			{
-                pxContext = new PxContext(application.Context, pxConfig);
+				pxContext = new PxContext(application.Context, pxConfig);
 
 				// check captcha after cookie validation to capture vid
 				if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && pxCaptchaValidator.CaptchaVerify(pxContext))
@@ -200,19 +200,19 @@ namespace PerimeterX
 					pxS2SValidator.VerifyS2S(pxContext);
 				}
 
-                return verificationHandler.HandleVerificatoin(pxConfig, pxContext, application);
+				return verificationHandler.HandleVerificatoin(pxConfig, pxContext, application);
 			}
 			catch (Exception ex)
 			{
-                Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
+				Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
 				pxContext.PassReason = PassReasonEnum.ERROR;
-                return verificationHandler.HandleVerificatoin(pxConfig, pxContext, application);
+				return verificationHandler.HandleVerificatoin(pxConfig, pxContext, application);
 			}
 		}
 
 		public void Dispose()
 		{
-            Debug.WriteLine("Shutting down Px Module");
+			Debug.WriteLine("Shutting down Px Module");
 			if (httpClient != null)
 			{
 				httpClient.Dispose();

@@ -8,7 +8,7 @@ namespace PerimeterX
 {
 	public static class PxCookieUtils
 	{
-        public static IPxCookie BuildCookie(PXConfigurationWrapper config, PxContext context, ICookieDecoder cookieDecoder)
+		public static IPxCookie BuildCookie(PXConfigurationWrapper config, PxContext context, ICookieDecoder cookieDecoder)
 		{
 			if (context.PxCookies.Count > 0)
 			{

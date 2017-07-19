@@ -6,44 +6,45 @@ using System.Web;
 
 namespace PerimeterX
 {
-    public class DefaultVerificationHandler : VerificationHandler
-    {
-        private IActivityReporter activityReporter;
+	public class DefaultVerificationHandler : VerificationHandler
+	{
+		private IActivityReporter activityReporter;
 
-        public DefaultVerificationHandler(IActivityReporter activityReporter)
-        {
-            this.activityReporter = activityReporter;
-        }
+		public DefaultVerificationHandler(IActivityReporter activityReporter)
+		{
+			this.activityReporter = activityReporter;
+		}
 
-        public bool HandleVerificatoin(PXConfigurationWrapper pxConfig, PxContext pxCtx, HttpApplication application)
-        {
-            int score = pxCtx.Score;
+		public bool HandleVerificatoin(PXConfigurationWrapper pxConfig, PxContext pxCtx, HttpApplication application)
+		{
+			int score = pxCtx.Score;
 
-            if (score < pxConfig.BlockingScore || pxConfig.MonitorMode){
-                Debug.WriteLine("Request was verified, passing request, score {0} mintor mode {1}", score, pxConfig.MonitorMode);
-                PostPageRequestedActivity(pxCtx, pxConfig);
-                return true;
-            }
+			if (score < pxConfig.BlockingScore || pxConfig.MonitorMode)
+			{
+				Debug.WriteLine("Request was verified, passing request, score {0} mintor mode {1}", score, pxConfig.MonitorMode);
+				PostPageRequestedActivity(pxCtx, pxConfig);
+				return true;
+			}
 
 			Debug.WriteLine("Request was not verified, blocking request, score {0}", score, pxConfig.MonitorMode);
-            PostBlockActivity(pxCtx, pxConfig);
+			PostBlockActivity(pxCtx, pxConfig);
 
-            application.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            application.Response.TrySkipIisCustomErrors = true;
+			application.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+			application.Response.TrySkipIisCustomErrors = true;
 			//End request
 			if (pxConfig.SuppressContentBlock)
 			{
 				pxCtx.ApplicationContext.Response.SuppressContent = true;
 			}
 
-            else
-            {
-                var html = ResponseBlockPage(pxCtx, pxConfig);
-                application.Response.Write(html);
-            }
+			else
+			{
+				var html = ResponseBlockPage(pxCtx, pxConfig);
+				application.Response.Write(html);
+			}
 
-            application.CompleteRequest();
-            return false;
+			application.CompleteRequest();
+			return false;
 		}
 
 		private void PostActivity(PxContext pxCtx, PXConfigurationWrapper pxConfig, string eventType, ActivityDetails details = null)
@@ -69,7 +70,7 @@ namespace PerimeterX
 			activityReporter.Post(activity);
 		}
 
-        private void PostPageRequestedActivity(PxContext pxCtx, PXConfigurationWrapper pxConfig)
+		private void PostPageRequestedActivity(PxContext pxCtx, PXConfigurationWrapper pxConfig)
 		{
 			if (pxConfig.SendPageActivites)
 			{
@@ -98,7 +99,7 @@ namespace PerimeterX
 			}
 		}
 
-        private string ResponseBlockPage(PxContext pxCtx, PXConfigurationWrapper pxConfig)
+		private string ResponseBlockPage(PxContext pxCtx, PXConfigurationWrapper pxConfig)
 		{
 			string template = "block";
 			string content;
@@ -109,5 +110,5 @@ namespace PerimeterX
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 			return content = TemplateFactory.getTemplate(template, pxConfig, pxCtx.UUID, pxCtx.Vid);
 		}
-    }
+	}
 }

@@ -10,8 +10,8 @@ namespace PerimeterX
 
 	class PXCaptchaValidator : IPXCaptchaValidator
 	{
-        private PXConfigurationWrapper pxConfig;
-        private PxClient pxClient;
+		private PXConfigurationWrapper pxConfig;
+		private PxClient pxClient;
 
 		public PXCaptchaValidator(PXConfigurationWrapper PxConfig, PxClient pxClient)
 		{
@@ -34,18 +34,19 @@ namespace PerimeterX
 					Vid = context.Vid,
 					Request = Request.CreateRequestFromContext(context)
 				};
-                var response = pxClient.SendCaptchaRequest(captchaRequest);
+				var response = pxClient.SendCaptchaRequest(captchaRequest);
 				if (response != null && response.Status == 0)
 				{
 					Debug.WriteLine("Captcha API call to server was successful", PxConstants.LOG_CATEGORY);
 					context.PassReason = PassReasonEnum.CAPTCHA;
 					retVal = true;
-				}else
+				}
+				else
 				{
 					Debug.WriteLine(string.Format("Captcha API call to server failed - {0}", response), PxConstants.LOG_CATEGORY);
 					retVal = false;
 				}
-				
+
 			}
 			catch (Exception ex)
 			{
@@ -64,6 +65,6 @@ namespace PerimeterX
 
 		}
 
-		
+
 	}
 }

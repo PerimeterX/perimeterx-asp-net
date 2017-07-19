@@ -10,23 +10,23 @@ namespace PerimeterX
 	public class PXS2SValidator : IPXS2SValidator
 	{
 
-        private readonly PXConfigurationWrapper pxConfig;
-        private readonly PxClient pxClient;
+		private readonly PXConfigurationWrapper pxConfig;
+		private readonly PxClient pxClient;
 
-        public PXS2SValidator(PXConfigurationWrapper pxConfig, PxClient pxClient)
+		public PXS2SValidator(PXConfigurationWrapper pxConfig, PxClient pxClient)
 		{
 			this.pxConfig = pxConfig;
 			this.pxClient = pxClient;
 		}
 
-        public bool VerifyS2S(PxContext pxCtx)
+		public bool VerifyS2S(PxContext pxCtx)
 		{
 			var riskRttStart = Stopwatch.StartNew();
 			bool retVal = false;
 			try
 			{
-                RiskRequest riskRequest = PrepareRiskRequest(pxCtx);
-                RiskResponse riskResponse = pxClient.SendRiskRequest(riskRequest);
+				RiskRequest riskRequest = PrepareRiskRequest(pxCtx);
+				RiskResponse riskResponse = pxClient.SendRiskRequest(riskRequest);
 				pxCtx.MadeS2SCallReason = true;
 
 				if (riskResponse.Score >= 0 && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
@@ -58,7 +58,7 @@ namespace PerimeterX
 				pxCtx.PassReason = PassReasonEnum.ERROR;
 				if (ex.InnerException is TaskCanceledException)
 				{
-                    Debug.WriteLine("S2S Inner Exception: " + ex.InnerException.Message, PxConstants.LOG_CATEGORY);
+					Debug.WriteLine("S2S Inner Exception: " + ex.InnerException.Message, PxConstants.LOG_CATEGORY);
 					pxCtx.PassReason = PassReasonEnum.S2S_TIMEOUT;
 				}
 				retVal = false;
@@ -68,7 +68,7 @@ namespace PerimeterX
 			return retVal;
 		}
 
-        private RiskRequest PrepareRiskRequest(PxContext pxCtx)
+		private RiskRequest PrepareRiskRequest(PxContext pxCtx)
 		{
 
 			var riskMode = ModuleMode.BLOCK_MODE;
@@ -113,7 +113,7 @@ namespace PerimeterX
 				riskRequest.Additional.PXCookie = pxCtx.DecodedPxCookie;
 			}
 
-            return riskRequest;
+			return riskRequest;
 		}
 	}
 }

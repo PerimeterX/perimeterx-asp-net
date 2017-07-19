@@ -5,7 +5,7 @@ namespace PerimeterX
 {
 	class PXCookieValidator : IPXCookieValidator
 	{
-        private PXConfigurationWrapper pxConfig;
+		private PXConfigurationWrapper pxConfig;
 
 		public PXCookieValidator(PXConfigurationWrapper config)
 		{
