@@ -49,7 +49,7 @@ namespace PerimeterX
                 Debug.WriteLineIf(httpResponse.StatusCode.Equals(HttpStatusCode.NoContent) , "Got configuration but no updates");
 				Debug.WriteLineIf(httpResponse.StatusCode > HttpStatusCode.NoContent, "Failed to get configuration");
 			}
-            else if (httpResponse.StatusCode.Equals(HttpStatusCode.OK))
+            else
 			{
                 var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
                 Debug.WriteLine(string.Format("Post request for {0} ), returned {1}", PxConstants.REMOTE_CONFIGURATION_SERVER, responseJson), PxConstants.LOG_CATEGORY);

@@ -6,7 +6,41 @@ namespace PerimeterX
 {
     public class PXConfigurationWrapper
     {
-        public PXConfigurationWrapper(PxModuleConfigurationSection config)
+		public bool Enabled { get; set; }
+		public string AppId { get; set; }
+		public string CookieName { get; set; }
+		public string CookieKey { get; set; }
+		public bool EncryptionEnabled { get; set; }
+		public bool CaptchaEnabled { get; set; }
+		public bool SignedWithUserAgent { get; set; }
+		public bool SignedWithIP { get; set; }
+		public int BlockingScore { get; set; }
+		public string ApiToken { get; set; }
+		public string BaseUri { get; set; }
+		public int ApiTimeout { get; set; }
+		public int ReporterApiTimeout { get; set; }
+		public StringCollection SocketIpHeader { get; set; }
+		public bool SuppressContentBlock { get; set; }
+		public int ActivitiesCapacity { get; set; }
+		public int ActivitiesBulkSize { get; set; }
+		public bool SendPageActivites { get; set; }
+		public bool SendBlockActivites { get; set; }
+		public StringCollection SensitiveHeaders { get; set; }
+		public StringCollection FileExtWhitelist { get; set; }
+		public StringCollection RoutesWhitelist { get; set; }
+		public StringCollection UseragentsWhitelist { get; set; }
+		public string CustomLogo { get; set; }
+		public string CssRef { get; set; }
+		public string JsRef { get; set; }
+		public string UserAgentOverride { get; set; }
+		public bool MonitorMode { get; set; }
+		public StringCollection SensitiveRoutes { get; set; }
+		public bool RemoteConfigurationEnabled { get; set; }
+		public string Checksum { get; set; }
+		public int RemoteConfigurationInterval { get; set; }
+		public int RemoteConfigurationDelay { get; set; }
+
+		public PXConfigurationWrapper(PxModuleConfigurationSection config)
         {
             Enabled = config.Enabled;
 			AppId = config.AppId;
@@ -55,39 +89,5 @@ namespace PerimeterX
 			ApiTimeout = dynamicConfig.RiskTimeout;
 			Checksum = dynamicConfig.Checksum;  
         }
-
-		public bool Enabled { get; set; }
-		public string AppId { get; set; }
-		public string CookieName { get; set; }
-		public string CookieKey { get; set; }
-		public bool EncryptionEnabled { get; set; }
-		public bool CaptchaEnabled { get; set; }
-		public bool SignedWithUserAgent { get; set; }
-		public bool SignedWithIP { get; set; }
-		public int BlockingScore { get; set; }
-		public string ApiToken { get; set; }
-		public string BaseUri { get; set; }
-		public int ApiTimeout { get; set; }
-		public int ReporterApiTimeout { get; set; }
-		public StringCollection SocketIpHeader { get; set; }
-		public bool SuppressContentBlock { get; set; }
-		public int ActivitiesCapacity { get; set; }
-		public int ActivitiesBulkSize { get; set; }
-		public bool SendPageActivites { get; set; }
-		public bool SendBlockActivites { get; set; }
-		public StringCollection SensitiveHeaders { get; set; }
-		public StringCollection FileExtWhitelist { get; set; }
-		public StringCollection RoutesWhitelist { get; set; }
-		public StringCollection UseragentsWhitelist { get; set; }
-		public string CustomLogo { get; set; }
-		public string CssRef { get; set; }
-		public string JsRef { get; set; }
-		public string UserAgentOverride { get; set; }
-		public bool MonitorMode { get; set; }
-		public StringCollection SensitiveRoutes { get; set; }
-		public bool RemoteConfigurationEnabled { get; set; }
-		public string Checksum { get; set; }
-        public int RemoteConfigurationInterval { get; set; }
-        public int RemoteConfigurationDelay { get; set; }
     }
 }
