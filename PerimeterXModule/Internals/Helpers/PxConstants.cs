@@ -31,7 +31,7 @@ namespace PerimeterX
 			return "ASP.NET v" + fvi.FileVersion;
 		}
 
-		public static string FormatBaseUri(PxModuleConfigurationSection config)
+		public static string FormatBaseUri(IPXConfiguration config)
 		{
 			return string.Format(config.BaseUri, config.AppId);
 		}

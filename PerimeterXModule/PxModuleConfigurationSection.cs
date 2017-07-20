@@ -413,5 +413,18 @@ namespace PerimeterX
 				this["sensitiveRoutes"] = value;
 			}
 		}
+
+		[ConfigurationProperty("remoteConfigurationEnabled", DefaultValue = false)]
+		public bool RemoteConfigurationEnabled
+		{
+			get
+			{ 
+				return (bool)this["remoteConfigurationEnabled"];
+			}
+			set
+			{
+				this["remoteConfigurationEnabled"] = value;
+			}
+		}
 	}
 }

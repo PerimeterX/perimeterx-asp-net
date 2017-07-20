@@ -74,6 +74,10 @@
     <Compile Include="Internals\Enums\PassReasonEnum.cs" />
     <Compile Include="Internals\Enums\RiskRequestReasonEnum.cs" />
     <Compile Include="Internals\Helpers\PxConstants.cs" />
+    <Compile Include="Internals\PXClient\IPXHttpClient.cs" />
+    <Compile Include="Internals\PXClient\PXHttpClient.cs" />
+    <Compile Include="Internals\PXConfiguration\IPXConfiguration.cs" />
+    <Compile Include="Internals\PXConfiguration\PXDynamicConfiguration.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCaptchaValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXS2SValidator.cs" />
