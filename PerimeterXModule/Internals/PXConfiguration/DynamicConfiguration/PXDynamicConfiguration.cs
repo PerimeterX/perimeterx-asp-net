@@ -36,14 +36,14 @@ namespace PerimeterX
 		public int RemoteConfigurationInterval { get { return configSection.RemoteConfigurationInterval; } }
 
 		//Dynamic properties 
-		public int ApiTimeout { get { return dynamicProperties.ApiTimeout; } }
-		public StringCollection SocketIpHeaders { get { return dynamicProperties.SocketIpHeaders; } }
-		public StringCollection SensitiveHeaders { get { return dynamicProperties.SensitiveHeaders; } }
-		public bool MonitorMode { get { return dynamicProperties.MonitorMode; } }
-		public bool Enabled { get { return dynamicProperties.Enabled; } }
-		public string CookieKey { get { return dynamicProperties.CookieKey; } }
-		public int BlockingScore { get { return dynamicProperties.BlockingScore; } }
-		public string AppId { get { return dynamicProperties.AppId; } }
+		public int ApiTimeout { get { return DynamicPropertiesObject.ApiTimeout; } }
+		public StringCollection SocketIpHeaders { get { return DynamicPropertiesObject.SocketIpHeaders; } }
+		public StringCollection SensitiveHeaders { get { return DynamicPropertiesObject.SensitiveHeaders; } }
+		public bool MonitorMode { get { return DynamicPropertiesObject.MonitorMode; } }
+		public bool Enabled { get { return DynamicPropertiesObject.Enabled; } }
+		public string CookieKey { get { return DynamicPropertiesObject.CookieKey; } }
+		public int BlockingScore { get { return DynamicPropertiesObject.BlockingScore; } }
+		public string AppId { get { return DynamicPropertiesObject.AppId; } }
 
 		private IPXHttpClient pxHttpClient;
 		private System.Timers.Timer timer;
@@ -51,13 +51,13 @@ namespace PerimeterX
 		private PxModuleConfigurationSection configSection;
 		private DynamicProperties _dynamicProperties;
 
-		private DynamicProperties dynamicProperties
+		private DynamicProperties DynamicPropertiesObject
 		{
 			get
 			{
 				try
 				{
-					rwl.AcquireReaderLock(0);	
+					rwl.AcquireReaderLock(Timeout.Infinite);
 					return this._dynamicProperties;
 				}
 				finally
@@ -69,7 +69,7 @@ namespace PerimeterX
 			{
 				try
 				{
-					rwl.AcquireWriterLock(0);
+					rwl.AcquireWriterLock(Timeout.Infinite);
 					_dynamicProperties = value;
 				}
 				finally
@@ -84,7 +84,7 @@ namespace PerimeterX
 			Debug.WriteLine("Loaded Dynamic configuration ", PxConstants.LOG_CATEGORY);
 			this.configSection = configSection;
 
-			dynamicProperties = new DynamicProperties()
+			DynamicPropertiesObject = new DynamicProperties()
 			{
 				ApiTimeout = configSection.ApiTimeout,
 				AppId = configSection.AppId,
@@ -112,13 +112,13 @@ namespace PerimeterX
 		{
 			try
 			{
-				RemoteConfigurationResponse remoteConfiguration = pxHttpClient.GetConfiguration(RemoteConfigurationUrl, PxConstants.REMOTE_CONFIG_V1, dynamicProperties.Checksum);
+				RemoteConfigurationResponse remoteConfiguration = pxHttpClient.GetConfiguration(RemoteConfigurationUrl, PxConstants.REMOTE_CONFIG_V1, DynamicPropertiesObject.Checksum);
 				if (remoteConfiguration != null)
 				{
 					Debug.WriteLine("New configuration found, updating current configuration");
 					Update(remoteConfiguration);
 				}
-				else if (string.IsNullOrEmpty(dynamicProperties.Checksum))
+				else if (string.IsNullOrEmpty(DynamicPropertiesObject.Checksum))
 				{
 					DisableModuleOnError();
 				}
@@ -126,7 +126,7 @@ namespace PerimeterX
 			catch (Exception ex)
 			{
 				Debug.WriteLine(string.Format("An exception was caught during configuraiton fetch, {0}", ex.Message), PxConstants.LOG_CATEGORY);
-				if (string.IsNullOrEmpty(dynamicProperties.Checksum))
+				if (string.IsNullOrEmpty(DynamicPropertiesObject.Checksum))
 				{
 					DisableModuleOnError();
 				}
@@ -150,13 +150,13 @@ namespace PerimeterX
 			newDynamicProperties.SensitiveHeaders.AddRange(remoteConfiguration.SensitiveHeaders);
 			newDynamicProperties.SocketIpHeaders.AddRange(remoteConfiguration.IpHeaders);
 
-			dynamicProperties = newDynamicProperties;
+			DynamicPropertiesObject = newDynamicProperties;
 		}
 
 		private void DisableModuleOnError()
 		{
 			Debug.WriteLine("Disabling PxModule because failed to get configruation", PxConstants.LOG_CATEGORY);
-			dynamicProperties.Enabled = false;
+			DynamicPropertiesObject.Enabled = false;
 		}
 
 		public void Dispose()
