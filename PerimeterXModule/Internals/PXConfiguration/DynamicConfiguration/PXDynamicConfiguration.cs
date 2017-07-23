@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Threading;
 using System.Timers;
 
 namespace PerimeterX
 {
 	public class PXDynamicConfiguration : IPXConfiguration, IDisposable
 	{
+		private static ReaderWriterLock rwl = new ReaderWriterLock();
+
 		public int ActivitiesBulkSize { get { return configSection.ActivitiesBulkSize; } }
 		public int ActivitiesCapacity { get { return configSection.ActivitiesCapacity; } }
 		public string ApiToken { get { return configSection.ApiToken; } }
@@ -43,8 +46,8 @@ namespace PerimeterX
 		public string AppId { get { return dynamicProperties.AppId; } }
 
 		private IPXHttpClient pxHttpClient;
-		private Timer timer;
-		private object lockObject;
+		private System.Timers.Timer timer;
+		
 		private PxModuleConfigurationSection configSection;
 		private DynamicProperties _dynamicProperties;
 
@@ -52,16 +55,26 @@ namespace PerimeterX
 		{
 			get
 			{
-				lock (lockObject)
+				try
 				{
+					rwl.AcquireReaderLock(0);	
 					return this._dynamicProperties;
+				}
+				finally
+				{
+					rwl.ReleaseReaderLock();
 				}
 			}
 			set
 			{
-				lock (lockObject)
+				try
 				{
+					rwl.AcquireWriterLock(0);
 					_dynamicProperties = value;
+				}
+				finally
+				{
+					rwl.ReleaseWriterLock();
 				}
 			}
 		}
@@ -70,7 +83,6 @@ namespace PerimeterX
 		{
 			Debug.WriteLine("Loaded Dynamic configuration ", PxConstants.LOG_CATEGORY);
 			this.configSection = configSection;
-			lockObject = new object();
 
 			dynamicProperties = new DynamicProperties()
 			{
@@ -86,7 +98,7 @@ namespace PerimeterX
 
 			pxHttpClient = new PXHttpClient(ApiToken);
 
-			timer = new Timer()
+			timer = new System.Timers.Timer()
 			{
 				Enabled = true,
 				AutoReset = true,
