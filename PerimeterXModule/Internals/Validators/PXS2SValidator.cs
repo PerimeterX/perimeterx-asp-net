@@ -26,8 +26,9 @@ namespace PerimeterX
 			try
 			{
 				RiskRequest riskRequest = PrepareRiskRequest(PxContext);
-				string url = PxConstants.FormatBaseUri(PxConfig) + PxConstants.RISK_API_V2;
-				RiskResponse riskResponse = pxHttpClient.SendRiskApi(url, riskRequest, PxConfig.ApiTimeout);
+				string url = PxConstants.FormatBaseUri(PxConfig);
+				string path = PxConstants.RISK_API_V2;
+				RiskResponse riskResponse = pxHttpClient.SendRiskApi(url, path, riskRequest, PxConfig.ApiTimeout);
 				PxContext.MadeS2SCallReason = true;
 
 				if (riskResponse.Score >= 0 && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))

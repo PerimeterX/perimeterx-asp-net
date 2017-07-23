@@ -8,8 +8,8 @@ namespace PerimeterX
 {
 	public interface IPXHttpClient
 	{
-		RiskResponse SendRiskApi(string url, RiskRequest riskRequest, int timeout);
-		CaptchaResponse SendCaptchaApi(string url, CaptchaRequest request, int timeout);
+		RiskResponse SendRiskApi(string url, string path, RiskRequest riskRequest, int timeout);
+		CaptchaResponse SendCaptchaApi(string url, string path, CaptchaRequest request, int timeout);
 		RemoteConfigurationResponse GetConfiguration(string url, string path, string checksum);
 	}
 }

@@ -79,7 +79,6 @@
     <Compile Include="Internals\PXClient\PXHttpClient.cs" />
     <Compile Include="Internals\PXConfiguration\ConfigurationFactory.cs" />
     <Compile Include="Internals\PXConfiguration\Interfaces\IPXConfiguration.cs" />
-    <Compile Include="Internals\PXConfiguration\PXConfiguration.cs" />
     <Compile Include="Internals\PXConfiguration\DynamicConfiguration\PXDynamicConfiguration.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCaptchaValidator.cs" />

@@ -17,7 +17,7 @@ namespace PerimeterX
 	{
 		HttpClient httpClient;
 
-		public PXHttpClient(IPXConfiguration config)
+		public PXHttpClient(string apiToken)
 		{
 			var webRequestHandler = new WebRequestHandler
 			{
@@ -27,15 +27,20 @@ namespace PerimeterX
 			};
 
 			httpClient = new HttpClient(webRequestHandler, true);
-			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.ApiToken); ;
+			httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiToken); ;
 			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			httpClient.DefaultRequestHeaders.ExpectContinue = false;
 		}
 
-		public CaptchaResponse SendCaptchaApi(string url, CaptchaRequest request, int timeout)
+		public CaptchaResponse SendCaptchaApi(string url, string path, CaptchaRequest request, int timeout)
 		{
+			var uriBuilder = new UriBuilder(url)
+			{
+				Path = path
+			};
+			string uri = uriBuilder.ToString();
 			var requestJson = JSON.Serialize(request, PxConstants.JSON_OPTIONS);
-			var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
+			var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri);
 			requestMessage.Content = new StringContent(requestJson, Encoding.UTF8, "application/json");
 			CancellationTokenSource source = new CancellationTokenSource(timeout);
 			CancellationToken token = source.Token;
@@ -43,14 +48,20 @@ namespace PerimeterX
 			var httpResponse = httpClient.SendAsync(requestMessage, token).Result;
 			httpResponse.EnsureSuccessStatusCode();
 			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", url, requestJson, responseJson), PxConstants.LOG_CATEGORY);
+			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", uri, requestJson, responseJson), PxConstants.LOG_CATEGORY);
 			return JSON.Deserialize<CaptchaResponse>(responseJson, PxConstants.JSON_OPTIONS);
 		}
 
-		public RiskResponse SendRiskApi(string url, RiskRequest riskRequest, int timeout)
+		public RiskResponse SendRiskApi(string url, string path, RiskRequest riskRequest, int timeout)
 		{
+			var uriBuilder = new UriBuilder(url)
+			{
+				Path = path
+			};
+			string uri = uriBuilder.ToString();
+
 			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
-			var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
+			var requestMessage = new HttpRequestMessage(HttpMethod.Post, uri)
 			{
 				Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
 			};
@@ -60,29 +71,31 @@ namespace PerimeterX
 			var httpResponse = httpClient.SendAsync(requestMessage, token).Result;
 			httpResponse.EnsureSuccessStatusCode();
 			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.RISK_API_V2, requestJson, responseJson), PxConstants.LOG_CATEGORY);
+			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", uri, requestJson, responseJson), PxConstants.LOG_CATEGORY);
 			return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
 		}
 
 		public RemoteConfigurationResponse GetConfiguration(string url, string path, string checksum)
 		{
-			var uriBuilder = new UriBuilder(url);
-			uriBuilder.Path = path;
-	
+			var uriBuilder = new UriBuilder(url)
+			{
+				Path = path
+			};
+
 			if (!string.IsNullOrEmpty(checksum))
 			{
 				var query = HttpUtility.ParseQueryString(uriBuilder.Query);
 				query["checksum"] = checksum;
 				uriBuilder.Query = query.ToString();
 			}
-			url = uriBuilder.ToString();
-			Debug.WriteLine(string.Format("GET request for {0}", url), PxConstants.LOG_CATEGORY);
-			HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
+			string uri = uriBuilder.ToString();
+			Debug.WriteLine(string.Format("GET request for {0}", uri), PxConstants.LOG_CATEGORY);
+			HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
 
 			var httpResponse = httpClient.SendAsync(requestMessage).Result;
 			httpResponse.EnsureSuccessStatusCode();
 			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-			Debug.WriteLine(string.Format("GET request for {0}, returned status code {1} and json {2}", url, httpResponse.StatusCode, responseJson), PxConstants.LOG_CATEGORY);
+			Debug.WriteLine(string.Format("GET request for {0}, returned status code {1} and json {2}", uri, httpResponse.StatusCode, responseJson), PxConstants.LOG_CATEGORY);
 			RemoteConfigurationResponse remoteConfiguration = null;
 			if (httpResponse.StatusCode.Equals(HttpStatusCode.OK))
 			{

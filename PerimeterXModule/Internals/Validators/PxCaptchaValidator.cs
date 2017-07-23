@@ -33,7 +33,9 @@ namespace PerimeterX
 					Vid = context.Vid,
 					Request = Request.CreateRequestFromContext(context)
 				};
-				var response = pxHttpClient.SendCaptchaApi(PxConstants.FormatBaseUri(PxConfig) + PxConstants.CAPTCHA_API_V1, captchaRequest, PxConfig.ApiTimeout);
+				string url = PxConstants.FormatBaseUri(PxConfig);
+				string path = PxConstants.CAPTCHA_API_V1;
+				var response = pxHttpClient.SendCaptchaApi(url, path, captchaRequest, PxConfig.ApiTimeout);
 				if (response != null && response.Status == 0)
 				{
 					Debug.WriteLine("Captcha API call to server was successful", PxConstants.LOG_CATEGORY);

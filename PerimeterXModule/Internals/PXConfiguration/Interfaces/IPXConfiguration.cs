@@ -40,7 +40,6 @@ namespace PerimeterX
 		StringCollection SensitiveRoutes { get; }
 		bool RemoteConfigurationEnabled { get; }
 		string RemoteConfigurationUrl { get; }
-		string RemoteConfigurationPath { get; }
 		int RemoteConfigurationInterval { get; }
 	}
 }

@@ -17,7 +17,7 @@ namespace PerimeterX
 			}
 			else
 			{
-				pxConfig = new PXConfiguration(config);
+				pxConfig = config;
 			}
 			return pxConfig;
 		}

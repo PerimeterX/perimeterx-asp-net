@@ -28,7 +28,7 @@ using System.Configuration;
 
 namespace PerimeterX
 {
-	public class PxModuleConfigurationSection : ConfigurationSection
+	public class PxModuleConfigurationSection : ConfigurationSection, IPXConfiguration
 	{
 		[ConfigurationProperty("enabled", DefaultValue = true)]
 		public bool Enabled
@@ -438,19 +438,6 @@ namespace PerimeterX
 			set
 			{
 				this["remoteConfigurationUrl"] = value;
-			}
-		}
-
-		[ConfigurationProperty("remoteConfigurationPath", DefaultValue = "/api/v1/enforcer")]
-		public string RemoteConfigurationPath
-		{
-			get
-			{
-				return (string)this["remoteConfigurationPath"];
-			}
-			set
-			{
-				this["remoteConfigurationPath"] = value;
 			}
 		}
 

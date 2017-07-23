@@ -5,105 +5,108 @@ using System.Timers;
 
 namespace PerimeterX
 {
-	public class PXDynamicConfiguration : IPXConfiguration
+	public class PXDynamicConfiguration : IPXConfiguration, IDisposable
 	{
-		public int ActivitiesBulkSize { get; private set; }
-		public int ActivitiesCapacity { get; private set; }
-		public int ApiTimeout { get; private set; }
-		public string ApiToken { get; private set; }
-		public string AppId { get; private set; }
-		public string BaseUri { get; private set; }
-		public int BlockingScore { get; private set; }
-		public bool CaptchaEnabled { get; private set; }
-		public string CookieKey { get; private set; }
-		public string CookieName { get; private set; }
-		public string CssRef { get; private set; }
-		public string CustomLogo { get; private set; }
-		public bool Enabled { get; private set; }
-		public bool EncryptionEnabled { get; private set; }
-		public StringCollection FileExtWhitelist { get; private set; }
-		public string JsRef { get; private set; }
-		public bool MonitorMode { get; private set; }
-		public bool RemoteConfigurationEnabled { get; private set; }
-		public int ReporterApiTimeout { get; private set; }
-		public StringCollection RoutesWhitelist { get; private set; }
-		public bool SendBlockActivites { get; private set; }
-		public bool SendPageActivites { get; private set; }
-		public StringCollection SensitiveHeaders { get; private set; }
-		public StringCollection SensitiveRoutes { get; private set; }
-		public bool SignedWithIP { get; private set; }
-		public bool SignedWithUserAgent { get; private set; }
-		public StringCollection SocketIpHeaders { get; private set; }
-		public bool SuppressContentBlock { get; private set; }
-		public string UserAgentOverride { get; private set; }
-		public StringCollection UseragentsWhitelist { get; private set; }
-		public string RemoteConfigurationUrl { get; private set; }
-		public string RemoteConfigurationPath { get; private set; }
-		public int RemoteConfigurationInterval { get; set; }
+		public int ActivitiesBulkSize { get { return configSection.ActivitiesBulkSize; } }
+		public int ActivitiesCapacity { get { return configSection.ActivitiesCapacity; } }
+		public string ApiToken { get { return configSection.ApiToken; } }
+		public string BaseUri { get { return configSection.BaseUri; } }
+		public bool CaptchaEnabled { get { return configSection.CaptchaEnabled; } }
+		public string CookieName { get { return configSection.CookieName; } }
+		public string CssRef { get { return configSection.CssRef; } }
+		public string CustomLogo { get { return configSection.CustomLogo; } }
+		public bool EncryptionEnabled { get { return configSection.EncryptionEnabled; } }
+		public StringCollection FileExtWhitelist { get { return configSection.FileExtWhitelist; } }
+		public string JsRef { get { return configSection.JsRef; } }
+		public bool RemoteConfigurationEnabled { get { return configSection.RemoteConfigurationEnabled; } }
+		public int ReporterApiTimeout { get { return configSection.ReporterApiTimeout; } }
+		public StringCollection RoutesWhitelist { get { return configSection.RoutesWhitelist; } }
+		public bool SendBlockActivites { get { return configSection.SendBlockActivites; } }
+		public bool SendPageActivites { get { return configSection.SendPageActivites; } }
+		public StringCollection SensitiveRoutes { get { return configSection.SensitiveRoutes; } }
+		public bool SignedWithIP { get { return configSection.SignedWithIP; } }
+		public bool SignedWithUserAgent { get { return configSection.SignedWithUserAgent; } }
+		public Boolean SuppressContentBlock { get { return configSection.SuppressContentBlock; } }
+		public string UserAgentOverride { get { return configSection.UserAgentOverride; } }
+		public StringCollection UseragentsWhitelist { get { return configSection.UseragentsWhitelist; } }
+		public string RemoteConfigurationUrl { get { return configSection.RemoteConfigurationUrl; } }
+		public int RemoteConfigurationInterval { get { return configSection.RemoteConfigurationInterval; } }
 
-		private string checksum;
+		//Dynamic properties 
+		public int ApiTimeout { get { return dynamicProperties.ApiTimeout; } }
+		public StringCollection SocketIpHeaders { get { return dynamicProperties.SocketIpHeaders; } }
+		public StringCollection SensitiveHeaders { get { return dynamicProperties.SensitiveHeaders; } }
+		public bool MonitorMode { get { return dynamicProperties.MonitorMode; } }
+		public bool Enabled { get { return dynamicProperties.Enabled; } }
+		public string CookieKey { get { return dynamicProperties.CookieKey; } }
+		public int BlockingScore { get { return dynamicProperties.BlockingScore; } }
+		public string AppId { get { return dynamicProperties.AppId; } }
+
 		private IPXHttpClient pxHttpClient;
+		private Timer timer;
+		private object lockObject;
+		private PxModuleConfigurationSection configSection;
+		private DynamicProperties _dynamicProperties;
 
-		public PXDynamicConfiguration(PxModuleConfigurationSection config)
+		private DynamicProperties dynamicProperties
 		{
-			Debug.WriteLine("Dynamic configuration loaded", PxConstants.LOG_CATEGORY);
-			ActivitiesBulkSize = config.ActivitiesBulkSize;
-			ActivitiesCapacity = config.ActivitiesCapacity;
-			ApiTimeout = config.ApiTimeout;
-			ApiToken = config.ApiToken;
-			AppId = config.AppId;
-			BaseUri = config.BaseUri;
-			BlockingScore = config.BlockingScore;
-			CaptchaEnabled = config.CaptchaEnabled;
-			CookieKey = config.CookieKey;
-			CookieName = config.CookieName;
-			CssRef = config.CssRef;
-			CustomLogo = config.CustomLogo;
-			Enabled = config.Enabled;
-			EncryptionEnabled = config.EncryptionEnabled;
-			FileExtWhitelist = config.FileExtWhitelist;
-			JsRef = config.JsRef;
-			MonitorMode = config.MonitorMode;
-			RemoteConfigurationEnabled = config.RemoteConfigurationEnabled;
-			ReporterApiTimeout = config.ReporterApiTimeout;
-			RoutesWhitelist = config.RoutesWhitelist;
-			SendBlockActivites = config.SendBlockActivites;
-			SendPageActivites = config.SendPageActivites;
-			SensitiveHeaders = config.SensitiveHeaders;
-			SensitiveRoutes = config.SensitiveRoutes;
-			SignedWithIP = config.SignedWithIP;
-			SignedWithUserAgent = config.SignedWithUserAgent;
-			SocketIpHeaders = config.SocketIpHeaders;
-			SuppressContentBlock = config.SuppressContentBlock;
-			UserAgentOverride = config.UserAgentOverride;
-			UseragentsWhitelist = config.UseragentsWhitelist;
-			RemoteConfigurationUrl = config.RemoteConfigurationUrl;
-			RemoteConfigurationPath = config.RemoteConfigurationPath;
-			RemoteConfigurationInterval = config.RemoteConfigurationInterval;
+			get
+			{
+				lock (lockObject)
+				{
+					return this._dynamicProperties;
+				}
+			}
+			set
+			{
+				lock (lockObject)
+				{
+					_dynamicProperties = value;
+				}
+			}
+		}
 
-			pxHttpClient = new PXHttpClient(this);
+		public PXDynamicConfiguration(PxModuleConfigurationSection configSection)
+		{
+			Debug.WriteLine("Loaded Dynamic configuration ", PxConstants.LOG_CATEGORY);
+			this.configSection = configSection;
+			lockObject = new object();
 
-			Timer timer = new Timer()
+			dynamicProperties = new DynamicProperties()
+			{
+				ApiTimeout = configSection.ApiTimeout,
+				AppId = configSection.AppId,
+				BlockingScore = configSection.BlockingScore,
+				CookieKey = configSection.CookieKey,
+				Enabled = configSection.Enabled,
+				MonitorMode = configSection.MonitorMode,
+				SensitiveHeaders = configSection.SensitiveHeaders,
+				SocketIpHeaders = configSection.SocketIpHeaders
+			};
+
+			pxHttpClient = new PXHttpClient(ApiToken);
+
+			timer = new Timer()
 			{
 				Enabled = true,
 				AutoReset = true,
 				Interval = RemoteConfigurationInterval
 			};
 			timer.Elapsed += (obj, e) => UpdateConfigurationTask();
-			
+
 		}
-		
+
 		private void UpdateConfigurationTask()
 		{
 			try
 			{
-				RemoteConfigurationResponse remoteConfiguration = pxHttpClient.GetConfiguration(RemoteConfigurationUrl, RemoteConfigurationPath, checksum);
+				RemoteConfigurationResponse remoteConfiguration = pxHttpClient.GetConfiguration(RemoteConfigurationUrl, PxConstants.REMOTE_CONFIG_V1, dynamicProperties.Checksum);
 				if (remoteConfiguration != null)
 				{
 					Debug.WriteLine("New configuration found, updating current configuration");
 					Update(remoteConfiguration);
-				} 
-				else if (string.IsNullOrEmpty(checksum))
+				}
+				else if (string.IsNullOrEmpty(dynamicProperties.Checksum))
 				{
 					DisableModuleOnError();
 				}
@@ -111,7 +114,7 @@ namespace PerimeterX
 			catch (Exception ex)
 			{
 				Debug.WriteLine(string.Format("An exception was caught during configuraiton fetch, {0}", ex.Message), PxConstants.LOG_CATEGORY);
-				if (string.IsNullOrEmpty(checksum))
+				if (string.IsNullOrEmpty(dynamicProperties.Checksum))
 				{
 					DisableModuleOnError();
 				}
@@ -120,25 +123,46 @@ namespace PerimeterX
 
 		private void Update(RemoteConfigurationResponse remoteConfiguration)
 		{
-			Enabled = remoteConfiguration.ModuleEnabled;
-			CookieKey = remoteConfiguration.CookieKey;
-			BlockingScore = remoteConfiguration.BlockingScore;
-			AppId = remoteConfiguration.AppId;
-			MonitorMode = remoteConfiguration.ModuleMode == "monitoring";
-			ApiTimeout = remoteConfiguration.RiskTimeout;
-			checksum = remoteConfiguration.Checksum;
+			DynamicProperties newDynamicProperties = new DynamicProperties()
+			{
+				ApiTimeout = remoteConfiguration.RiskTimeout,
+				AppId = remoteConfiguration.AppId,
+				BlockingScore = remoteConfiguration.BlockingScore,
+				CookieKey = remoteConfiguration.CookieKey,
+				Enabled = remoteConfiguration.ModuleEnabled,
+				MonitorMode = remoteConfiguration.ModuleMode == "monitoring",
+				SensitiveHeaders = new StringCollection(),
+				SocketIpHeaders = new StringCollection(),
+				Checksum = remoteConfiguration.Checksum
+			};
+			newDynamicProperties.SensitiveHeaders.AddRange(remoteConfiguration.SensitiveHeaders);
+			newDynamicProperties.SocketIpHeaders.AddRange(remoteConfiguration.IpHeaders);
 
-			SocketIpHeaders.Clear();
-			SocketIpHeaders.AddRange(remoteConfiguration.IpHeaders);
-
-			SensitiveHeaders.Clear();
-			SensitiveHeaders.AddRange(remoteConfiguration.SensitiveHeaders);
+			dynamicProperties = newDynamicProperties;
 		}
 
 		private void DisableModuleOnError()
 		{
 			Debug.WriteLine("Disabling PxModule because failed to get configruation", PxConstants.LOG_CATEGORY);
-			Enabled = false;
+			dynamicProperties.Enabled = false;
+		}
+
+		public void Dispose()
+		{
+			timer.Dispose();
+		}
+
+		class DynamicProperties
+		{
+			public int ApiTimeout { get; set; }
+			public string AppId { get; set; }
+			public int BlockingScore { get; set; }
+			public string CookieKey { get; set; }
+			public bool Enabled { get; set; }
+			public bool MonitorMode { get; set; }
+			public StringCollection SensitiveHeaders { get; set; }
+			public StringCollection SocketIpHeaders { get; set; }
+			public string Checksum { get; set; }
 		}
 	}
 }

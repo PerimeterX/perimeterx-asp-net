@@ -98,7 +98,7 @@ namespace PerimeterX
 			}
 
 			// Set Validators
-			IPXHttpClient httpClient = new PXHttpClient(pxConfiguration);
+			IPXHttpClient httpClient = new PXHttpClient(pxConfiguration.ApiToken);
 
 			PxS2SValidator = new PXS2SValidator(pxConfiguration, httpClient);
 			PxCaptchaValidator = new PXCaptchaValidator(pxConfiguration, httpClient);
@@ -304,6 +304,7 @@ namespace PerimeterX
 
 		private bool VerifyRequest(HttpContext applicationContext)
 		{
+
 			try
 			{
 				pxContext = new PxContext(applicationContext, pxConfiguration);
