@@ -61,7 +61,7 @@ namespace PerimeterX
 					throw new ConfigurationErrorsException("Missing PerimeterX module configuration section " + PxConstants.CONFIG_SECTION);
 				}
 
-				pxConfiguration = // factory.create()
+				pxConfiguration = ConfigurationFactory.Create(config);
 
 				// allocate reporter if needed
 				if (pxConfiguration != null && (pxConfiguration.SendBlockActivites || pxConfiguration.SendPageActivites))
@@ -248,7 +248,6 @@ namespace PerimeterX
 
 		private void ResponseBlockPage(PxContext pxContext)
 		{
-			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 			string template = "block";
 			string content;
 			if (pxContext.BlockAction.Equals("c"))
@@ -256,7 +255,7 @@ namespace PerimeterX
 				template = "captcha";
 			}
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
-			content = TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
+			content = TemplateFactory.getTemplate(template, pxConfiguration, pxContext.UUID, pxContext.Vid);
 			pxContext.ApplicationContext.Response.Write(content);
 		}
 
@@ -307,8 +306,7 @@ namespace PerimeterX
 		{
 			try
 			{
-				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-				pxContext = new PxContext(applicationContext, config);
+				pxContext = new PxContext(applicationContext, pxConfiguration);
 
 				// check captcha after cookie validation to capture vid
 				if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && PxCaptchaValidator.CaptchaVerify(pxContext))
@@ -317,14 +315,14 @@ namespace PerimeterX
 				}
 
 				// validate using risk cookie
-				IPxCookie pxCookie = PxCookieUtils.BuildCookie(config, pxContext, cookieDecoder);
+				IPxCookie pxCookie = PxCookieUtils.BuildCookie(pxConfiguration, pxContext, cookieDecoder);
 				if (!PxCookieValidator.CookieVerify(pxContext, pxCookie))
 				{
 					// validate using server risk api
 					PxS2SValidator.VerifyS2S(pxContext);
 				}
 
-				return config.BlockingScore > pxContext.Score;
+				return pxConfiguration.BlockingScore > pxContext.Score;
 			}
 			catch (Exception ex)
 			{
