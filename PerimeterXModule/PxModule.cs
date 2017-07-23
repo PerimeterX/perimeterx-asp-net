@@ -41,12 +41,9 @@ namespace PerimeterX
 	{
 		private static IActivityReporter reporter;
 		private static IPXConfiguration pxConfiguration;
-
 		private PxContext pxContext;
-
 		private readonly string validationMarker;
 		private readonly ICookieDecoder cookieDecoder;
-
 		private readonly IPXCaptchaValidator PxCaptchaValidator;
 		private readonly IPXCookieValidator PxCookieValidator;
 		private readonly IPXS2SValidator PxS2SValidator;
@@ -304,7 +301,6 @@ namespace PerimeterX
 
 		private bool VerifyRequest(HttpContext applicationContext)
 		{
-
 			try
 			{
 				pxContext = new PxContext(applicationContext, pxConfiguration);

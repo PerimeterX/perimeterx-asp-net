@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PerimeterX
 {
-	public interface IPXHttpClient
+	public interface IPXHttpClient : IDisposable
 	{
 		RiskResponse SendRiskApi(string url, string path, RiskRequest riskRequest, int timeout);
 		CaptchaResponse SendCaptchaApi(string url, string path, CaptchaRequest request, int timeout);

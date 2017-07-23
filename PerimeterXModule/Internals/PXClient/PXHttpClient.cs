@@ -13,7 +13,7 @@ using System.Web;
 
 namespace PerimeterX
 {
-	class PXHttpClient : IPXHttpClient, IDisposable
+	class PXHttpClient : IPXHttpClient
 	{
 		HttpClient httpClient;
 

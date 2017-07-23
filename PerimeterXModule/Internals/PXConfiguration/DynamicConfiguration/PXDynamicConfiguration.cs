@@ -49,7 +49,7 @@ namespace PerimeterX
 		private System.Timers.Timer timer;
 		
 		private PxModuleConfigurationSection configSection;
-		private DynamicProperties _dynamicProperties;
+		private DynamicProperties dynamicProperties;
 
 		private DynamicProperties DynamicPropertiesObject
 		{
@@ -58,7 +58,7 @@ namespace PerimeterX
 				try
 				{
 					rwl.AcquireReaderLock(Timeout.Infinite);
-					return this._dynamicProperties;
+					return this.dynamicProperties;
 				}
 				finally
 				{
@@ -70,7 +70,7 @@ namespace PerimeterX
 				try
 				{
 					rwl.AcquireWriterLock(Timeout.Infinite);
-					_dynamicProperties = value;
+					dynamicProperties = value;
 				}
 				finally
 				{
@@ -162,6 +162,7 @@ namespace PerimeterX
 		public void Dispose()
 		{
 			timer.Dispose();
+			pxHttpClient.Dispose();
 		}
 
 		class DynamicProperties
