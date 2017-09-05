@@ -35,7 +35,13 @@ namespace PerimeterX
 					PxContext.UUID = riskResponse.Uuid;
 					PxContext.BlockAction = riskResponse.RiskResponseAction;
 
-					if (score >= PxConfig.BlockingScore)
+                    if (PxContext.BlockAction == PxConstants.JS_CHALLENGE_ACTION && 
+                        !string.IsNullOrEmpty(riskResponse.RiskResponseActionData.Body))
+                    {
+                        PxContext.BlockReason = BlockReasonEnum.CHALLENGE;
+                        PxContext.BlockData = riskResponse.RiskResponseActionData.Body;
+                    }
+					else if (score >= PxConfig.BlockingScore)
 					{
 						PxContext.BlockReason = BlockReasonEnum.RISK_HIGH_SCORE;
 					}
