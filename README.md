@@ -8,11 +8,12 @@
 Table of Contents
 -----------------
 
--   [Usage](#usage)
+  **[Usage](#usage)**
   *   [Dependencies](#dependencies)
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
--   [Configuration](#configuration)
+  
+  **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
   *   [Blocking Score](#blocking-score)
   *   [Enable/Disable Captcha](#captcha-support)
@@ -25,7 +26,8 @@ Table of Contents
   *   [Send Page Activities](#send-page-activities)
   *   [Debug Mode](#debug-mode)
   *   [Base URI](#base-uri)
--   [Contributing](#contributing)
+  
+  **[Contributing](#contributing)**
   *   [Tests](#tests)
 
 <a name="Usage"></a>
