@@ -106,7 +106,7 @@ namespace PerimeterX
 			appId = config.AppId;
 			suppressContentBlock = config.SuppressContentBlock;
 			captchaEnabled = config.CaptchaEnabled;
-            captchaProvider = config.CaptchaProvider;
+			captchaProvider = config.CaptchaProvider;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
 			routesWhitelist = config.RoutesWhitelist;
