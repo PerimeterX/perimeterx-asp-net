@@ -49,7 +49,7 @@ namespace PerimeterX
 				}
 				else if (key.Equals(PxConstants.COOKIE_CAPTCHA_PREFIX))
 				{
-                    PxCaptcha = contextCookie.Get(key).Value;
+					PxCaptcha = contextCookie.Get(key).Value;
 				}
 			}
 
