@@ -296,7 +296,7 @@ namespace PerimeterX
 			string content;
 			if (captchaEnabled)
 			{
-                template = captchaProvider;
+				template = captchaProvider;
 			}
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 			content = TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
