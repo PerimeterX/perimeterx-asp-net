@@ -26,12 +26,12 @@ namespace PerimeterX
 			var riskRttStart = Stopwatch.StartNew();
 			try
 			{
-                var captchaAPIRequest = new CaptchaAPIRequest()
+				var captchaAPIRequest = new CaptchaAPIRequest()
 				{
 					Hostname = context.Hostname,
 					PXCaptcha = context.PxCaptcha,
-                    Request = CaptchaRequest.CreateCaptchaRequestFromContext(context, PxConfig.CaptchaProvider),
-                    Additional = new Additional { ModuleVersion = PxConstants.MODULE_VERSION }
+					Request = CaptchaRequest.CreateCaptchaRequestFromContext(context, PxConfig.CaptchaProvider),
+					Additional = new Additional { ModuleVersion = PxConstants.MODULE_VERSION }
 				};
                 
 				var response = PostRequest(PxConstants.FormatBaseUri(PxConfig) + PxConstants.CAPTCHA_API_V2, captchaAPIRequest);
@@ -41,7 +41,7 @@ namespace PerimeterX
 					context.PassReason = PassReasonEnum.CAPTCHA;
 					retVal = true;
 				}
-                else
+				else
 				{
 					Debug.WriteLine(string.Format("Captcha API call to server failed - {0}", response), PxConstants.LOG_CATEGORY);
 					retVal = false;
