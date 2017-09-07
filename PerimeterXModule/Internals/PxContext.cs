@@ -49,15 +49,7 @@ namespace PerimeterX
 				}
 				else if (key.Equals(PxConstants.COOKIE_CAPTCHA_PREFIX))
 				{
-					var captchaCookie = contextCookie.Get(key).Value;
-					var captchaCookieParts = captchaCookie.Split(new char[] { ':' }, 2);
-					if (captchaCookieParts.Length == 2)
-					{
-						PxCaptcha = captchaCookieParts[0];
-						Vid = captchaCookieParts[1];
-						var expiredCookie = new HttpCookie(PxConstants.COOKIE_CAPTCHA_PREFIX) { Expires = DateTime.Now.AddDays(-1) };
-						context.Response.Cookies.Add(expiredCookie);
-					}
+                    PxCaptcha = contextCookie.Get(key).Value;
 				}
 			}
 

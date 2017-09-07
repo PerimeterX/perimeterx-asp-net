@@ -19,7 +19,6 @@ namespace PerimeterX
 			this.HttpClient = HttpClient;
 		}
 
-
 		public bool CaptchaVerify(PxContext context)
 		{
 			Debug.WriteLine(string.Format("Check captcha cookie {0} for {1}", context.PxCaptcha, context.Vid ?? ""), PxConstants.LOG_CATEGORY);
@@ -27,20 +26,22 @@ namespace PerimeterX
 			var riskRttStart = Stopwatch.StartNew();
 			try
 			{
-				var captchaRequest = new CaptchaRequest()
+                var captchaAPIRequest = new CaptchaAPIRequest()
 				{
 					Hostname = context.Hostname,
 					PXCaptcha = context.PxCaptcha,
-					Vid = context.Vid,
-					Request = Request.CreateRequestFromContext(context)
+                    Request = CaptchaRequest.CreateCaptchaRequestFromContext(context, PxConfig.CaptchaProvider),
+                    Additional = new Additional { ModuleVersion = PxConstants.MODULE_VERSION }
 				};
-				var response = PostRequest(PxConstants.FormatBaseUri(PxConfig) + PxConstants.CAPTCHA_API_V1, captchaRequest);
+                
+				var response = PostRequest(PxConstants.FormatBaseUri(PxConfig) + PxConstants.CAPTCHA_API_V2, captchaAPIRequest);
 				if (response != null && response.Status == 0)
 				{
 					Debug.WriteLine("Captcha API call to server was successful", PxConstants.LOG_CATEGORY);
 					context.PassReason = PassReasonEnum.CAPTCHA;
 					retVal = true;
-				}else
+				}
+                else
 				{
 					Debug.WriteLine(string.Format("Captcha API call to server failed - {0}", response), PxConstants.LOG_CATEGORY);
 					retVal = false;
@@ -64,7 +65,7 @@ namespace PerimeterX
 
 		}
 
-		private CaptchaResponse PostRequest(string url, CaptchaRequest request)
+		private CaptchaResponse PostRequest(string url, CaptchaAPIRequest request)
 		{
 			var requestJson = JSON.Serialize(request, PxConstants.JSON_OPTIONS);
 			var requestMessage = new HttpRequestMessage(HttpMethod.Post, url);

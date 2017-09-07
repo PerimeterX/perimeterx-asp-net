@@ -108,6 +108,19 @@ namespace PerimeterX
 			}
 		}
 
+		[ConfigurationProperty("captchaProvider", DefaultValue = "reCaptcha")]
+		public string CaptchaProvider
+		{
+			get
+			{
+				return (string)this["captchaProvider"];
+			}
+			set
+			{
+				this["captchaProvider"] = value;
+			}
+		}
+
 		[ConfigurationProperty("signedWithUserAgent", DefaultValue = true)]
 		public bool SignedWithUserAgent
 		{
