@@ -22,7 +22,7 @@ namespace PerimeterX
 
 		// Endpoints
 		public const string RISK_API_V2 = "/api/v2/risk";
-		public const string CAPTCHA_API_V1 = "/api/v1/risk/captcha";
+		public const string CAPTCHA_API_PATH = "/api/v2/risk/captcha";
 
 		private static string GetAssemblyVersion()
 		{

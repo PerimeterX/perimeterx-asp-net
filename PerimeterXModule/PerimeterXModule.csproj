@@ -98,7 +98,7 @@
     <Compile Include="Internals\ActivityReporter.cs" />
     <Compile Include="DataContracts\Requests\RiskRequestHeader.cs" />
     <Compile Include="DataContracts\Requests\Additional.cs" />
-    <Compile Include="DataContracts\Requests\CaptchaRequest.cs" />
+    <Compile Include="DataContracts\Requests\CaptchaAPIRequest.cs" />
     <Compile Include="DataContracts\Responses\CaptchaResponse.cs" />
     <Compile Include="DataContracts\Requests\RiskRequest.cs" />
     <Compile Include="DataContracts\Requests\Request.cs" />
@@ -109,12 +109,13 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Internals\Templates\block.mustache" />
-    <EmbeddedResource Include="Internals\Templates\captcha.mustache" />
+    <EmbeddedResource Include="Internals\Templates\reCaptcha.mustache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <EmbeddedResource Include="Internals\Templates\funCaptcha.mustache" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
