@@ -128,18 +128,18 @@ namespace PerimeterX
 
 		private bool CheckSensitiveRoute(StringCollection sensitiveRoutes, string uri)
 		{
-            if (sensitiveRoutes != null) 
-            {
-				foreach (string sensitiveRoute in sensitiveRoutes)
-				{
-					if (uri.StartsWith(sensitiveRoute))
-					{
-						return true;
-					}
-				}
-            }
+                        if (sensitiveRoutes != null) 
+                        {
+                                foreach (string sensitiveRoute in sensitiveRoutes)
+                                {
+                                        if (uri.StartsWith(sensitiveRoute))
+                                        {
+                                                return true;
+                                        }
+                                }
+                        }
 
-			return false;
+                        return false;
 		}
 
 		private string ExtractHttpVersion(HttpContext context)
