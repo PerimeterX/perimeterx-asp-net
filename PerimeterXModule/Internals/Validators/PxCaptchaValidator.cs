@@ -34,7 +34,7 @@ namespace PerimeterX
 					Additional = new Additional { ModuleVersion = PxConstants.MODULE_VERSION }
 				};
                 
-				var response = PostRequest(PxConstants.FormatBaseUri(PxConfig) + PxConstants.CAPTCHA_API_V2, captchaAPIRequest);
+				var response = PostRequest(PxConstants.FormatBaseUri(PxConfig) + PxConstants.CAPTCHA_API_PATH, captchaAPIRequest);
 				if (response != null && response.Status == 0)
 				{
 					Debug.WriteLine("Captcha API call to server was successful", PxConstants.LOG_CATEGORY);
