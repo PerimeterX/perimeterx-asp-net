@@ -84,11 +84,23 @@ namespace PerimeterX.Properties
 		/// <summary>
 		///   Looks up a localized resource of type System.Byte[].
 		/// </summary>
-		internal static byte[] captcha
+		internal static byte[] reCaptcha
 		{
 			get
 			{
-				object obj = ResourceManager.GetObject("captcha", resourceCulture);
+                object obj = ResourceManager.GetObject("reCaptcha", resourceCulture);
+                return ((byte[])(obj));
+			}
+		}
+
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        internal static byte[] funCaptcha
+		{
+			get
+			{
+				object obj = ResourceManager.GetObject("funCaptcha", resourceCulture);
 				return ((byte[])(obj));
 			}
 		}

@@ -121,7 +121,10 @@
   <data name="block" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\internals\templates\block.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="captcha" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\internals\templates\captcha.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="reCaptcha" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\internals\templates\reCaptcha.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="funCaptcha" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\internals\templates\funCaptcha.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

@@ -58,8 +58,8 @@ namespace PerimeterX
 		private readonly int blockingScore;
 		private readonly string appId;
 		private readonly bool suppressContentBlock;
-		private readonly bool captchaEnabled;
-		private readonly bool challengeEnabled;
+        private readonly bool challengeEnabled;
+		private readonly string captchaProvider;
 		private readonly string[] sensetiveHeaders;
 		private readonly StringCollection fileExtWhitelist;
 		private readonly StringCollection routesWhitelist;
@@ -105,8 +105,8 @@ namespace PerimeterX
 			blockingScore = config.BlockingScore;
 			appId = config.AppId;
 			suppressContentBlock = config.SuppressContentBlock;
-			captchaEnabled = config.CaptchaEnabled;
             challengeEnabled = config.ChallengeEnabled;
+			captchaProvider = config.CaptchaProvider;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
 			routesWhitelist = config.RoutesWhitelist;
@@ -293,14 +293,16 @@ namespace PerimeterX
 			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 			string template = "block";
 			string content;
+
             if (pxContext.BlockAction == "j")
             {
                 template = "challenge";
             }
-            else if (captchaEnabled)
+            else if (pxContext.BlockAction == "c")
 			{
-				template = "captcha";
+				template = captchaProvider;
 			}
+
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 
             // In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.

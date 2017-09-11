@@ -8,14 +8,16 @@
 Table of Contents
 -----------------
 
--   [Usage](#usage)
+  **[Usage](#usage)**
   *   [Dependencies](#dependencies)
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
--   [Configuration](#configuration)
+  
+  **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
   *   [Blocking Score](#blocking-score)
   *   [Enable/Disable Captcha](#captcha-support)
+  *   [Select Captcha Provider](#captcha-provider)
   *   [Extracting Real IP Address](#real-ip)
   *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
@@ -24,7 +26,8 @@ Table of Contents
   *   [Send Page Activities](#send-page-activities)
   *   [Debug Mode](#debug-mode)
   *   [Base URI](#base-uri)
--   [Contributing](#contributing)
+  
+  **[Contributing](#contributing)**
   *   [Tests](#tests)
 
 <a name="Usage"></a>
@@ -118,19 +121,19 @@ On both cases if the URL is not a valid format an exception will be thrown
 
 Example below:
 ```xml
-  ...
+...
   jsRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
   cssRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-  ...
+...
 ```
 #### <a name="blocking-score"></a> Changing the Minimum Score for Blocking
 
 **default:** 70
 
 ```xml
-	..
-    blockingScore="70"
-    ..
+... 
+  blockingScore="70"
+...
 ```
 
 #### <a name="captcha-support"></a>Enable/disable captcha in the block page
@@ -140,9 +143,22 @@ By enabling captcha support, a captcha will be served as part of the block page 
 **default: true**
 
 ```xml
-	..
-    captchaEnabled="true"
-    ..
+...
+  captchaEnabled="true"
+...
+```
+
+#### <a name="captcha-provider"></a>Select CAPTCHA Provider
+
+The CAPTCHA part of the block page can use one of the following:
+* [reCAPTCHA](https://www.google.com/recaptcha)
+* [FunCaptcha](https://www.funcaptcha.com/)
+
+**default: 'reCaptcha'**
+```xml
+...
+  captchaProvider = "funCaptcha"
+...
 ```
 
 #### <a name="real-ip"></a>Extracting the Real User IP Address
@@ -154,9 +170,9 @@ The user ip can be returned to the PerimeterX module using a name of a header in
 **default: IP is taken from UserHostAddress of the incoming request**
 
 ```xml
-	..
-    socketIpHeader="X-PX-TRUE-IP"
-    ..
+...
+  socketIpHeader="X-PX-TRUE-IP"
+...
 ```
 
 #### <a name="sensitive-headers"></a> Filter sensitive headers
@@ -166,9 +182,9 @@ A user can define a list of sensitive header he want to prevent from being send 
 **default: cookie, cookies**
 
 ```xml
-	..
-    sensitiveHeaders="cookie,cookies"
-    ..
+...
+  sensitiveHeaders="cookie,cookies"
+...
 ```
 
 #### <a name="sensitive-routes"></a> Sensitive Routes
@@ -179,9 +195,9 @@ List of routes prefix. The Perimeterx module will always match request uri by th
 **default: None**
 
 ```xml
-	..
-    sensitiveRoutes="/login,/user/profile"
-    ..
+...
+  sensitiveRoutes="/login,/user/profile"
+...
 ```
 
 #### <a name="api-timeout"></a>API Timeouts
@@ -194,9 +210,9 @@ API Timeout in milliseconds to wait for the PerimeterX server API response.
 **default:** 2000
 
 ```
-	..
-    apiTimeout="2000"
-    ..
+...
+  apiTimeout="2000"
+...
 ```
 
 #### <a name="send-page-activities"></a> Send Page Activities
@@ -209,9 +225,9 @@ amount requests blocked and API usage statistics.
 **default:** false
 
 ```xml
-    ..
-    sendPageActivities="false"
-    ..
+...
+  sendPageActivities="false"
+...
 ```
 
 #### <a name="base-uri"></a> Base URI
@@ -221,9 +237,9 @@ A user can define a different API endpoint as a target URI to send the requests 
 **default:** https://sapi.perimeterx.net
 
 ```xml
-	..
-    baseUri="https://sapi.perimeterx.net"
-    ..
+...
+  baseUri="https://sapi.perimeterx.net"
+...
 ```
 
 #### <a name="override-ua"></a> Custom User Agent Header
@@ -233,9 +249,9 @@ The user's user agent can be returned to the PerimeterX module using a name of a
 **default: The User Agent is taken from header name "user-agent" from the incoming request**
 
 ```xml
-    ..
-    useragentOverride="px-user-agent"
-    ..
+...
+  useragentOverride="px-user-agent"
+...
 ```
 
 <a name="contributing"></a> Contributing

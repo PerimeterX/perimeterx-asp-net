@@ -18,13 +18,13 @@ namespace PerimeterX
 		public string ModuleVersion { get { return PxConstants.MODULE_VERSION; } set { } }
 
 		[DataMember(Name = "s2s_call_reason")]
-		public RiskRequestReasonEnum CallReason;
+		public RiskRequestReasonEnum? CallReason;
 
 		[DataMember(Name = "px_orig_cookie")]
 		public string PxOrigCookie;
 
 		[DataMember(Name = "risk_mode")]
-		public ModuleMode RiskMode;
+		public ModuleMode? RiskMode;
 
 		[DataMember(Name = "px_cookie_hmac")]
 		public string PxCookieHMAC;
