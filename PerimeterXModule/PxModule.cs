@@ -292,10 +292,10 @@ namespace PerimeterX
 			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 			string template = "block";
 			string content;
-            if (pxContext.BlockAction == "c")
-            {
-                template = captchaProvider;
-            }
+                        if (pxContext.BlockAction == "c")
+                        {
+                                template = captchaProvider;
+                        }
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 			content = TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
 			pxContext.ApplicationContext.Response.Write(content);
