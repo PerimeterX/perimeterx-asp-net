@@ -58,7 +58,6 @@ namespace PerimeterX
 		private readonly int blockingScore;
 		private readonly string appId;
 		private readonly bool suppressContentBlock;
-		private readonly bool captchaEnabled;
 		private readonly string captchaProvider;
 		private readonly string[] sensetiveHeaders;
 		private readonly StringCollection fileExtWhitelist;
@@ -105,7 +104,6 @@ namespace PerimeterX
 			blockingScore = config.BlockingScore;
 			appId = config.AppId;
 			suppressContentBlock = config.SuppressContentBlock;
-			captchaEnabled = config.CaptchaEnabled;
 			captchaProvider = config.CaptchaProvider;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
@@ -294,10 +292,10 @@ namespace PerimeterX
 			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 			string template = "block";
 			string content;
-			if (captchaEnabled)
-			{
-				template = captchaProvider;
-			}
+            if (pxContext.BlockAction == "c")
+            {
+                template = captchaProvider;
+            }
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 			content = TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
 			pxContext.ApplicationContext.Response.Write(content);
