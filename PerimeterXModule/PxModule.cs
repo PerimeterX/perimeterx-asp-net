@@ -106,7 +106,7 @@ namespace PerimeterX
 			appId = config.AppId;
 			suppressContentBlock = config.SuppressContentBlock;
 			captchaEnabled = config.CaptchaEnabled;
-            challengeEnabled = config.ChallengeEnabled;
+                        challengeEnabled = config.ChallengeEnabled;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
 			routesWhitelist = config.RoutesWhitelist;
@@ -293,19 +293,19 @@ namespace PerimeterX
 			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 			string template = "block";
 			string content;
-            if (pxContext.BlockAction == "j")
-            {
-                template = "challenge";
-            }
-            else if (captchaEnabled)
+                        if (pxContext.BlockAction == "j")
+                        {
+                                template = "challenge";
+                        }
+                        else if (captchaEnabled)
 			{
 				template = "captcha";
 			}
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 
-            // In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.
-            content = template == "challenge" &&  !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData  : 
-                TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
+                        // In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.
+                        content = template == "challenge" &&  !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData  : 
+                            TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
 			
 			pxContext.ApplicationContext.Response.Write(content);
 		}
@@ -379,7 +379,7 @@ namespace PerimeterX
 
 				return config.BlockingScore > pxContext.Score;
 			}
-            catch (Exception ex) {
+                        catch (Exception ex) {
 				Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
 				pxContext.PassReason = PassReasonEnum.ERROR;
 				return true; //true pass request
