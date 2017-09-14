@@ -20,7 +20,18 @@ namespace PerimeterX
 		[DataMember(Name = "action")]
 		public string RiskResponseAction;
 
+		[DataMember(Name = "action_data")]
+		public ActionData RiskResponseActionData;
+
 		[DataMember(Name = "error_msg")]
 		public string ErrorMessage;
+	}
+
+
+	[DataContract]
+	public class ActionData
+	{
+		[DataMember(Name = "body")]
+		public string Body;
 	}
 }

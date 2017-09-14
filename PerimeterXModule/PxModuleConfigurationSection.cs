@@ -108,6 +108,19 @@ namespace PerimeterX
 			}
 		}
 
+		[ConfigurationProperty("challengeEnabled", DefaultValue = true)]
+		public bool ChallengeEnabled
+		{
+			get
+			{
+				return (bool)this["challengeEnabled"];
+			}
+			set
+			{
+				this["challengeEnabled"] = value;
+			}
+		}
+
 		[ConfigurationProperty("captchaProvider", DefaultValue = "reCaptcha")]
 		public string CaptchaProvider
 		{
@@ -264,7 +277,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sendPageActivities", DefaultValue = false)]
+		[ConfigurationProperty("sendPageActivities", DefaultValue = true)]
 		public bool SendPageActivites
 		{
 			get
@@ -413,7 +426,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sensitiveRoutes", DefaultValue = "")]
+		[ConfigurationProperty("sensitiveRoutes")]
 		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
 		public StringCollection SensitiveRoutes
 		{

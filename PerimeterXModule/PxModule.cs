@@ -58,6 +58,7 @@ namespace PerimeterX
 		private readonly int blockingScore;
 		private readonly string appId;
 		private readonly bool suppressContentBlock;
+                private readonly bool challengeEnabled;
 		private readonly string captchaProvider;
 		private readonly string[] sensetiveHeaders;
 		private readonly StringCollection fileExtWhitelist;
@@ -104,7 +105,10 @@ namespace PerimeterX
 			blockingScore = config.BlockingScore;
 			appId = config.AppId;
 			suppressContentBlock = config.SuppressContentBlock;
-			captchaProvider = config.CaptchaProvider;
+                        challengeEnabled = config.ChallengeEnabled;
+			captchaProvider = config.CaptchaProvider;	
+                        challengeEnabled = config.ChallengeEnabled;
+
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
 			routesWhitelist = config.RoutesWhitelist;
@@ -176,7 +180,6 @@ namespace PerimeterX
 				if (HttpRuntime.UsingIntegratedPipeline)
 				{
 					applicationContext.Request.Headers.Add(PxConstants.PX_VALIDATED_HEADER, validationMarker);
-
 				}
 				else
 				{
@@ -292,12 +295,22 @@ namespace PerimeterX
 			var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 			string template = "block";
 			string content;
-                        if (pxContext.BlockAction == "c")
+
+                        if (pxContext.BlockAction == "j")
+                        {
+                                template = "challenge"; 
+                        }
+                        else if (pxContext.BlockAction == "c")
                         {
                                 template = captchaProvider;
                         }
-			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
-			content = TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
+
+                        Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
+
+                        // In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.
+                        content = template == "challenge" &&  !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData  : 
+                            TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid);
+			
 			pxContext.ApplicationContext.Response.Write(content);
 		}
 
@@ -370,7 +383,7 @@ namespace PerimeterX
 
 				return config.BlockingScore > pxContext.Score;
 			}
-			catch (Exception ex) {
+                        catch (Exception ex) {
 				Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
 				pxContext.PassReason = PassReasonEnum.ERROR;
 				return true; //true pass request
