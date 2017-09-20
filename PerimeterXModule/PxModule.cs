@@ -57,6 +57,7 @@ namespace PerimeterX
         private readonly bool sendBlockActivities;
         private readonly int blockingScore;
         private readonly string appId;
+        private readonly string customVerificationHandler;
         private readonly bool suppressContentBlock;
         private readonly bool challengeEnabled;
         private readonly string captchaProvider;
@@ -104,8 +105,8 @@ namespace PerimeterX
             cookieKeyBytes = Encoding.UTF8.GetBytes(cookieKey);
             blockingScore = config.BlockingScore;
             appId = config.AppId;
+            customVerificationHandler = config.CustomVerificationHandler;
             suppressContentBlock = config.SuppressContentBlock;
-            challengeEnabled = config.ChallengeEnabled;
             captchaProvider = config.CaptchaProvider;
             challengeEnabled = config.ChallengeEnabled;
 
@@ -205,19 +206,7 @@ namespace PerimeterX
                     ro.SetValue(headers, true, null);
                 }
 
-                if (VerifyRequest(applicationContext))
-                {
-                    Debug.WriteLine("Valid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
-                    PostPageRequestedActivity(pxContext);
-
-                }
-                else
-                {
-                    Debug.WriteLine("Invalid request to " + applicationContext.Request.RawUrl, PxConstants.LOG_CATEGORY);
-                    PostBlockActivity(pxContext);
-                    BlockRequest(pxContext);
-                    application.CompleteRequest();
-                }
+                VerifyRequest(application);
             }
             catch (Exception ex)
             {
@@ -262,37 +251,29 @@ namespace PerimeterX
                 AppId = appId,
                 SocketIP = pxContext.Ip,
                 Url = pxContext.FullUrl,
-                Details = details
+                Details = details,
+                Headers = pxContext.GetHeadersAsDictionary()
             };
-
-            activity.Headers = new Dictionary<string, string>();
-
-            foreach (RiskRequestHeader riskHeader in pxContext.Headers)
-            {
-                var key = riskHeader.Name;
-                activity.Headers.Add(key, riskHeader.Value);
-            }
 
             reporter.Post(activity);
         }
 
-        private void BlockRequest(PxContext pxContext)
+        public static void BlockRequest(PxContext pxContext, PxModuleConfigurationSection config)
         {
             pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
             pxContext.ApplicationContext.Response.TrySkipIisCustomErrors = true;
-            if (suppressContentBlock)
+            if (config.SuppressContentBlock)
             {
                 pxContext.ApplicationContext.Response.SuppressContent = true;
             }
             else
             {
-                ResponseBlockPage(pxContext);
+                ResponseBlockPage(pxContext, config);
             }
         }
 
-        private void ResponseBlockPage(PxContext pxContext)
+        public static void ResponseBlockPage(PxContext pxContext, PxModuleConfigurationSection config)
         {
-            var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
             string template = "block";
             string content;
 
@@ -302,7 +283,7 @@ namespace PerimeterX
             }
             else if (pxContext.BlockAction == "c")
             {
-                template = captchaProvider;
+                template = config.CaptchaProvider;
             }
 
             Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
@@ -360,17 +341,18 @@ namespace PerimeterX
             return false;
         }
 
-        private bool VerifyRequest(HttpContext applicationContext)
+        private void VerifyRequest(HttpApplication application)
         {
             try
             {
                 var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-                pxContext = new PxContext(applicationContext, config);
+                pxContext = new PxContext(application.Context, config);
 
                 // check captcha after cookie validation to capture vid
                 if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && PxCaptchaValidator.CaptchaVerify(pxContext))
                 {
-                    return true;
+                    HandleVerification(application);
+                    return;
                 }
 
                 // validate using risk cookie
@@ -381,13 +363,13 @@ namespace PerimeterX
                     PxS2SValidator.VerifyS2S(pxContext);
                 }
 
-                return config.BlockingScore > pxContext.Score;
+                HandleVerification(application);
             }
-            catch (Exception ex)
+            catch (Exception ex) // Fail-open approach
             {
-                Debug.WriteLine("Module failed to process request in fault: {0}, passing request", ex.Message, PxConstants.LOG_CATEGORY);
+                Debug.WriteLine(string.Format("Module failed to process request in fault: {0}, passing request", ex.Message), PxConstants.LOG_CATEGORY);
                 pxContext.PassReason = PassReasonEnum.ERROR;
-                return true; //true pass request
+                PostPageRequestedActivity(pxContext);
             }
         }
 
@@ -402,5 +384,83 @@ namespace PerimeterX
             return sb.ToString();
         }
 
+        private void HandleVerification(HttpApplication application)
+        {
+            bool verified = blockingScore > pxContext.Score;
+            PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+
+            Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}.", pxContext.Score, blockingScore), PxConstants.LOG_CATEGORY);
+
+            if (verified)
+            {
+                Debug.WriteLine(string.Format("Valid request to {0}", application.Context.Request.RawUrl), PxConstants.LOG_CATEGORY);
+                PostPageRequestedActivity(pxContext);
+            }
+            else
+            {
+                Debug.WriteLine(string.Format("Invalid request to {0}", application.Context.Request.RawUrl), PxConstants.LOG_CATEGORY);
+                PostBlockActivity(pxContext);
+            }
+
+            // If implemented, run the customVerificationHandler.
+            if (!string.IsNullOrEmpty(customVerificationHandler))
+            {
+                ICustomVerificationHandler customVerificationHandlerInstance = GetCustomVerificationHandler(customVerificationHandler);
+                if (customVerificationHandlerInstance != null)
+                {
+                    customVerificationHandlerInstance.Handle(application, pxContext, config);
+                }
+                else
+                {
+                    Debug.WriteLine(string.Format(
+                        "Missing implementation of the configured ICustomVerificationHandler ('customVerificationHandler' attribute): {0}.",
+                        customVerificationHandler), PxConstants.LOG_CATEGORY);
+                }
+            }
+            else // No custom verification handler -> continue regular flow
+            {
+                if (!verified)
+                {
+                    BlockRequest(pxContext, config);
+                    application.CompleteRequest();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Uses reflection to check whether an ICustomVerificationHandler was implemented by the customer. 
+        /// </summary>
+        /// <returns>If found, returns the ICustomVerificationHandler class instance. Otherwise, returns null.</returns>
+        private static ICustomVerificationHandler GetCustomVerificationHandler(string customHandlerName)
+        {
+            ICustomVerificationHandler customVerificationHandler = null;
+
+            try
+            {
+                var customVerificationHandlerType =
+                    AppDomain.CurrentDomain.GetAssemblies()
+                             .SelectMany(a => a.GetTypes())
+                             .FirstOrDefault(t => t.GetInterface(typeof(ICustomVerificationHandler).Name) != null &&
+                                                  t.Name.Equals(customHandlerName) && t.IsClass && !t.IsAbstract);
+
+                if (customVerificationHandlerType != null)
+                {
+                    customVerificationHandler = (ICustomVerificationHandler)Activator.CreateInstance(customVerificationHandlerType, null);
+                    Debug.WriteLine(string.Format("Successfully loaded ICustomeVerificationHandler '{0}'.", customHandlerName), PxConstants.LOG_CATEGORY);
+                }
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                Debug.WriteLine(string.Format("Failed to load the ICustomeVerificationHandler '{0}': {1}.",
+                                              customHandlerName, ex.Message), PxConstants.LOG_CATEGORY);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(string.Format("Encountered an error while retrieving the ICustomeVerificationHandler '{0}': {1}.",
+                                              customHandlerName, ex.Message), PxConstants.LOG_CATEGORY);
+            }
+
+            return customVerificationHandler;
+        }
     }
 }
