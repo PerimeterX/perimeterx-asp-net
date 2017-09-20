@@ -137,7 +137,7 @@ Example below:
 ...
 ```
 
-####<a name="custom-verification-handler"></a>**Custom Verification Handler**
+#### <a name="custom-verification-handler"></a> Custom Verification Handler
 
 A custom verification handler can be called by the PxModule instead of the default behavior, to allow a user to customize the behavior based on the risk score returned by PerimeterX.
 
