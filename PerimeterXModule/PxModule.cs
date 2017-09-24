@@ -427,11 +427,11 @@ namespace PerimeterX
             }
         }
 
-		/// <summary>
-		/// Uses reflection to check whether an IVerificationHandler was implemented by the customer. 
-		/// </summary>
-		/// <returns>If found, returns the IVerificationHandler class instance. Otherwise, returns null.</returns>
-		private static IVerificationHandler GetCustomVerificationHandler(string customHandlerName)
+        /// <summary>
+        /// Uses reflection to check whether an IVerificationHandler was implemented by the customer. 
+        /// </summary>
+        /// <returns>If found, returns the IVerificationHandler class instance. Otherwise, returns null.</returns>
+        private static IVerificationHandler GetCustomVerificationHandler(string customHandlerName)
         {
             IVerificationHandler customVerificationHandler = null;
 
