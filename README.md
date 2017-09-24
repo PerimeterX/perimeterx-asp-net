@@ -16,6 +16,7 @@ Table of Contents
   **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
   *   [Blocking Score](#blocking-score)
+  *   [Custom Verification Handler](#custom-verification-handler)
   *   [Enable/Disable Captcha](#captcha-support)
   *   [Select Captcha Provider](#captcha-provider)
   *   [Extracting Real IP Address](#real-ip)
@@ -134,6 +135,48 @@ Example below:
 ... 
   blockingScore="70"
 ...
+```
+
+#### <a name="custom-verification-handler"></a> Custom Verification Handler
+
+A custom verification handler can be called by the PxModule instead of the default behavior, to allow a user to customize the behavior based on the risk score returned by PerimeterX.
+
+The custom handler class should implement the `IVerificationHandler` interface, and its name should be added to the configuration section:   
+
+```xml
+...
+  customVerificationHandler="UniqueVerificationHandler"
+...
+```
+
+The custom logic will reside in the `Handle` method, making use of the following arguments:
+
+- `HttpApplication application` - The currently running ASP.NET application methods, properties and events. Calling [`application.CompleteRequest`](https://msdn.microsoft.com/en-us/library/system.web.httpapplication.completerequest(v=vs.110).aspx), for example, will directly execute the [`EndRequest`](https://msdn.microsoft.com/en-us/library/system.web.httpapplication.endrequest(v=vs.110).aspx) event to return a response to the client.
+- `PxContext pxContext` - The PerimeterX context, containing valuable fields such as `Score`, `UUID`, `BlockAction` etc. 
+- `PxModuleConfigurationSection pxConfig` - The current configuration used by the PxModule, representing the `PerimeterX.PxModuleConfigurationSection` settings. Contains fields such as `BlockingScore`.
+
+Common customization options are presenting of a captcha or a custom branded block page. 
+
+```xml
+...
+
+namespace myUniqueApp
+{
+    public class UniqueVerificationHandler : IVerificationHandler
+    {
+        public void Handle(HttpApplication application, PxContext pxContext, PxModuleConfigurationSection pxConfig)
+        {
+            // Custom verification logic goes here. 
+            // The following code is only an example of a possible implementation:
+
+            if (pxContext.Score >= pxConfig.BlockingScore) // In the case of a high score, present the standard block/captcha page
+            {
+                PxModule.BlockRequest(pxContext, pxConfig);
+                application.CompleteRequest();
+            }
+        }
+    }
+}
 ```
 
 #### <a name="captcha-support"></a>Enable/disable captcha in the block page

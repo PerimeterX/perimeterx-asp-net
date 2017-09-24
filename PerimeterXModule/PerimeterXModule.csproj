@@ -106,6 +106,7 @@
     <Compile Include="DataContracts\Responses\RiskResponse.cs" />
     <Compile Include="DataContracts\Activities\Activity.cs" />
     <Compile Include="DataContracts\Activities\ActivityDetails.cs" />
+    <Compile Include="CustomBehavior\IVerificationHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Internals\Templates\block.mustache" />
@@ -125,6 +126,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="CustomBehavior\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets" Condition="Exists('..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets')" />
 </Project>

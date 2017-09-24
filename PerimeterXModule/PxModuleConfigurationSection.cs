@@ -439,5 +439,18 @@ namespace PerimeterX
 				this["sensitiveRoutes"] = value;
 			}
 		}
+
+		[ConfigurationProperty("customVerificationHandler")]
+		public string CustomVerificationHandler
+		{
+			get
+			{
+				return (string)this["customVerificationHandler"];
+			}
+			set
+			{
+				this["customVerificationHandler"] = value;
+			}
+		}
 	}
 }
