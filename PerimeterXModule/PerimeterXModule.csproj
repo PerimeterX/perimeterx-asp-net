@@ -106,7 +106,7 @@
     <Compile Include="DataContracts\Responses\RiskResponse.cs" />
     <Compile Include="DataContracts\Activities\Activity.cs" />
     <Compile Include="DataContracts\Activities\ActivityDetails.cs" />
-    <Compile Include="CustomBehavior\ICustomVerificationHandler.cs" />
+    <Compile Include="CustomBehavior\IVerificationHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Internals\Templates\block.mustache" />

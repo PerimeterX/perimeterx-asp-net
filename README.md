@@ -141,7 +141,7 @@ Example below:
 
 A custom verification handler can be called by the PxModule instead of the default behavior, to allow a user to customize the behavior based on the risk score returned by PerimeterX.
 
-The custom handler class should implement the `ICustomVerificationHandler` interface, and its name should be added to the configuration section:   
+The custom handler class should implement the `IVerificationHandler` interface, and its name should be added to the configuration section:   
 
 ```xml
 ...
@@ -162,17 +162,18 @@ Common customization options are presenting of a captcha or a custom branded blo
 
 namespace myUniqueApp
 {
-    public class UniqueVerificationHandler : ICustomVerificationHandler
+    public class UniqueVerificationHandler : IVerificationHandler
     {
         public void Handle(HttpApplication application, PxContext pxContext, PxModuleConfigurationSection pxConfig)
         {
-            // Custom verification logic goes here, e.g -
-            // 
-            // if (pxContext.Score >= pxConfig.BlockingScore) // In the case of a high score, present the standard block/captcha page
-            // {
-            //     PxModule.BlockRequest(pxContext, pxConfig);
-            //     application.CompleteRequest();
-            // }
+            // Custom verification logic goes here. 
+            // The following code is only an example of a possible implementation:
+
+            if (pxContext.Score >= pxConfig.BlockingScore) // In the case of a high score, present the standard block/captcha page
+            {
+                PxModule.BlockRequest(pxContext, pxConfig);
+                application.CompleteRequest();
+            }
         }
     }
 }

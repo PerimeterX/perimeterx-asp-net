@@ -405,7 +405,7 @@ namespace PerimeterX
             // If implemented, run the customVerificationHandler.
             if (!string.IsNullOrEmpty(customVerificationHandler))
             {
-                ICustomVerificationHandler customVerificationHandlerInstance = GetCustomVerificationHandler(customVerificationHandler);
+                IVerificationHandler customVerificationHandlerInstance = GetCustomVerificationHandler(customVerificationHandler);
                 if (customVerificationHandlerInstance != null)
                 {
                     customVerificationHandlerInstance.Handle(application, pxContext, config);
@@ -413,7 +413,7 @@ namespace PerimeterX
                 else
                 {
                     Debug.WriteLine(string.Format(
-                        "Missing implementation of the configured ICustomVerificationHandler ('customVerificationHandler' attribute): {0}.",
+                        "Missing implementation of the configured IVerificationHandler ('customVerificationHandler' attribute): {0}.",
                         customVerificationHandler), PxConstants.LOG_CATEGORY);
                 }
             }
@@ -427,25 +427,25 @@ namespace PerimeterX
             }
         }
 
-        /// <summary>
-        /// Uses reflection to check whether an ICustomVerificationHandler was implemented by the customer. 
-        /// </summary>
-        /// <returns>If found, returns the ICustomVerificationHandler class instance. Otherwise, returns null.</returns>
-        private static ICustomVerificationHandler GetCustomVerificationHandler(string customHandlerName)
+		/// <summary>
+		/// Uses reflection to check whether an IVerificationHandler was implemented by the customer. 
+		/// </summary>
+		/// <returns>If found, returns the IVerificationHandler class instance. Otherwise, returns null.</returns>
+		private static IVerificationHandler GetCustomVerificationHandler(string customHandlerName)
         {
-            ICustomVerificationHandler customVerificationHandler = null;
+            IVerificationHandler customVerificationHandler = null;
 
             try
             {
                 var customVerificationHandlerType =
                     AppDomain.CurrentDomain.GetAssemblies()
                              .SelectMany(a => a.GetTypes())
-                             .FirstOrDefault(t => t.GetInterface(typeof(ICustomVerificationHandler).Name) != null &&
+                             .FirstOrDefault(t => t.GetInterface(typeof(IVerificationHandler).Name) != null &&
                                                   t.Name.Equals(customHandlerName) && t.IsClass && !t.IsAbstract);
 
                 if (customVerificationHandlerType != null)
                 {
-                    customVerificationHandler = (ICustomVerificationHandler)Activator.CreateInstance(customVerificationHandlerType, null);
+                    customVerificationHandler = (IVerificationHandler)Activator.CreateInstance(customVerificationHandlerType, null);
                     Debug.WriteLine(string.Format("Successfully loaded ICustomeVerificationHandler '{0}'.", customHandlerName), PxConstants.LOG_CATEGORY);
                 }
             }
