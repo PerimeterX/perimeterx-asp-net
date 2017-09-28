@@ -41,7 +41,7 @@ namespace PerimeterX
 				if (PxCookieUtils.IsExpired(pxCookie.Timestamp))
 				{
 					Debug.WriteLine("Request with expired cookie - " + context.Uri, PxConstants.LOG_CATEGORY);
-					context.S2SCallReason = RiskRequestReasonEnum.EXPIRED_COOKIE;
+					context.S2SCallReason = RiskRequestReasonEnum.COOKIE_EXPIRED;
 					return false;
 				}
 

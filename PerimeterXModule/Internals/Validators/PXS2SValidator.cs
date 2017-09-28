@@ -111,7 +111,7 @@ namespace PerimeterX
             {
                 riskRequest.Additional.PxOrigCookie = PxContext.GetPxCookie();
             }
-            else if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.EXPIRED_COOKIE) || PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.VALIDATION_FAILED))
+            else if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.COOKIE_EXPIRED) || PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.VALIDATION_FAILED))
             {
                 riskRequest.Additional.PXCookie = PxContext.DecodedPxCookie;
             }
