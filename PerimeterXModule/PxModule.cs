@@ -389,9 +389,9 @@ namespace PerimeterX
             bool verified = blockingScore > pxContext.Score;
             PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 
-            Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}.", pxContext.Score, blockingScore), PxConstants.LOG_CATEGORY);
+            Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}, monitor mode status: {2}.", pxContext.Score, blockingScore, config.MonitorMode == true ? "on" : "off"), PxConstants.LOG_CATEGORY);
 
-            if (verified)
+            if (verified || config.MonitorMode == true)
             {
                 Debug.WriteLine(string.Format("Valid request to {0}", application.Context.Request.RawUrl), PxConstants.LOG_CATEGORY);
                 PostPageRequestedActivity(pxContext);
