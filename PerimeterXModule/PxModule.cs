@@ -389,7 +389,7 @@ namespace PerimeterX
             bool verified = blockingScore > pxContext.Score;
             PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 
-            Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}.", pxContext.Score, blockingScore), PxConstants.LOG_CATEGORY);
+            Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}, monitor mode status: {2}.", pxContext.Score, blockingScore, config.MonitorMode == true ? "On" : "Off"), PxConstants.LOG_CATEGORY);
 
             if (verified)
             {
@@ -419,7 +419,7 @@ namespace PerimeterX
             }
             else // No custom verification handler -> continue regular flow
             {
-                if (!verified)
+                if (!verified && config.MonitorMode == false)
                 {
                     BlockRequest(pxContext, config);
                     application.CompleteRequest();
