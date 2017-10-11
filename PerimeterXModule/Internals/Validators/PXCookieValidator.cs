@@ -5,9 +5,9 @@ namespace PerimeterX
 {
 	class PXCookieValidator : IPXCookieValidator
 	{
-		private PxModuleConfigurationSection config;
+		private IPXConfiguration config;
 
-		public PXCookieValidator(PxModuleConfigurationSection config)
+		public PXCookieValidator(IPXConfiguration config)
 		{
 			this.config = config;
 		}

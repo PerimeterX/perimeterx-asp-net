@@ -10,13 +10,13 @@ namespace PerimeterX
 	public class PXS2SValidator : IPXS2SValidator
 	{
 
-		private readonly PxModuleConfigurationSection PxConfig;
-		private readonly HttpClient HttpClient;
+		private readonly IPXConfiguration PxConfig;
+		private readonly IPXHttpClient pxHttpClient;
 
-		public PXS2SValidator(PxModuleConfigurationSection PxConfig, HttpClient HttpClient)
+		public PXS2SValidator(IPXConfiguration PxConfig, IPXHttpClient pxHttpClient)
 		{
 			this.PxConfig = PxConfig;
-			this.HttpClient = HttpClient;
+			this.pxHttpClient = pxHttpClient;
 		}
 
 		public bool VerifyS2S(PxContext PxContext)
@@ -25,7 +25,10 @@ namespace PerimeterX
 			bool retVal = false;
 			try
 			{
-				RiskResponse riskResponse = SendRiskResponse(PxContext);
+				RiskRequest riskRequest = PrepareRiskRequest(PxContext);
+				string url = PxConstants.FormatBaseUri(PxConfig);
+				string path = PxConstants.RISK_API_V2;
+				RiskResponse riskResponse = pxHttpClient.SendRiskApi(url, path, riskRequest, PxConfig.ApiTimeout);
 				PxContext.MadeS2SCallReason = true;
 
 				if (riskResponse.Score >= 0 && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
@@ -66,9 +69,8 @@ namespace PerimeterX
 			return retVal;
 		}
 
-		public RiskResponse SendRiskResponse(PxContext PxContext)
+		private RiskRequest PrepareRiskRequest(PxContext PxContext)
 		{
-
 			var riskMode = ModuleMode.BLOCK_MODE;
 			if (PxConfig.MonitorMode == true)
 			{
@@ -111,17 +113,7 @@ namespace PerimeterX
 				riskRequest.Additional.PXCookie = PxContext.DecodedPxCookie;
 			}
 
-			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
-			var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConstants.FormatBaseUri(PxConfig) + PxConstants.RISK_API_V2)
-			{
-				Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
-			};
-
-			var httpResponse = HttpClient.SendAsync(requestMessage).Result;
-			httpResponse.EnsureSuccessStatusCode();
-			var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-			Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.RISK_API_V2, requestJson, responseJson), PxConstants.LOG_CATEGORY);
-			return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
+			return riskRequest;
 		}
 	}
 }

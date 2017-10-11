@@ -28,7 +28,7 @@ using System.Configuration;
 
 namespace PerimeterX
 {
-	public class PxModuleConfigurationSection : ConfigurationSection
+	public class PxModuleConfigurationSection : ConfigurationSection, IPXConfiguration
 	{
 		[ConfigurationProperty("enabled", DefaultValue = true)]
 		public bool Enabled
@@ -199,16 +199,17 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("socketIpHeader")]
-		public string SocketIpHeader
+		[ConfigurationProperty("socketIpHeaders")]
+		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+		public StringCollection SocketIpHeaders
 		{
 			get
 			{
-				return (string)this["socketIpHeader"];
+				return (StringCollection)this["socketIpHeaders"];
 			}
 			set
 			{
-				this["socketIpHeader"] = value;
+				this["socketIpHeaders"] = value;
 			}
 		}
 
@@ -400,7 +401,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sensitiveRoutes", DefaultValue = "")]
+		[ConfigurationProperty("sensitiveRoutes")]
 		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
 		public StringCollection SensitiveRoutes
 		{
@@ -411,6 +412,45 @@ namespace PerimeterX
 			set
 			{
 				this["sensitiveRoutes"] = value;
+			}
+		}
+
+		[ConfigurationProperty("remoteConfigurationEnabled", DefaultValue = false)]
+		public bool RemoteConfigurationEnabled
+		{
+			get
+			{
+				return (bool)this["remoteConfigurationEnabled"];
+			}
+			set
+			{
+				this["remoteConfigurationEnabled"] = value;
+			}
+		}
+
+		[ConfigurationProperty("remoteConfigurationUrl", DefaultValue = "https://px-conf.perimeterx.net")]
+		public string RemoteConfigurationUrl
+		{
+			get
+			{
+				return (string)this["remoteConfigurationUrl"];
+			}
+			set
+			{
+				this["remoteConfigurationUrl"] = value;
+			}
+		}
+
+		[ConfigurationProperty("remoteConfigurationInterval", DefaultValue = 5000)]
+		public int RemoteConfigurationInterval
+		{
+			get
+			{
+				return (int)this["remoteConfigurationInterval"];
+			}
+			set
+			{
+				this["remoteConfigurationInterval"] = value;
 			}
 		}
 	}

@@ -57,8 +57,8 @@ namespace PerimeterX
 
 		public ActivityReporter(string baseUri, int capacity = 500, int bulkSize = 10, int timeout = 5000)
 		{
-			this.postUri = baseUri + @"/api/v1/collector/s2s";
-			this.activities = new BlockingCollection<Activity>(capacity);
+			postUri = baseUri + @"/api/v1/collector/s2s";
+			activities = new BlockingCollection<Activity>(capacity);
 			this.bulkSize = bulkSize;
 			var webRequestHandler = new WebRequestHandler
 			{
@@ -66,8 +66,8 @@ namespace PerimeterX
 				UseDefaultCredentials = true,
 				UnsafeAuthenticatedConnectionSharing = true
 			};
-			this.httpClient = new HttpClient(webRequestHandler, true);
-			this.httpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
+			httpClient = new HttpClient(webRequestHandler, true);
+			httpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
 			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			httpClient.DefaultRequestHeaders.ExpectContinue = false;
 			Task.Run(() => SendActivitiesTask());

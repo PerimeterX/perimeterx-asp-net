@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataContracts\Responses\RemoteConfigurationResponse.cs" />
     <Compile Include="Internals\Cookies\PxCookieUtils.cs" />
     <Compile Include="DataContracts\Cookies\DecodedCookieV3.cs" />
     <Compile Include="DataContracts\Cookies\RiskCookieScores.cs" />
@@ -74,6 +75,11 @@
     <Compile Include="Internals\Enums\PassReasonEnum.cs" />
     <Compile Include="Internals\Enums\RiskRequestReasonEnum.cs" />
     <Compile Include="Internals\Helpers\PxConstants.cs" />
+    <Compile Include="Internals\PXClient\IPXHttpClient.cs" />
+    <Compile Include="Internals\PXClient\PXHttpClient.cs" />
+    <Compile Include="Internals\PXConfiguration\ConfigurationFactory.cs" />
+    <Compile Include="Internals\PXConfiguration\Interfaces\IPXConfiguration.cs" />
+    <Compile Include="Internals\PXConfiguration\DynamicConfiguration\PXDynamicConfiguration.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCaptchaValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXS2SValidator.cs" />

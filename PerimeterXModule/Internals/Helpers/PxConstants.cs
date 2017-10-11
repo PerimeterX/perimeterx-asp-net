@@ -23,6 +23,7 @@ namespace PerimeterX
 		// Endpoints
 		public const string RISK_API_V2 = "/api/v2/risk";
 		public const string CAPTCHA_API_V1 = "/api/v1/risk/captcha";
+		public const string REMOTE_CONFIG_V1 = "/api/v1/enforcer";
 
 		private static string GetAssemblyVersion()
 		{
@@ -31,9 +32,10 @@ namespace PerimeterX
 			return "ASP.NET v" + fvi.FileVersion;
 		}
 
-		public static string FormatBaseUri(PxModuleConfigurationSection config)
+		public static string FormatBaseUri(IPXConfiguration config)
 		{
 			return string.Format(config.BaseUri, config.AppId);
 		}
 	}
 }
+
