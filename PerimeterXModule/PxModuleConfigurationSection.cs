@@ -251,7 +251,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sendPageActivities", DefaultValue = true)]
+		[ConfigurationProperty("sendPageActivities", DefaultValue = false)]
 		public bool SendPageActivites
 		{
 			get

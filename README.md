@@ -206,13 +206,13 @@ API Timeout in milliseconds to wait for the PerimeterX server API response.
 Boolean flag to enable or disable sending activities and metrics to
 PerimeterX on each page request. Enabling this feature will provide data
 that populates the PerimeterX portal with valuable information such as
-amount requests blocked and API usage statistics. It is not recommended to turn this flag off.
+amount requests blocked and API usage statistics.
 
-**default:** true
+**default:** false
 
 ```xml
     ..
-    sendPageActivities="true"
+    sendPageActivities="false"
     ..
 ```
 
