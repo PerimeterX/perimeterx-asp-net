@@ -14,7 +14,7 @@
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <PackageId>PxModule</PackageId>
-    <PackageVersion>1.2.1</PackageVersion>
+    <PackageVersion>2.2.0</PackageVersion>
     <Authors>Nitzan Goldfeder</Authors>
     <Description>PxModule for ASP/.NET</Description>
   </PropertyGroup>
@@ -29,7 +29,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType></DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>

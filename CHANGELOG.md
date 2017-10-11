@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+##[2.2.0] - 2017-11-10
+### Fixed
+	- Fixed default value for sensitive_route
+	- Using action_block to render block pages
+	- Naming for s2s expired_cookie reason to cookie_expired 
+### Added
+	- JS Challenge support
+	- FunCaptcha support
+	- CustomVerificationHandler support 
+	- MonitorMode and set default to true 
 ##[2.1.0] - 2017-04-06
 ### Fixed
 	- Renamed risk_score to block_score in activity details
