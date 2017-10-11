@@ -14,8 +14,8 @@ namespace PerimeterX
 		NONE,
 		[EnumMember(Value = "no_cookie")]
 		NO_COOKIE,
-		[EnumMember(Value = "expired_cookie")]
-		EXPIRED_COOKIE,
+		[EnumMember(Value = "cookie_expired")]
+		COOKIE_EXPIRED,
 		[EnumMember(Value = "invalid_cookie")]
 		INVALID_COOKIE,
 		[EnumMember(Value = "cookie_decryption_failed")]

@@ -10,11 +10,13 @@ namespace PerimeterX
 	[DataContract]
 	public enum BlockReasonEnum
 	{
-		[EnumMember]
+		[EnumMember(Value = "none")]
 		NONE,
 		[EnumMember(Value = "cookie_high_score")]
 		COOKIE_HIGH_SCORE,
 		[EnumMember(Value = "s2s_high_score")]
-		RISK_HIGH_SCORE
+		RISK_HIGH_SCORE,
+		[EnumMember(Value = "challenge")]
+		CHALLENGE
 	}
 }

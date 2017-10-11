@@ -18,11 +18,12 @@ namespace PerimeterX
 		public static readonly string LOG_CATEGORY = "PxModule";
 		public static readonly string MODULE_VERSION = GetAssemblyVersion();
 		public static readonly Options JSON_OPTIONS = new Options(prettyPrint: false, excludeNulls: true, includeInherited: true);
+                public static readonly string JS_CHALLENGE_ACTION = "j";
 
 
 		// Endpoints
 		public const string RISK_API_V2 = "/api/v2/risk";
-		public const string CAPTCHA_API_V1 = "/api/v1/risk/captcha";
+		public const string CAPTCHA_API_PATH = "/api/v2/risk/captcha";
 
 		private static string GetAssemblyVersion()
 		{

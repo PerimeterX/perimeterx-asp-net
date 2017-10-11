@@ -108,6 +108,32 @@ namespace PerimeterX
 			}
 		}
 
+		[ConfigurationProperty("challengeEnabled", DefaultValue = true)]
+		public bool ChallengeEnabled
+		{
+			get
+			{
+				return (bool)this["challengeEnabled"];
+			}
+			set
+			{
+				this["challengeEnabled"] = value;
+			}
+		}
+
+		[ConfigurationProperty("captchaProvider", DefaultValue = "reCaptcha")]
+		public string CaptchaProvider
+		{
+			get
+			{
+				return (string)this["captchaProvider"];
+			}
+			set
+			{
+				this["captchaProvider"] = value;
+			}
+		}
+
 		[ConfigurationProperty("signedWithUserAgent", DefaultValue = true)]
 		public bool SignedWithUserAgent
 		{
@@ -134,7 +160,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("blockingScore", DefaultValue = 70)]
+		[ConfigurationProperty("blockingScore", DefaultValue = 100)]
 		public int BlockingScore
 		{
 			get
@@ -251,7 +277,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sendPageActivities", DefaultValue = false)]
+		[ConfigurationProperty("sendPageActivities", DefaultValue = true)]
 		public bool SendPageActivites
 		{
 			get
@@ -387,7 +413,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("monitorMode", DefaultValue = false)]
+		[ConfigurationProperty("monitorMode", DefaultValue = true)]
 		public bool MonitorMode
 		{
 			get
@@ -400,7 +426,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("sensitiveRoutes", DefaultValue = "")]
+		[ConfigurationProperty("sensitiveRoutes")]
 		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
 		public StringCollection SensitiveRoutes
 		{
@@ -411,6 +437,19 @@ namespace PerimeterX
 			set
 			{
 				this["sensitiveRoutes"] = value;
+			}
+		}
+
+		[ConfigurationProperty("customVerificationHandler")]
+		public string CustomVerificationHandler
+		{
+			get
+			{
+				return (string)this["customVerificationHandler"];
+			}
+			set
+			{
+				this["customVerificationHandler"] = value;
 			}
 		}
 	}
