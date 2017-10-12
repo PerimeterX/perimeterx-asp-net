@@ -262,31 +262,30 @@ API Timeout in milliseconds to wait for the PerimeterX server API response.
 ```
 
 #### <a name="send-page-activities"></a> Send Page Activities
+Boolean flag to enable or disable page activities
+Sending page activities is asynchronous and not blocking the request
 
-Boolean flag to enable or disable monitor mode
-While monitor mode is on, all requests will be inspected but not blocked
-Set this flag to false to disable monitor mode
-
-**default:** true
-
-```xml
-...
-  monitorMode="false"
-...
-```
-
-#### <a name="monitor-mode"></a> Monitor Mode
-
-
-
-
-**default:** false
+**default:** True 
 
 ```xml
 ...
   sendPageActivities="false"
 ...
 ```
+
+
+#### <a name="monitor-mode"></a> Monitor Mode
+
+Boolean flag to enable or disable monitor mode
+While monitor mode is on, all requests will be inspected but not blocked
+Set this flag to false to disable monitor mode
+
+```xml
+...
+  monitorMode="false"
+...
+```
+**default:** true
 
 #### <a name="base-uri"></a> Base URI
 

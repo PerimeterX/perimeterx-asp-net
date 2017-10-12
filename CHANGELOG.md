@@ -13,7 +13,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 	- JS Challenge support
 	- FunCaptcha support
 	- CustomVerificationHandler support 
-	- MonitorMode and set default to true 
+	- MonitorMode and set default to true
+	  Please note: 	MonitorMode is breaking backward support
+			if you upgrade to this version or further 
+			and want to keep your blocking active, please set its value to False 
+
 ##[2.1.0] - 2017-04-06
 ### Fixed
 	- Renamed risk_score to block_score in activity details
