@@ -86,6 +86,7 @@ Add site specific configuration (configuration level)
       appId="<PX Application ID>"
       apiToken="<API token>"
       cookieKey="<cookie key>"
+      monitorMode="false"
       blockingScore="70"
       >
     </pxModuleConfigurationSection>
