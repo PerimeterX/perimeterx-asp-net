@@ -26,11 +26,8 @@
 using System;
 using System.Web;
 using System.Security.Cryptography;
-using System.Net.Http;
-using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using System.Net.Http.Headers;
 using System.Configuration;
 using System.Diagnostics;
 using System.Collections.Specialized;
@@ -38,12 +35,13 @@ using System.Net;
 using System.Linq;
 using System.Reflection;
 using System.Collections;
+using Jil;
 
 namespace PerimeterX
 {
     public class PxModule : IHttpModule
     {
-        private HttpClient httpClient;
+        private HttpHandler httpHandler;
         private PxContext pxContext;
         private static IActivityReporter reporter;
         private readonly string validationMarker;
@@ -67,6 +65,8 @@ namespace PerimeterX
         private readonly StringCollection useragentsWhitelist;
         private readonly string cookieKey;
         private readonly byte[] cookieKeyBytes;
+        private readonly string osVersion;
+        private string nodeName;
 
         static PxModule()
         {
@@ -125,30 +125,20 @@ namespace PerimeterX
                 cookieDecoder = new CookieDecoder();
             }
 
-            var webRequestHandler = new WebRequestHandler
-            {
-                AllowPipelining = true,
-                UseDefaultCredentials = true,
-                UnsafeAuthenticatedConnectionSharing = true
-            };
-            this.httpClient = new HttpClient(webRequestHandler, true)
-            {
-                Timeout = TimeSpan.FromMilliseconds(config.ApiTimeout)
-            };
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", config.ApiToken);
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.ExpectContinue = false;
-
             using (var hasher = new SHA256Managed())
             {
                 validationMarker = ByteArrayToHexString(hasher.ComputeHash(cookieKeyBytes));
             }
 
-            // Set Validators
+            this.httpHandler = new HttpHandler(config, PxConstants.FormatBaseUri(config), config.ApiTimeout);
 
-            PxS2SValidator = new PXS2SValidator(config, httpClient);
-            PxCaptchaValidator = new PXCaptchaValidator(config, httpClient);
+            // Set Validators
+            PxS2SValidator = new PXS2SValidator(config, httpHandler);
+            PxCaptchaValidator = new PXCaptchaValidator(config, httpHandler);
             PxCookieValidator = new PXCookieValidator(config);
+
+            // Get OS type
+            osVersion = Environment.OSVersion.VersionString;
 
             Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
         }
@@ -161,6 +151,10 @@ namespace PerimeterX
         public void Init(HttpApplication application)
         {
             application.BeginRequest += this.Application_BeginRequest;
+
+            // Send Enforcer Telemetry config upon module initialization.
+            nodeName = application.Context.Server.MachineName;
+            PostEnforcerTelemetryActivity();
         }
 
         private void Application_BeginRequest(object source, EventArgs e)
@@ -242,12 +236,54 @@ namespace PerimeterX
             }
         }
 
+        private void PostEnforcerTelemetryActivity()
+        {
+            var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+
+            string serializedConfig;
+            using (var json = new StringWriter())
+            {
+                JSON.Serialize(config, json);
+                serializedConfig = json.ToString();
+            }
+
+            var activity = new Activity
+            {
+                Type = "enforcer_telemetry",
+                Timestamp = PxConstants.GetTimestamp(),
+                AppId = appId,
+                Details = new EnforcerTelemetryActivityDetails
+                {
+                    ModuleVersion = PxConstants.MODULE_VERSION,
+                    UpdateReason = EnforcerTelemetryUpdateReasonEnum.INITIAL_CONFIG,
+                    OsName = osVersion,
+                    NodeName = nodeName,
+                    EnforcerConfigs = serializedConfig
+                }
+            };
+
+            try
+            {
+                var stringBuilder = new StringBuilder();
+                using (var stringOutput = new StringWriter(stringBuilder))
+                {
+                    JSON.SerializeDynamic(activity, stringOutput, Options.IncludeInherited);
+                }
+
+                httpHandler.Post(stringBuilder.ToString(), PxConstants.ENFORCER_TELEMETRY_API_PATH);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(string.Format("Encountered an error sending enforcer telemetry activity: {0}.", ex.Message), PxConstants.LOG_CATEGORY);
+            }
+        }
+
         private void PostActivity(PxContext pxContext, string eventType, ActivityDetails details = null)
         {
             var activity = new Activity
             {
                 Type = eventType,
-                Timestamp = Math.Round(DateTime.UtcNow.ToUniversalTime().Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds, MidpointRounding.AwayFromZero),
+                Timestamp = PxConstants.GetTimestamp(),
                 AppId = appId,
                 SocketIP = pxContext.Ip,
                 Url = pxContext.FullUrl,
@@ -297,10 +333,9 @@ namespace PerimeterX
 
         public void Dispose()
         {
-            if (httpClient != null)
+            if (httpHandler != null)
             {
-                httpClient.Dispose();
-                httpClient = null;
+                httpHandler.Dispose();
             }
         }
 
