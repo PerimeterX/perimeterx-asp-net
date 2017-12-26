@@ -107,6 +107,8 @@
     <Compile Include="DataContracts\Activities\Activity.cs" />
     <Compile Include="DataContracts\Activities\ActivityDetails.cs" />
     <Compile Include="CustomBehavior\IVerificationHandler.cs" />
+    <Compile Include="Internals\Enums\EnforcerTelemetryUpdateReasonEnum.cs" />
+    <Compile Include="Internals\Helpers\HttpHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Internals\Templates\block.mustache" />
