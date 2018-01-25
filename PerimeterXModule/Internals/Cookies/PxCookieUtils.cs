@@ -1,6 +1,7 @@
 ﻿using Jil;
 using PerimeterX.DataContracts.Cookies;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -8,22 +9,20 @@ namespace PerimeterX
 {
 	public static class PxCookieUtils
 	{
-		public static IPxCookie BuildCookie(PxModuleConfigurationSection config, PxContext context, ICookieDecoder cookieDecoder)
+		public static IPxCookie BuildCookie(PxModuleConfigurationSection config, Dictionary<string,string> cookies, ICookieDecoder cookieDecoder)
 		{
-			if (context.PxCookies.Count > 0)
+			if (cookies.Count == 0)
 			{
-				var cookie = context.PxCookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX) ? context.PxCookies[PxConstants.COOKIE_V3_PREFIX] : null;
-				if (cookie != null)
-				{
-					return new PxCookieV3(cookieDecoder, cookie);
-				}
-				cookie = context.PxCookies[PxConstants.COOKIE_V1_PREFIX];
-				if (cookie != null)
-				{
-					return new PxCookieV1(cookieDecoder, cookie);
-				}
+				return null;
 			}
-			return null;
+
+			if (cookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX))
+			{
+				return new PxCookieV3(cookieDecoder, cookies[PxConstants.COOKIE_V3_PREFIX]);
+			}
+			
+			return new PxCookieV1(cookieDecoder, cookies[PxConstants.COOKIE_V1_PREFIX]);
+			
 		}
 
 		public static T Deserialize<T>(ICookieDecoder cookieDecoder, string rawCookie)

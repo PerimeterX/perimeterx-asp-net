@@ -452,5 +452,19 @@ namespace PerimeterX
 				this["customVerificationHandler"] = value;
 			}
 		}
+
+		[ConfigurationProperty("collectorUrl", DefaultValue = "https://collector-{0}.perimeterx.net") ]
+		public string CollectorUrl
+		{
+			get
+			{
+				return (string)this["collectorUrl"];
+			}
+			set
+			{
+				this["collectorUrl"] = value;
+			}
+		}
+		
 	}
 }

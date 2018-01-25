@@ -1,7 +1,7 @@
 ﻿namespace PerimeterX
 {
-	interface IPXCookieValidator
+	public interface IPXCookieValidator
 	{
-		bool CookieVerify(PxContext context, IPxCookie pxCookie);
+		bool Verify(PxContext context, IPxCookie pxCookie);
 	}
 }

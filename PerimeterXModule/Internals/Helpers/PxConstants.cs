@@ -10,15 +10,20 @@ namespace PerimeterX
 	{
 		public static readonly string HEX_ALPHABET = "0123456789abcdef";
 		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX };
+		public static readonly string[] PX_TOKEN_PREFIX = { TOKEN_V1_PREFIX, TOKEN_V3_PREFIX };
 		public const string COOKIE_V1_PREFIX = "_px";
 		public const string COOKIE_V3_PREFIX = "_px3";
+		public const string TOKEN_V1_PREFIX = "1";
+		public const string TOKEN_V3_PREFIX = "3";
 		public static readonly string COOKIE_CAPTCHA_PREFIX = "_pxCaptcha";
 		public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
 		public static readonly string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
 		public static readonly string LOG_CATEGORY = "PxModule";
+		public static readonly string MOBILE_HEADER = "X-PX-AUTHORIZATION";
+		public static readonly string ORIGINAL_TOKEN = "X-PX-ORIGINAL-TOKEN";
 		public static readonly string MODULE_VERSION = GetAssemblyVersion();
 		public static readonly Options JSON_OPTIONS = new Options(prettyPrint: false, excludeNulls: true, includeInherited: true);
-                public static readonly string JS_CHALLENGE_ACTION = "j";
+        public static readonly string JS_CHALLENGE_ACTION = "j";
 
 
 		// Endpoints

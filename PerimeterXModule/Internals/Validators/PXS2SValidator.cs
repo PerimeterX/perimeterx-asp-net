@@ -92,9 +92,11 @@ namespace PerimeterX
                     HttpMethod = PxContext.HttpMethod,
                     HttpVersion = PxContext.HttpVersion,
                     RiskMode = riskMode,
-                    PxCookieHMAC = PxContext.PxCookieHmac
-
-                }
+                    PxCookieHMAC = PxContext.PxCookieHmac,
+					CookieOrigin = PxContext.CookieOrigin,
+					OriginalUUID = PxContext.OriginalUUID,
+					OriginalTokenError = PxContext.OriginalTokenError
+				}
             };
 
             if (!string.IsNullOrEmpty(PxContext.Vid))
@@ -107,16 +109,21 @@ namespace PerimeterX
                 riskRequest.UUID = PxContext.UUID;
             }
 
-            if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.DECRYPTION_FAILED))
+            if (PxContext.S2SCallReason.Equals(PXCookieValidator.CALL_REASON_DECRYPTION_FAILED))
             {
                 riskRequest.Additional.PxOrigCookie = PxContext.GetPxCookie();
             }
-            else if (PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.COOKIE_EXPIRED) || PxContext.S2SCallReason.Equals(RiskRequestReasonEnum.VALIDATION_FAILED))
+            else if (PxContext.S2SCallReason.Equals(PXCookieValidator.CALL_REASON_EXPIRED_COOKIE) || PxContext.S2SCallReason.Equals(PXCookieValidator.CALL_REASON_VALIDATION_FAILED))
             {
                 riskRequest.Additional.PXCookie = PxContext.DecodedPxCookie;
             }
 
-            string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
+			if (PxContext.DecodedOriginalToken != null)
+			{
+				riskRequest.Additional.DecodedOriginalToken = PxContext.DecodedOriginalToken;
+			}
+
+			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConstants.FormatBaseUri(PxConfig) + PxConstants.RISK_API_V2)
             {
                 Content = new StringContent(requestJson, Encoding.UTF8, "application/json")

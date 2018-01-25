@@ -47,7 +47,7 @@ namespace PerimeterX
 			string[] parts = cookie.Split(new char[] { ':' }, 3);
 			if (parts.Length != 3)
 			{
-				throw new InvalidDataException("PX cookie format");
+				throw new InvalidDataException("PX `cookie format");
 			}
 			byte[] salt = Convert.FromBase64String(parts[0]);
 			int iterations = int.Parse(parts[1]);
