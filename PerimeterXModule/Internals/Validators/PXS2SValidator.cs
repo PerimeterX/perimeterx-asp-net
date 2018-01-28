@@ -1,8 +1,6 @@
 ﻿using Jil;
 using System;
 using System.Diagnostics;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace PerimeterX
@@ -11,12 +9,12 @@ namespace PerimeterX
     {
 
         private readonly PxModuleConfigurationSection PxConfig;
-        private readonly HttpClient HttpClient;
+        private readonly HttpHandler httpHandler;
 
-        public PXS2SValidator(PxModuleConfigurationSection PxConfig, HttpClient HttpClient)
+        public PXS2SValidator(PxModuleConfigurationSection PxConfig, HttpHandler httpHandler)
         {
             this.PxConfig = PxConfig;
-            this.HttpClient = HttpClient;
+            this.httpHandler = httpHandler;
         }
 
         public bool VerifyS2S(PxContext PxContext)
@@ -123,16 +121,8 @@ namespace PerimeterX
 				riskRequest.Additional.DecodedOriginalToken = PxContext.DecodedOriginalToken;
 			}
 
-			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, PxConstants.FormatBaseUri(PxConfig) + PxConstants.RISK_API_V2)
-            {
-                Content = new StringContent(requestJson, Encoding.UTF8, "application/json")
-            };
-
-            var httpResponse = HttpClient.SendAsync(requestMessage).Result;
-            httpResponse.EnsureSuccessStatusCode();
-            var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-            Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", PxConstants.RISK_API_V2, requestJson, responseJson), PxConstants.LOG_CATEGORY);
+            string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
+            var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_V2);
             return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
         }
     }

@@ -160,7 +160,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("blockingScore", DefaultValue = 70)]
+		[ConfigurationProperty("blockingScore", DefaultValue = 100)]
 		public int BlockingScore
 		{
 			get
@@ -413,7 +413,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("monitorMode", DefaultValue = false)]
+		[ConfigurationProperty("monitorMode", DefaultValue = true)]
 		public bool MonitorMode
 		{
 			get

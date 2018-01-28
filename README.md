@@ -5,6 +5,8 @@
 [PerimeterX](http://www.perimeterx.com) ASP.NET SDK
 ===================================================
 
+> Latest stable version: [v2.10.0](https://www.nuget.org/packages/PerimeterXModule/2.1.0)
+
 Table of Contents
 -----------------
 
@@ -25,6 +27,7 @@ Table of Contents
   *   [Sensitive Routes](#sensitive-routes)
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
+  *   [Monitor Mode](#monitor-mode)
   *   [Debug Mode](#debug-mode)
   *   [Base URI](#base-uri)
   
@@ -259,19 +262,30 @@ API Timeout in milliseconds to wait for the PerimeterX server API response.
 ```
 
 #### <a name="send-page-activities"></a> Send Page Activities
+Boolean flag to enable or disable page activities
+Sending page activities is asynchronous and not blocking the request
 
-Boolean flag to enable or disable sending activities and metrics to
-PerimeterX on each page request. Enabling this feature will provide data
-that populates the PerimeterX portal with valuable information such as
-amount requests blocked and API usage statistics.
-
-**default:** false
+**default:** True 
 
 ```xml
 ...
   sendPageActivities="false"
 ...
 ```
+
+
+#### <a name="monitor-mode"></a> Monitor Mode
+
+Boolean flag to enable or disable monitor mode
+While monitor mode is on, all requests will be inspected but not blocked
+Set this flag to false to disable monitor mode
+
+```xml
+...
+  monitorMode="false"
+...
+```
+**default:** true
 
 #### <a name="base-uri"></a> Base URI
 
