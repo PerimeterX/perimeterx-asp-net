@@ -358,9 +358,10 @@ namespace PerimeterX
 					content = output.ToString();
 				}
 			}
+			pxContext.ApplicationContext.Response.Write(content);
 		}
-
-        public void Dispose()
+		
+		public void Dispose()
         {
             if (httpHandler != null)
             {
@@ -451,13 +452,14 @@ namespace PerimeterX
 
         private void HandleVerification(HttpApplication application)
         {
-            bool verified = blockingScore > pxContext.Score;
             PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+			bool verified = blockingScore > pxContext.Score || config.MonitorMode;
 
-            Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}, monitor mode status: {2}.", pxContext.Score, blockingScore, config.MonitorMode == true ? "On" : "Off"), PxConstants.LOG_CATEGORY);
+			Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}, monitor mode status: {2}.", pxContext.Score, blockingScore, config.MonitorMode == true ? "On" : "Off"), PxConstants.LOG_CATEGORY);
 
             if (verified)
             {
+				Debug.WriteLineIf(config.MonitorMode, "Monitor Mode is activitated passing request", PxConstants.LOG_CATEGORY);
                 Debug.WriteLine(string.Format("Valid request to {0}", application.Context.Request.RawUrl), PxConstants.LOG_CATEGORY);
                 PostPageRequestedActivity(pxContext);
             }
@@ -484,11 +486,8 @@ namespace PerimeterX
             }
             else // No custom verification handler -> continue regular flow
             {
-                if (!verified && config.MonitorMode == false)
-                {
-                    BlockRequest(pxContext, config);
-                    application.CompleteRequest();
-                }
+                BlockRequest(pxContext, config);
+                application.CompleteRequest();
             }
         }
 

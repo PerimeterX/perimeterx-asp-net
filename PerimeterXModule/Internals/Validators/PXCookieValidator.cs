@@ -46,10 +46,12 @@ namespace PerimeterX
 						{
 							try
 							{
+								Debug.WriteLine(string.Format("Found original token in context"), PxConstants.LOG_CATEGORY);
 								PXOriginalCookieValidator.Verify(context, context.OriginalToken);
 							}
 							catch (Exception e)
 							{
+								Debug.WriteLine(string.Format("Failed to verify original token: {0}", e.Message) , PxConstants.LOG_CATEGORY);
 								context.OriginalTokenError = CALL_REASON_DECRYPTION_FAILED;
 							}
 						}
