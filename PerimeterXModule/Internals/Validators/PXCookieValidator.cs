@@ -123,7 +123,7 @@ namespace PerimeterX
 		protected string[] getAdditionalSignedFields(PxContext context)
 		{
 			// Dont sign anything if cookie is mobile
-			if (context.CookieOrigin.Equals(CookieOrigin.COOKIE))
+			if (context.CookieOrigin.Equals(CookieOrigin.HEADER))
 			{
 				return new string[] { };
 			}

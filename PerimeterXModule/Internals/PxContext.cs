@@ -50,6 +50,7 @@ namespace PerimeterX
 			CookieOrigin = CookieOrigin.COOKIE;
 			PxCookies = new Dictionary<string, string>();
 			OriginalTokens = new Dictionary<string, string>();
+			S2SCallReason = "none";
 
 			// Get Headers
 
@@ -86,10 +87,9 @@ namespace PerimeterX
 
 			// Handle Cookies
 			var contextCookie = context.Request.Cookies;
-
-			// Check if X-PX-AUTHORIZATION exist
 			string mobileHeader = context.Request.Headers[PxConstants.MOBILE_HEADER];
-			if (!string.IsNullOrEmpty(mobileHeader))
+			// Check if X-PX-AUTHORIZATION exist
+			if (mobileHeader != null)
 			{
 				// Extract Original Tokens
 				CookieOrigin = CookieOrigin.HEADER;
@@ -97,10 +97,20 @@ namespace PerimeterX
 				if (!string.IsNullOrEmpty(originalToken))
 				{
 					string[] splitedOriginalToken = originalToken.Split(MOBILE_DELIMITER, 2);
+					string[] fallbackSplittedOriginalToken = originalToken.Split(MOBILE_DELIMITER);
 					if (!string.IsNullOrEmpty(splitedOriginalToken[0]) && Array.IndexOf(PxConstants.PX_TOKEN_PREFIX, splitedOriginalToken[0]) > -1)
 					{
 						string originlTokenKey = splitedOriginalToken[0].Equals(PxConstants.TOKEN_V3_PREFIX) ? PxConstants.COOKIE_V3_PREFIX : PxConstants.COOKIE_V1_PREFIX;
 						OriginalTokens.Add(originlTokenKey, splitedOriginalToken[1]);
+					}
+					// Fallback
+					else if (fallbackSplittedOriginalToken.Length == 4)
+					{
+						OriginalTokens.Add(PxConstants.COOKIE_V3_PREFIX, originalToken);
+					}
+					else if (fallbackSplittedOriginalToken.Length == 3)
+					{
+						OriginalTokens.Add(PxConstants.COOKIE_V1_PREFIX, originalToken);
 					}
 					else
 					{

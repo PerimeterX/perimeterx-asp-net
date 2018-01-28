@@ -28,6 +28,8 @@ namespace PerimeterX
 			}
 
 			context.DecodedOriginalToken = pxCookie.DecodedCookie;
+			context.OriginalUUID = pxCookie.Uuid;
+			context.Vid = pxCookie.Vid;
 
 			if (!pxCookie.IsSecured(config.CookieKey, getAdditionalSignedFields(context)))
 			{
@@ -35,9 +37,6 @@ namespace PerimeterX
 				context.OriginalTokenError = CALL_REASON_VALIDATION_FAILED;
 				return false;
 			}
-
-			context.OriginalUUID = pxCookie.Uuid;
-			context.Vid = pxCookie.Vid;
 
 			Debug.WriteLine("Original token verification passed succesfully", PxConstants.LOG_CATEGORY);
 
