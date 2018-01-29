@@ -44,7 +44,7 @@ namespace PerimeterX
             var contextCookie = context.Request.Cookies;
             foreach (string key in contextCookie.AllKeys)
             {
-                if (Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1)
+                if (Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1 && !PxCookies.ContainsKey(key))
                 {
                     PxCookies.Add(key, contextCookie.Get(key).Value);
                 }
