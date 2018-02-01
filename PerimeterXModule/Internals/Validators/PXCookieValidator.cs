@@ -13,7 +13,7 @@ namespace PerimeterX
 		public static string CALL_REASON_EXPIRED_COOKIE = "cookie_expired";
 		public static string CALL_REASON_SENSITIVE_ROUTE = "sensitive_route";
 		public static string CALL_REASON_MOBILE_ERROR = "mobile_error_{0}";
-		public IPXCookieValidator PXOriginalCookieValidator { get; set; }
+		public IPXCookieValidator PXOriginalTokenValidator { get; set; }
 
 		protected PxModuleConfigurationSection config;
 		private readonly string MOBILE_PATTERN_ERROR = @"^\d+$";
@@ -46,7 +46,7 @@ namespace PerimeterX
 							try
 							{
 								Debug.WriteLine(string.Format("Found original token in context"), PxConstants.LOG_CATEGORY);
-								PXOriginalCookieValidator.Verify(context, context.OriginalToken);
+								PXOriginalTokenValidator.Verify(context, context.OriginalToken);
 							}
 							catch (Exception e)
 							{

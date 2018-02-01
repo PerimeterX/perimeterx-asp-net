@@ -137,7 +137,7 @@ namespace PerimeterX
 			PxCaptchaValidator = new PXCaptchaValidator(config, httpHandler);
 			PxCookieValidator = new PXCookieValidator(config)
 			{
-				PXOriginalCookieValidator = new PXOriginalTokenValidator(config)
+				PXOriginalTokenValidator = new PXOriginalTokenValidator(config)
 			};
 
 			// Get OS type
@@ -314,7 +314,6 @@ namespace PerimeterX
 		public static void ResponseBlockPage(PxContext pxContext, PxModuleConfigurationSection config)
 		{
 			string template = config.CaptchaProvider;
-			string content;
 
 			if (pxContext.BlockAction == "j")
 			{
@@ -326,10 +325,9 @@ namespace PerimeterX
 			}
 
 			// In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.
-			string html = template == "challenge" && !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData :
+			string content = template == "challenge" && !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData :
 				TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid, pxContext.IsMobileRequest);
 
-			content = html;
 			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 			if (pxContext.IsMobileRequest)
 			{
@@ -343,7 +341,7 @@ namespace PerimeterX
 							Uuid = pxContext.UUID,
 							Action = pxContext.MapBlockAction(),
 							Vid = pxContext.Vid,
-							Page = Convert.ToBase64String(Encoding.UTF8.GetBytes(html)),
+							Page = Convert.ToBase64String(Encoding.UTF8.GetBytes(content)),
 							CollectorUrl = string.Format(config.CollectorUrl, config.AppId)
 						}, output);
 					content = output.ToString();
@@ -444,7 +442,7 @@ namespace PerimeterX
 		private void HandleVerification(HttpApplication application)
 		{
 			PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-			bool verified = blockingScore > pxContext.Score || config.MonitorMode;
+			bool verified = blockingScore > pxContext.Score;
 
 			Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}, monitor mode status: {2}.", pxContext.Score, blockingScore, config.MonitorMode == true ? "On" : "Off"), PxConstants.LOG_CATEGORY);
 
@@ -476,7 +474,7 @@ namespace PerimeterX
 				}
 			}
 			// No custom verification handler -> continue regular flow
-			else if (!verified)
+			else if (!verified && !config.MonitorMode)
 			{
 				BlockRequest(pxContext, config);
 				application.CompleteRequest();
