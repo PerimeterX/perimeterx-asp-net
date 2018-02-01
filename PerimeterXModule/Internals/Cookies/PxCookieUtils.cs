@@ -16,13 +16,12 @@ namespace PerimeterX
 				return null;
 			}
 
-			if (cookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX))
+			if (cookies.ContainsKey(PxConstants.COOKIE_V1_PREFIX))
 			{
-				return new PxCookieV3(cookieDecoder, cookies[PxConstants.COOKIE_V3_PREFIX]);
+				return new PxCookieV1(cookieDecoder, cookies[PxConstants.COOKIE_V1_PREFIX]);
 			}
-			
-			return new PxCookieV1(cookieDecoder, cookies[PxConstants.COOKIE_V1_PREFIX]);
-			
+
+			return new PxCookieV3(cookieDecoder, cookies[PxConstants.COOKIE_V3_PREFIX]);
 		}
 
 		public static T Deserialize<T>(ICookieDecoder cookieDecoder, string rawCookie)

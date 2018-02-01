@@ -34,11 +34,10 @@ namespace PerimeterX
 					return false;
 				}
 
-				if (context.CookieOrigin.Equals(CookieOrigin.HEADER))
+				if (context.IsMobileRequest)
 				{
 					string authorizatoinHeader = context.GetHeadersAsDictionary()[PxConstants.MOBILE_HEADER.ToLower()];
-					Regex match = new Regex(MOBILE_PATTERN_ERROR);
-					if (!string.IsNullOrEmpty(authorizatoinHeader) && match.IsMatch(authorizatoinHeader))
+					if (!string.IsNullOrEmpty(authorizatoinHeader) && Regex.Match(authorizatoinHeader, MOBILE_PATTERN_ERROR).Success)
 					{
 						context.S2SCallReason = string.Format(CALL_REASON_MOBILE_ERROR, authorizatoinHeader);
 						// Process original token
@@ -55,6 +54,7 @@ namespace PerimeterX
 								context.OriginalTokenError = CALL_REASON_DECRYPTION_FAILED;
 							}
 						}
+						Debug.WriteLine(string.Format("Mobile sdk error found {0}", context.S2SCallReason), PxConstants.LOG_CATEGORY);
 						return false;
 					}
 				}
@@ -123,7 +123,7 @@ namespace PerimeterX
 		protected string[] getAdditionalSignedFields(PxContext context)
 		{
 			// Dont sign anything if cookie is mobile
-			if (context.CookieOrigin.Equals(CookieOrigin.HEADER))
+			if (context.IsMobileRequest)
 			{
 				return new string[] { };
 			}

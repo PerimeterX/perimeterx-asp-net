@@ -38,7 +38,7 @@ namespace PerimeterX
 		[DataMember(Name = "original_token_error")]
 		public string OriginalTokenError;
 
-		[DataMember(Name = "decoded_original_token")]
+		[DataMember(Name = "px_decoded_original_token")]
 		public object DecodedOriginalToken;
 
 	}

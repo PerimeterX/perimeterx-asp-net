@@ -91,9 +91,7 @@ namespace PerimeterX
                     HttpVersion = PxContext.HttpVersion,
                     RiskMode = riskMode,
                     PxCookieHMAC = PxContext.PxCookieHmac,
-					CookieOrigin = PxContext.CookieOrigin,
-					OriginalUUID = PxContext.OriginalUUID,
-					OriginalTokenError = PxContext.OriginalTokenError
+					CookieOrigin = PxContext.CookieOrigin
 				}
             };
 
@@ -121,7 +119,18 @@ namespace PerimeterX
 				riskRequest.Additional.DecodedOriginalToken = PxContext.DecodedOriginalToken;
 			}
 
-            string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
+			if (!string.IsNullOrEmpty(PxContext.OriginalUUID))
+			{
+				riskRequest.Additional.OriginalUUID = PxContext.OriginalUUID;
+			}
+
+			if (!string.IsNullOrEmpty(PxContext.OriginalUUID))
+			{
+				riskRequest.Additional.OriginalTokenError = PxContext.OriginalTokenError;
+			}
+			
+
+			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
             var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_V2);
             return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
         }

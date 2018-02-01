@@ -1,6 +1,7 @@
 ﻿using Nustache.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 
@@ -9,8 +10,13 @@ namespace PerimeterX
 	abstract class TemplateFactory
 	{
 
-		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid)
+		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest)
 		{
+			if (isMobileRequest)
+			{
+				template = string.Format("{0}Mobile", template);
+			}
+			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 			string templateStr = getTemplateString(template);
 			return Render.StringToString(templateStr, getProps(pxConfiguration, uuid, vid));
 

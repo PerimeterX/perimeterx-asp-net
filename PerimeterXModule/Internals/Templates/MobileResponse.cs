@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PerimeterX
 {
 	[DataContract]
-	class MobileResponse
+	class MobileResponse : IMobileResponse
 	{
 		[DataMember(Name = "appId")]
 		public string AppId;

@@ -22,7 +22,7 @@ namespace PerimeterX
 
 			if (!pxCookie.Deserialize())
 			{
-				Debug.WriteLine("Failed to decode orignal token", PxConstants.LOG_CATEGORY);
+				Debug.WriteLine("Failed to decode original token", PxConstants.LOG_CATEGORY);
 				context.OriginalTokenError = CALL_REASON_DECRYPTION_FAILED;
 				return false;
 			}
@@ -33,7 +33,7 @@ namespace PerimeterX
 
 			if (!pxCookie.IsSecured(config.CookieKey, getAdditionalSignedFields(context)))
 			{
-				Debug.WriteLine("Failed to validate original token HMAC", PxConstants.LOG_CATEGORY);
+				Debug.WriteLine("Cookie HMAC validation failed", PxConstants.LOG_CATEGORY);
 				context.OriginalTokenError = CALL_REASON_VALIDATION_FAILED;
 				return false;
 			}
