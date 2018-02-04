@@ -52,6 +52,7 @@ namespace PerimeterX
 			props.Add("jsRef", pxConfiguration.JsRef);
 			props.Add("logoVisibility", string.IsNullOrEmpty(pxConfiguration.CustomLogo) ? "hidden" : "visible");
 			props.Add("hostUrl", string.Format(pxConfiguration.CollectorUrl, pxConfiguration.AppId));
+			props.Add("captchaType", pxConfiguration.CaptchaProvider);
 
 			return props;
 		}

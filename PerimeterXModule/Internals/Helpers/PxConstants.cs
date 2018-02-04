@@ -41,8 +41,8 @@ namespace PerimeterX
 
         public static string FormatBaseUri(PxModuleConfigurationSection config)
         {
-            return string.Format(config.BaseUri, config.AppId);
-        }
+			return string.Format(config.BaseUri, config.AppId);
+		}
 
         internal static HttpClient CreateHttpClient(bool expectContinue = false, int timeout = 5000, bool useAuth = false, PxModuleConfigurationSection config = null)
         {
