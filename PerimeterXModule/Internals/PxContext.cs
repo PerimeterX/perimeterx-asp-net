@@ -96,21 +96,21 @@ namespace PerimeterX
 				// Extract Original Tokens
 				CookieOrigin = CookieOrigin.HEADER;
 				IsMobileRequest = true;
+				// Extact Token
+				string[] splittedToken = mobileHeader.Split(MOBILE_DELIMITER, 2, StringSplitOptions.RemoveEmptyEntries);
+				if (splittedToken.Length > 1 && Array.IndexOf(PxConstants.PX_TOKEN_PREFIX, splittedToken[0]) > -1)
+				{
+					string tokenKey = splittedToken[0].Equals(PxConstants.TOKEN_V3_PREFIX) ? PxConstants.COOKIE_V3_PREFIX : PxConstants.COOKIE_V1_PREFIX;
+					PxCookies.Add(tokenKey, splittedToken[1]);
+				}
+				else
+				{
+					PxCookies.Add(PxConstants.COOKIE_V3_PREFIX, mobileHeader);
+				}
+
 				string originalToken = context.Request.Headers[PxConstants.ORIGINAL_TOKEN];
 				if (!string.IsNullOrEmpty(originalToken))
 				{
-					// Extact Token
-					string[] splittedToken = mobileHeader.Split(MOBILE_DELIMITER, 2, StringSplitOptions.RemoveEmptyEntries);
-					if (splittedToken.Length > 1 && Array.IndexOf(PxConstants.PX_TOKEN_PREFIX, splittedToken[0]) > -1)
-					{
-						string tokenKey = splittedToken[0].Equals(PxConstants.TOKEN_V3_PREFIX) ? PxConstants.COOKIE_V3_PREFIX : PxConstants.COOKIE_V1_PREFIX;
-						PxCookies.Add(tokenKey, splittedToken[1]);
-					}
-					else
-					{
-						PxCookies.Add(PxConstants.COOKIE_V3_PREFIX, mobileHeader);
-					}
-
 					// Extract original token
 					string[] splittedOriginalToken = originalToken.Split(MOBILE_DELIMITER, 2, StringSplitOptions.RemoveEmptyEntries);
 					string[] fallbackSplittedOriginalToken = originalToken.Split(MOBILE_DELIMITER);
