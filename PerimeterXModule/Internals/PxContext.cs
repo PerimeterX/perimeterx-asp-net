@@ -114,7 +114,7 @@ namespace PerimeterX
 					// Extract original token
 					string[] splittedOriginalToken = originalToken.Split(MOBILE_DELIMITER, 2, StringSplitOptions.RemoveEmptyEntries);
 					string[] fallbackSplittedOriginalToken = originalToken.Split(MOBILE_DELIMITER);
-					if (Array.IndexOf(PxConstants.PX_TOKEN_PREFIX, splittedOriginalToken[0]) > -1)
+					if (splittedOriginalToken.Length > 1 && Array.IndexOf(PxConstants.PX_TOKEN_PREFIX, splittedOriginalToken[0]) > -1)
 					{
 						string originlTokenKey = splittedOriginalToken[0].Equals(PxConstants.TOKEN_V3_PREFIX) ? PxConstants.COOKIE_V3_PREFIX : PxConstants.COOKIE_V1_PREFIX;
 						OriginalTokens.Add(originlTokenKey, splittedOriginalToken[1]);
