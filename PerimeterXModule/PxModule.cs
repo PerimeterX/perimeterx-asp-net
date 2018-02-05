@@ -219,7 +219,8 @@ namespace PerimeterX
 				{
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					PassReason = pxContext.PassReason,
-					RiskRoundtripTime = pxContext.RiskRoundtripTime
+					RiskRoundtripTime = pxContext.RiskRoundtripTime,
+					ClientUuid = pxContext.UUID
 				});
 			}
 		}
@@ -293,6 +294,11 @@ namespace PerimeterX
 				Details = details,
 				Headers = pxContext.GetHeadersAsDictionary()
 			};
+
+			if (!string.IsNullOrEmpty(pxContext.Vid))
+			{
+				activity.Vid = pxContext.Vid;
+			}
 
 			reporter.Post(activity);
 		}
