@@ -127,4 +127,13 @@
   <data name="funCaptcha" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\internals\templates\funCaptcha.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="blockMobile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\internals\templates\blockmobile.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="funCaptchaMobile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\internals\templates\funcaptchamobile.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="reCaptchaMobile" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\internals\templates\recaptchamobile.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
 </root>
