@@ -28,7 +28,6 @@ Table of Contents
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
-  *   [Debug Mode](#debug-mode)
   *   [Base URI](#base-uri)
   
   **[Contributing](#contributing)**
@@ -298,7 +297,7 @@ A user can define a different API endpoint as a target URI to send the requests 
 ...
   baseUri="https://sapi.perimeterx.net"
 ...
-```
+``` 
 
 #### <a name="override-ua"></a> Custom User Agent Header
 

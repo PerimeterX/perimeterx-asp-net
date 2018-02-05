@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace PerimeterX
+namespace PerimeterX 
 {
     [DataContract]
     public class CaptchaAPIRequest

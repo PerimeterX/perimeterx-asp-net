@@ -18,7 +18,7 @@ namespace PerimeterX
 		public string ModuleVersion { get { return PxConstants.MODULE_VERSION; } set { } }
 
 		[DataMember(Name = "s2s_call_reason")]
-		public RiskRequestReasonEnum? CallReason;
+		public string CallReason;
 
 		[DataMember(Name = "px_orig_cookie")]
 		public string PxOrigCookie;
@@ -28,5 +28,18 @@ namespace PerimeterX
 
 		[DataMember(Name = "px_cookie_hmac")]
 		public string PxCookieHMAC;
+
+		[DataMember(Name = "cookie_origin")]
+		public CookieOrigin CookieOrigin;
+
+		[DataMember(Name = "original_uuid")]
+		public string OriginalUUID;
+
+		[DataMember(Name = "original_token_error")]
+		public string OriginalTokenError;
+
+		[DataMember(Name = "px_decoded_original_token")]
+		public object DecodedOriginalToken;
+
 	}
 }
