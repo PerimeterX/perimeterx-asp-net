@@ -70,15 +70,18 @@
     <Compile Include="Internals\Cookies\PxCookieV3.cs" />
     <Compile Include="DataContracts\Cookies\DecodedCookieV1.cs" />
     <Compile Include="Internals\Enums\BlockReasonEnum.cs" />
+    <Compile Include="Internals\Enums\CookieOrigin.cs" />
     <Compile Include="Internals\Enums\ModuleMode.cs" />
     <Compile Include="Internals\Enums\PassReasonEnum.cs" />
-    <Compile Include="Internals\Enums\RiskRequestReasonEnum.cs" />
     <Compile Include="Internals\Helpers\PxConstants.cs" />
+    <Compile Include="Internals\Templates\IMobileResponse.cs" />
+    <Compile Include="Internals\Templates\MobileResponse.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCaptchaValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXS2SValidator.cs" />
     <Compile Include="Internals\Validators\PXCaptchaValidator.cs" />
     <Compile Include="Internals\Validators\PXCookieValidator.cs" />
+    <Compile Include="Internals\Validators\PXOriginalTokenValidator.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -113,6 +116,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Internals\Templates\block.mustache" />
     <EmbeddedResource Include="Internals\Templates\reCaptcha.mustache" />
+    <EmbeddedResource Include="Internals\Templates\blockMobile.mustache" />
+    <EmbeddedResource Include="Internals\Templates\funCaptchaMobile.mustache" />
+    <EmbeddedResource Include="Internals\Templates\reCaptchaMobile.mustache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -128,9 +134,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="CustomBehavior\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets" Condition="Exists('..\..\SimpleWebApp\packages\NuGet.Build.Packaging.0.1.248\build\NuGet.Build.Packaging.targets')" />
 </Project>
