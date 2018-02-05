@@ -184,6 +184,8 @@ namespace myUniqueApp
 
 #### <a name="captcha-support"></a>Enable/disable captcha in the block page
 *** DEPRECATED *** 
+
+
 By enabling captcha support, a captcha will be served as part of the block page giving real users the ability to answer, get score clean up and passed to the requested page.
 
 **default: true**
