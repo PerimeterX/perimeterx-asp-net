@@ -1,22 +1,34 @@
 # Change Log
 
 All notable changes to this project will be documented in this file.
-
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
+
+##[2.3.0] - 2018-05-02
+### Added
+	- Support for mobile sdk
+	- Support for original tokens
+	- Support funCaptcha in mobile
+	- Enforcer Telemetry
+### Modified
+	- Edit block page footer
+	- Edit reCaptcha template to use b64 captcha
+	- Enrichment for async activities
+### Fixed
+	- Handling duplicate cookies
 
 ##[2.2.0] - 2017-11-10
 ### Fixed
 	- Fixed default value for sensitive_route
 	- Using action_block to render block pages
-	- Naming for s2s expired_cookie reason to cookie_expired 
+	- Naming for s2s expired_cookie reason to cookie_expired
 ### Added
 	- JS Challenge support
 	- FunCaptcha support
-	- CustomVerificationHandler support 
+	- CustomVerificationHandler support
 	- MonitorMode and set default to true
 	  Please note: 	MonitorMode is breaking backward support
-			if you upgrade to this version or further 
-			and want to keep your blocking active, please set its value to False 
+			if you upgrade to this version or further
+			and want to keep your blocking active, please set its value to False
 
 ##[2.1.0] - 2017-04-06
 ### Fixed
@@ -41,17 +53,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 	- New classes, Validators, DataContracts (Cookies, Activities, Requests etc...)
 	- Refactor module to work with PxContext
 	- Reordered library into folders
-	
+
 
 ##[1.2.0] - 2017-24-04
 - Support custom header for user-agent
 
-##[1.1.1] - 2017-20-04 
+##[1.1.1] - 2017-20-04
 - added .axd files to whitelist files
 - sending px_orig_value when decryption fails
 
 ##[1.1] - 2017-28-03
 - Moved server url to new URL
 - New design for block pages
-- Block page customisation 
+- Block page customisation
 - Support for classic pipeline mode
