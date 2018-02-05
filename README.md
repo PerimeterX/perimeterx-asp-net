@@ -5,7 +5,7 @@
 [PerimeterX](http://www.perimeterx.com) ASP.NET SDK
 ===================================================
 
-> Latest stable version: [v2.10.0](https://www.nuget.org/packages/PerimeterXModule/2.1.0)
+> Latest stable version: [v2.3.0](https://www.nuget.org/packages/PerimeterXModule/2.3.0)
 
 Table of Contents
 -----------------
@@ -183,7 +183,7 @@ namespace myUniqueApp
 ```
 
 #### <a name="captcha-support"></a>Enable/disable captcha in the block page
-
+*** DEPRECATED *** 
 By enabling captcha support, a captcha will be served as part of the block page giving real users the ability to answer, get score clean up and passed to the requested page.
 
 **default: true**
