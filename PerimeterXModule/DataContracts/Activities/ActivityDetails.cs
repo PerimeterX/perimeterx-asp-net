@@ -1,6 +1,5 @@
 ﻿using System.Runtime.Serialization;
 
-
 namespace PerimeterX
 {
     public interface IActivityDetails
@@ -20,6 +19,9 @@ namespace PerimeterX
 
         [DataMember(Name = "block_uuid")]
         public string BlockUuid;
+
+        [DataMember(Name = "client_uuid")]
+        public string ClientUuid;
 
         [DataMember(Name = "block_score")]
         public int RiskScore;
