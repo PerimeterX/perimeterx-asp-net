@@ -25,6 +25,7 @@ Table of Contents
   *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
   *   [Sensitive Routes](#sensitive-routes)
+  *   [Whitelist Routes](#whitelist-routes)
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
@@ -245,6 +246,18 @@ List of routes prefix. The Perimeterx module will always match request uri by th
 ```xml
 ...
   sensitiveRoutes="/login,/user/profile"
+...
+```
+
+#### <a name="whitelist-routes"></a> Whitelist Routes
+
+List of routes prefix. The Perimeterx module will skip detection if the prefix match request uri .
+
+**default: None**
+
+```xml
+...
+  routesWhitelist="/login,/user/profile"
 ...
 ```
 
