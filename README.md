@@ -14,7 +14,7 @@ Table of Contents
   *   [Dependencies](#dependencies)
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
-  
+
   **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
   *   [Blocking Score](#blocking-score)
@@ -25,12 +25,13 @@ Table of Contents
   *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
   *   [Sensitive Routes](#sensitive-routes)
+  *   [Block Specific Routes](#block-specific-routes)
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
   *   [Debug Mode](#debug-mode)
   *   [Base URI](#base-uri)
-  
+
   **[Contributing](#contributing)**
   *   [Tests](#tests)
 
@@ -135,7 +136,7 @@ Example below:
 **default:** 70
 
 ```xml
-... 
+...
   blockingScore="70"
 ...
 ```
@@ -155,10 +156,10 @@ The custom handler class should implement the `IVerificationHandler` interface, 
 The custom logic will reside in the `Handle` method, making use of the following arguments:
 
 - `HttpApplication application` - The currently running ASP.NET application methods, properties and events. Calling [`application.CompleteRequest`](https://msdn.microsoft.com/en-us/library/system.web.httpapplication.completerequest(v=vs.110).aspx), for example, will directly execute the [`EndRequest`](https://msdn.microsoft.com/en-us/library/system.web.httpapplication.endrequest(v=vs.110).aspx) event to return a response to the client.
-- `PxContext pxContext` - The PerimeterX context, containing valuable fields such as `Score`, `UUID`, `BlockAction` etc. 
+- `PxContext pxContext` - The PerimeterX context, containing valuable fields such as `Score`, `UUID`, `BlockAction` etc.
 - `PxModuleConfigurationSection pxConfig` - The current configuration used by the PxModule, representing the `PerimeterX.PxModuleConfigurationSection` settings. Contains fields such as `BlockingScore`.
 
-Common customization options are presenting of a captcha or a custom branded block page. 
+Common customization options are presenting of a captcha or a custom branded block page.
 
 ```xml
 ...
@@ -169,7 +170,7 @@ namespace myUniqueApp
     {
         public void Handle(HttpApplication application, PxContext pxContext, PxModuleConfigurationSection pxConfig)
         {
-            // Custom verification logic goes here. 
+            // Custom verification logic goes here.
             // The following code is only an example of a possible implementation:
 
             if (pxContext.Score >= pxConfig.BlockingScore) // In the case of a high score, present the standard block/captcha page
@@ -246,6 +247,19 @@ List of routes prefix. The Perimeterx module will always match request uri by th
 ...
 ```
 
+  #### <a name="block-specific-routes"></a> Block Specific Routes
+
+  List of routes prefix. If the list is not empty, The PerimeterX module will be active only on these routes if they match the prefix
+
+
+  **default: None**
+
+  ```xml
+  ...
+    blockSpecificRoutes="/only/for/this, /protect/login"
+  ...
+  ```
+
 #### <a name="api-timeout"></a>API Timeouts
 
 Control the timeouts for PerimeterX requests. The API is called when the risk cookie does not exist, or is expired or invalid.
@@ -265,7 +279,7 @@ API Timeout in milliseconds to wait for the PerimeterX server API response.
 Boolean flag to enable or disable page activities
 Sending page activities is asynchronous and not blocking the request
 
-**default:** True 
+**default:** True
 
 ```xml
 ...
