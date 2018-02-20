@@ -452,5 +452,19 @@ namespace PerimeterX
 				this["customVerificationHandler"] = value;
 			}
 		}
+
+        [ConfigurationProperty("blockSpecificRoutes")]
+        [TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+        public StringCollection BlockSpecificRoutes
+        {
+            get
+            {
+                return (StringCollection)this["blockSpecificRoutes"];
+            }
+            set
+            {
+                this["blockSpecificRoutes"] = value;
+            }
+        }
 	}
 }

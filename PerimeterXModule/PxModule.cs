@@ -63,6 +63,7 @@ namespace PerimeterX
         private readonly string captchaProvider;
         private readonly string[] sensetiveHeaders;
         private readonly StringCollection fileExtWhitelist;
+        private readonly StringCollection blockSpecificRoutes;
         private readonly StringCollection routesWhitelist;
         private readonly StringCollection useragentsWhitelist;
         private readonly string cookieKey;
@@ -114,6 +115,7 @@ namespace PerimeterX
             fileExtWhitelist = config.FileExtWhitelist;
             routesWhitelist = config.RoutesWhitelist;
             useragentsWhitelist = config.UseragentsWhitelist;
+            blockSpecificRoutes = config.BlockSpecificRoutes;
 
             // Set Decoder
             if (config.EncryptionEnabled)
@@ -319,6 +321,12 @@ namespace PerimeterX
                 return true;
             }
 
+
+            if (fileExtWhitelist != null && fileExtWhitelist.Contains(ext))
+            {
+                return true;
+            }
+
             // whitelist routes prefix
             var url = context.Request.Url.AbsolutePath;
             if (routesWhitelist != null)
@@ -338,6 +346,19 @@ namespace PerimeterX
                 return true;
             }
 
+            // block specific routes prefix
+            if (blockSpecificRoutes != null)
+            {
+                foreach (var prefix in blockSpecificRoutes)
+                {
+                    if (url.StartsWith(prefix))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+           
             return false;
         }
 
