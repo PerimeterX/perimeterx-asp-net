@@ -466,17 +466,17 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("blockSpecificRoutes")]
+		[ConfigurationProperty("enforceSpecificRoutes")]
 		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
-		public StringCollection BlockSpecificRoutes
+		public StringCollection EnforceSpecificRoutes
 		{
 			get
 			{
-				return (StringCollection)this["blockSpecificRoutes"];
+				return (StringCollection)this["enforceSpecificRoutes"];
 			}
 			set
 			{
-				this["blockSpecificRoutes"] = value;
+				this["enforceSpecificRoutes"] = value;
 			}
 		}
 	}
