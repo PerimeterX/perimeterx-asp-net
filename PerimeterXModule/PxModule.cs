@@ -63,6 +63,7 @@ namespace PerimeterX
 		private readonly StringCollection fileExtWhitelist;
 		private readonly StringCollection routesWhitelist;
 		private readonly StringCollection useragentsWhitelist;
+		private readonly StringCollection blockSpecificRoutes;
 		private readonly string cookieKey;
 		private readonly byte[] cookieKeyBytes;
 		private readonly string osVersion;
@@ -114,6 +115,7 @@ namespace PerimeterX
 			fileExtWhitelist = config.FileExtWhitelist;
 			routesWhitelist = config.RoutesWhitelist;
 			useragentsWhitelist = config.UseragentsWhitelist;
+			blockSpecificRoutes = config.BlockSpecificRoutes;
 
 			// Set Decoder
 			if (config.EncryptionEnabled)
@@ -395,6 +397,19 @@ namespace PerimeterX
 			// whitelist user-agent
 			if (useragentsWhitelist != null && useragentsWhitelist.Contains(context.Request.UserAgent))
 			{
+				return true;
+			}
+
+			// block specific routes prefix
+			if (blockSpecificRoutes != null)
+			{
+				foreach (var prefix in blockSpecificRoutes)
+				{
+					if (url.StartsWith(prefix))
+					{
+						return false;
+					}
+				}
 				return true;
 			}
 
