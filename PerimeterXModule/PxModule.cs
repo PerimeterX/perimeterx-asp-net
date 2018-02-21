@@ -63,6 +63,7 @@ namespace PerimeterX
 		private readonly StringCollection fileExtWhitelist;
 		private readonly StringCollection routesWhitelist;
 		private readonly StringCollection useragentsWhitelist;
+		private readonly StringCollection enforceSpecificRoutes;
 		private readonly string cookieKey;
 		private readonly byte[] cookieKeyBytes;
 		private readonly string osVersion;
@@ -114,6 +115,7 @@ namespace PerimeterX
 			fileExtWhitelist = config.FileExtWhitelist;
 			routesWhitelist = config.RoutesWhitelist;
 			useragentsWhitelist = config.UseragentsWhitelist;
+			enforceSpecificRoutes = config.EnforceSpecificRoutes;
 
 			// Set Decoder
 			if (config.EncryptionEnabled)
@@ -395,6 +397,23 @@ namespace PerimeterX
 			// whitelist user-agent
 			if (useragentsWhitelist != null && useragentsWhitelist.Contains(context.Request.UserAgent))
 			{
+				return true;
+			}
+
+			// enforce specific routes prefix
+			if (enforceSpecificRoutes != null)
+			{
+				// case list is not empty, module will skip the route if
+				// the routes prefix is not present in the list
+				foreach (var prefix in enforceSpecificRoutes)
+				{
+					if (url.StartsWith(prefix))
+					{
+						return false;
+					}
+				}
+				// we go over all the list and prefix wasn't found
+				// meaning this route is not a specifc route
 				return true;
 			}
 

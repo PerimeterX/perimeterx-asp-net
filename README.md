@@ -26,6 +26,7 @@ Table of Contents
   *   [Filter Sensitive Headers](#sensitive-headers)
   *   [Sensitive Routes](#sensitive-routes)
   *   [Whitelist Routes](#whitelist-routes)
+  *   [Enforcer Specific Routes](#enforcer-specific-routes)
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
@@ -258,6 +259,18 @@ List of routes prefix. The Perimeterx module will skip detection if the prefix m
 ```xml
 ...
   routesWhitelist="/login,/user/profile"
+...
+```
+
+#### <a name="enforcer-specific-routes"></a> Enforcer Specific Routes 
+
+List of routes prefix. If the list is not empty, The Perimeterx module will enforcer only on the url that match the prefix, any other route will be skipped
+
+**default: None**
+
+```xml
+...
+  enforceSpecificRoutes="/protect/route,/login,/checkout"
 ...
 ```
 

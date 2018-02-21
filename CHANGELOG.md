@@ -2,7 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
-
+##[2.4.0] - 2018-21-02
+	- Support enforced specific routes
+	
 ##[2.3.0] - 2018-05-02
 ### Added
 	- Support for mobile sdk

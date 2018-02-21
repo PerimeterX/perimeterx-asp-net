@@ -465,6 +465,20 @@ namespace PerimeterX
 				this["collectorUrl"] = value;
 			}
 		}
-		
+
+		[ConfigurationProperty("enforceSpecificRoutes")]
+		[TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+		public StringCollection EnforceSpecificRoutes
+		{
+			get
+			{
+				return (StringCollection)this["enforceSpecificRoutes"];
+			}
+			set
+			{
+				this["enforceSpecificRoutes"] = value;
+			}
+		}
 	}
 }
+
