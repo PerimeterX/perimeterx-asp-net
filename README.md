@@ -270,7 +270,7 @@ List of routes prefix. If the list is not empty, The Perimeterx module will enfo
 
 ```xml
 ...
-  enforcerSpecificRoutes="/protect/route,/login,/checkout"
+  enforceSpecificRoutes="/protect/route,/login,/checkout"
 ...
 ```
 
