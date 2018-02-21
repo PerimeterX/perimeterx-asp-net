@@ -5,7 +5,7 @@
 [PerimeterX](http://www.perimeterx.com) ASP.NET SDK
 ===================================================
 
-> Latest stable version: [v2.10.0](https://www.nuget.org/packages/PerimeterXModule/2.1.0)
+> Latest stable version: [v2.3.0](https://www.nuget.org/packages/PerimeterXModule/2.3.0)
 
 Table of Contents
 -----------------
@@ -25,6 +25,8 @@ Table of Contents
   *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
   *   [Sensitive Routes](#sensitive-routes)
+  *   [Whitelist Routes](#whitelist-routes)
+  *   [Enforcer Specific Routes](#enforcer-specific-routes)
   *   [API Timeouts](#api-timeout)
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
@@ -85,6 +87,7 @@ Add site specific configuration (configuration level)
       appId="<PX Application ID>"
       apiToken="<API token>"
       cookieKey="<cookie key>"
+      monitorMode="false"
       blockingScore="70"
       >
     </pxModuleConfigurationSection>
@@ -182,6 +185,8 @@ namespace myUniqueApp
 ```
 
 #### <a name="captcha-support"></a>Enable/disable captcha in the block page
+***DEPRECATED*** 
+
 
 By enabling captcha support, a captcha will be served as part of the block page giving real users the ability to answer, get score clean up and passed to the requested page.
 
@@ -242,6 +247,30 @@ List of routes prefix. The Perimeterx module will always match request uri by th
 ```xml
 ...
   sensitiveRoutes="/login,/user/profile"
+...
+```
+
+#### <a name="whitelist-routes"></a> Whitelist Routes
+
+List of routes prefix. The Perimeterx module will skip detection if the prefix match request uri .
+
+**default: None**
+
+```xml
+...
+  routesWhitelist="/login,/user/profile"
+...
+```
+
+#### <a name="enforcer-specific-routes"></a> Enforcer Specific Routes 
+
+List of routes prefix. If the list is not empty, The Perimeterx module will enforcer only on the url that match the prefix, any other route will be skipped
+
+**default: None**
+
+```xml
+...
+  enforceSpecificRoutes="/protect/route,/login,/checkout"
 ...
 ```
 
