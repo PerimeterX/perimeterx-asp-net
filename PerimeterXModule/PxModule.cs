@@ -400,9 +400,11 @@ namespace PerimeterX
 				return true;
 			}
 
-			// block specific routes prefix
+			// enforce specific routes prefix
 			if (enforceSpecificRoutes != null)
 			{
+				// case list is not empty, module will skip the route if
+				// the routes prefix is not present in the list
 				foreach (var prefix in enforceSpecificRoutes)
 				{
 					if (url.StartsWith(prefix))
@@ -410,6 +412,8 @@ namespace PerimeterX
 						return false;
 					}
 				}
+				// we go over all the list and prefix wasn't found
+				// meaning this route is not a specifc route
 				return true;
 			}
 
