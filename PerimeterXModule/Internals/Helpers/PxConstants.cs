@@ -25,6 +25,9 @@ namespace PerimeterX
 		public static readonly string MODULE_VERSION = GetAssemblyVersion();
 		public static readonly Options JSON_OPTIONS = new Options(prettyPrint: false, excludeNulls: true, includeInherited: true);
 		public static readonly string JS_CHALLENGE_ACTION = "j";
+		public static readonly string ENFORCER_TRUE_IP_HEADER = "X-PX-ENFORCER-TRUE-IP";
+		public static readonly string FIRST_PARTY_HEADER = "X-PX-ENFORCER-TRUE-IP";
+		public static readonly string FIRST_PARTY_VALUE = "1";
 
 		// Endpoints
 		public const string RISK_API_V2 = "/api/v2/risk";

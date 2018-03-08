@@ -49,6 +49,7 @@ namespace PerimeterX
 		private readonly IPXCaptchaValidator PxCaptchaValidator;
 		private readonly IPXCookieValidator PxCookieValidator;
 		private readonly IPXS2SValidator PxS2SValidator;
+		private readonly IReverseProxy ReverseProxy;
 
 		private readonly bool enabled;
 		private readonly bool sendPageActivites;
@@ -110,7 +111,6 @@ namespace PerimeterX
 			suppressContentBlock = config.SuppressContentBlock;
 			captchaProvider = config.CaptchaProvider;
 			challengeEnabled = config.ChallengeEnabled;
-
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
 			routesWhitelist = config.RoutesWhitelist;
@@ -145,6 +145,9 @@ namespace PerimeterX
 			// Get OS type
 			osVersion = Environment.OSVersion.VersionString;
 
+			// Build reverse proxy
+			ReverseProxy = new ReverseProxy(config);
+
 			Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
 		}
 
@@ -167,15 +170,29 @@ namespace PerimeterX
 			try
 			{
 				var application = (HttpApplication)source;
-				if (application == null || IsFilteredRequest(application.Context))
+
+				if (application == null)
 				{
 					return;
 				}
+
 				var applicationContext = application.Context;
+
+				if (applicationContext == null || IsProxyRequest(applicationContext))
+				{
+					return;
+				}
+
+				if (IsFilteredRequest(applicationContext))
+				{
+					return;
+				}
+
 				if (validationMarker == applicationContext.Request.Headers[PxConstants.PX_VALIDATED_HEADER])
 				{
 					return;
 				}
+
 				// Setting custom header for classic mode
 				if (HttpRuntime.UsingIntegratedPipeline)
 				{
@@ -364,6 +381,30 @@ namespace PerimeterX
 			{
 				httpHandler.Dispose();
 			}
+		}
+
+
+		/// <summary>
+		/// Checks the url if it should be a proxy request for the client/xhrs
+		/// </summary>
+		/// <param name="context">HTTP context for client</param>
+		private bool IsProxyRequest(HttpContext context)
+		{
+			PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+			if (ReverseProxy.ShouldReverseClient(context.Request.Url.AbsolutePath))
+			{
+				Debug.WriteLine("Matched client reverse prefix");
+				ReverseProxy.ReversePxClient(context);
+				return true;
+			}
+
+			if (ReverseProxy.ShouldReverseXhr(context.Request.Url.AbsolutePath))
+			{
+				ReverseProxy.ReversePxXhr(context);
+				return true;
+			}
+
+			return false;
 		}
 
 		private bool IsFilteredRequest(HttpContext context)

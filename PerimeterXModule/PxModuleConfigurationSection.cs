@@ -30,6 +30,7 @@ namespace PerimeterX
 {
 	public class PxModuleConfigurationSection : ConfigurationSection
 	{
+
 		[ConfigurationProperty("enabled", DefaultValue = true)]
 		public bool Enabled
 		{
@@ -53,6 +54,7 @@ namespace PerimeterX
 			set
 			{
 				this["appId"] = value;
+				this["collectorUrl"] = string.Format(CollectorUrl, value);
 			}
 		}
 
@@ -453,7 +455,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("collectorUrl", DefaultValue = "https://collector-{0}.perimeterx.net") ]
+		[ConfigurationProperty("collectorUrl", DefaultValue = "https://collector-{0}.perimeterx.net")]
 		public string CollectorUrl
 		{
 			get
@@ -477,6 +479,46 @@ namespace PerimeterX
 			set
 			{
 				this["enforceSpecificRoutes"] = value;
+			}
+		}
+
+		[ConfigurationProperty("firstPartyEnabled", DefaultValue = true)]
+		public bool FirstPartyEnabled
+		{
+			get
+			{
+				return (bool)this["firstPartyEnabled"];
+			}
+			set
+			{
+				this["firstPartyEnabled"] = value;
+			}
+		}
+
+		[ConfigurationProperty("firstPartyXhrEnabled", DefaultValue = true)]
+		public bool FirstPartyXhrEnabled
+		{
+			get
+			{
+				return (bool)this["firstPartyXhrEnabled"];
+			}
+			set
+			{
+				this["firstPartyXhrEnabled"] = value;
+			}
+		}
+
+		[ConfigurationProperty("clientHostUrl", DefaultValue = "https://client.perimeterx.net")]
+		public string ClientHostUrl
+		{
+			get
+			{
+				return (string)this["clientHostUrl"];
+			}
+
+			set
+			{
+				this["clientHostUrl"] = value;
 			}
 		}
 	}

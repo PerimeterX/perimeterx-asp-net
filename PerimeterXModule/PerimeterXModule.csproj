@@ -29,7 +29,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType></DebugType>
+    <DebugType>
+    </DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -73,7 +74,10 @@
     <Compile Include="Internals\Enums\CookieOrigin.cs" />
     <Compile Include="Internals\Enums\ModuleMode.cs" />
     <Compile Include="Internals\Enums\PassReasonEnum.cs" />
+    <Compile Include="Internals\Helpers\PxCommonUtils.cs" />
     <Compile Include="Internals\Helpers\PxConstants.cs" />
+    <Compile Include="Internals\Helpers\RemoteServer.cs" />
+    <Compile Include="Internals\ReverseProxy.cs" />
     <Compile Include="Internals\Templates\IMobileResponse.cs" />
     <Compile Include="Internals\Templates\MobileResponse.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
