@@ -54,6 +54,16 @@ namespace PerimeterX
 			props.Add("hostUrl", string.Format(pxConfiguration.CollectorUrl, pxConfiguration.AppId));
 			props.Add("captchaType", pxConfiguration.CaptchaProvider);
 
+			if (pxConfiguration.FirstPartyEnabled)
+			{
+				props.Add("jsClientSrc", string.Format("/{0}/init.js", pxConfiguration.AppId.Substring(2)));
+				props.Add("firstPartyEnabled", "1");
+
+			}
+			else
+			{
+				props.Add("jsClientSrc", string.Format("//client.perimeterx.net/{0}/main.min.js", pxConfiguration.AppId));
+			}
 			return props;
 		}
 	}

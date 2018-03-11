@@ -92,7 +92,9 @@ namespace PerimeterX
 					RiskMode = riskMode,
 					PxCookieHMAC = PxContext.PxCookieHmac,
 					CookieOrigin = PxContext.CookieOrigin
-				}
+				},
+				FirstParty = PxConfig.FirstPartyEnabled
+			
 			};
 
 			if (!string.IsNullOrEmpty(PxContext.Vid))

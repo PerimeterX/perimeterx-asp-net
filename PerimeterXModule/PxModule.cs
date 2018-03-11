@@ -395,12 +395,15 @@ namespace PerimeterX
 			{
 				Debug.WriteLine("Matched client reverse prefix");
 				ReverseProxy.ReversePxClient(context);
+				context.ApplicationInstance.CompleteRequest();
 				return true;
 			}
 
 			if (ReverseProxy.ShouldReverseXhr(context.Request.Url.AbsolutePath))
 			{
+				Debug.WriteLine("Matched XHR reverse prefix");
 				ReverseProxy.ReversePxXhr(context);
+				context.ApplicationInstance.CompleteRequest();
 				return true;
 			}
 
