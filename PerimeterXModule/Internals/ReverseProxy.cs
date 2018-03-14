@@ -28,7 +28,8 @@ namespace PerimeterX
 		private readonly string CONTENT_TYPE_GIF = "image/gif";
 
 		private readonly string XHR_PATH = "/xhr";
-		private readonly string CLIENT_PATH = "/init.js";
+		private readonly string CLIENT_FP_PATH = "/init.js";
+		private readonly string CLIENT_TP_PATH = "/main.min.js";
 
 		private string ClientReversePrefix;
 		private string XhrReversePrefix;
@@ -45,20 +46,20 @@ namespace PerimeterX
 		{
 			PxConfig = pxConfig;
 			string appIdPrefix = pxConfig.AppId.Substring(2);
-			ClientReversePrefix = "/" + appIdPrefix + CLIENT_PATH;
+			ClientReversePrefix = "/" + appIdPrefix + CLIENT_FP_PATH;
 			XhrReversePrefix = "/" + appIdPrefix + XHR_PATH;
 			CollectorUrl = pxConfig.CollectorUrl;
 		}
 
 		/**
 		 *  <summary>
-		 * Method calls when client request the server
-		 * ProcessRequest will return a boolean value to indicate
-		 * Whether or not to render a predefined request
+		 *  Reversing an HttpContext.Request and returns a 
+		 *  boolean value indicating whether reverse-proxy was 
+		 *  successful
 		 * </summary>
-		 * <param name="context">HttpContext</param>
-		 * <param name="serverUrl">string</param>
-		 * <param name="uri">string</param>
+		 * <param name="context">The original reuqest context</param>
+		 * <param name="serverUrl">string value of the remote server's url</param>
+		 * <param name="uri">string value for the remote server's uri</param>
 		 * <returns>boolean</returns>
 		 */
 		private bool ProcessRequest(HttpContext context, string serverUrl, string uri)
@@ -69,18 +70,15 @@ namespace PerimeterX
 				context.Request.Headers.Add(PxConstants.ENFORCER_TRUE_IP_HEADER, PxCommonUtils.GetRequestIP(context, PxConfig));
 				context.Request.Headers.Add(PxConstants.FIRST_PARTY_HEADER, PxConstants.FIRST_PARTY_VALUE);
 
-				// Create a connexion to the Remote Server to redirect all requests
+				// Create a connection to the Remote Server to redirect all requests
 				RemoteServer server = new RemoteServer(context, serverUrl, uri);
 
-				// Create a request with same data in navigator request
-				HttpWebRequest request = server.GetRequest();
-
 				// Send the request to the remote server and return the response
-				HttpWebResponse response = server.GetResponse(request);
+				HttpWebResponse response = server.GetResponse(server.GetRequest());
 				if (response == null || !response.StatusCode.Equals(HttpStatusCode.OK))
 				{
 					Debug.WriteLine("ReverseProxy responeded with none 200 status", PxConstants.LOG_CATEGORY);
-					Debug.WriteLineIf(!(response == null), "Response status {0}", PxConstants.LOG_CATEGORY);
+					Debug.WriteLineIf(response != null, "Response status {0}", PxConstants.LOG_CATEGORY);
 					return false;
 				}
 
@@ -107,9 +105,9 @@ namespace PerimeterX
 		}
 		/**
 		 * <summary>
-		 * Forward requests for PerimeterX client
+		 * Reverse requests for PerimeterX client
 		 * </summary>
-		 * <param name="context">HttpContext</param>
+		 * <param name="context">The original reuqest context</param>
 		 */
 		public void ReversePxClient(HttpContext context)
 		{
@@ -120,7 +118,7 @@ namespace PerimeterX
 				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
 				return;
 			}
-			string uri = "/" + PxConfig.AppId + "/main.min.js";
+			string uri = "/" + PxConfig.AppId + CLIENT_TP_PATH;
 			bool success = ProcessRequest(context, PxConfig.ClientHostUrl, uri);
 
 			if (!success)
@@ -133,9 +131,9 @@ namespace PerimeterX
 
 		/**
 		 * <summary>
-		 * Forward any sensor activities back to PerimeterX servers
+		 * Reverse proxy any sensor activities back to PerimeterX servers
 		 * </summary>
-		 * <param name="context">HttpContext</param>
+		 * <param name="context">The original reuqest context</param>
 		 */
 		public void ReversePxXhr(HttpContext context)
 		{
@@ -192,9 +190,9 @@ namespace PerimeterX
 		/**
 		 * <summary>
 		 * Checks if this is a first party route for the Client JS sensor.
-		 * If the route matche the prefix, the module will redirect the request
+		 * If the route matches the prefix, the module will redirect the request
 		 * </summary>
-		 * <param name="context">HttpContext</param>
+		 * <param name="context">The original reuqest context</param>
 		 * <returns>boolean</returns>
 		 */
 		public bool ShouldReverseClient(HttpContext context)
@@ -212,9 +210,9 @@ namespace PerimeterX
 		/**
 		* <summary>
 		* Checks if this is a first party route for XHR requests
-		* If the route matche the prefix, the module will redirect the request
+		* If the route matches the prefix, the module will redirect the request
 		* </summary>
-		* <param name="context">HttpContext</param>
+		 * <param name="context">The original reuqest context</param>
 		* <returns>boolean</returns>
 		*/
 		public bool ShouldReverseXhr(HttpContext context)

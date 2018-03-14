@@ -113,8 +113,7 @@ namespace PerimeterX
 		/// <summary>
 		/// Return the response in bytes array format
 		/// </summary>
-		/// <param name="response">Response received
-		///             from the remote server </param>
+		/// <param name="response">Response received from the remote server </param>
 		/// <returns>Response in bytes </returns>
 		public byte[] GetResponseStreamBytes(HttpWebResponse response)
 		{
