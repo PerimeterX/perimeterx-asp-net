@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PerimeterX
 {
 	abstract class TemplateFactory
 	{
+		private static readonly string CLIENT_SRC_FP = "/{0}/init.js";
+			private static readonly string CLIENT_SRC_TP = "{0}/{1}/main.min.js";
 
 		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest)
 		{
@@ -51,18 +54,17 @@ namespace PerimeterX
 			props.Add("cssRef", pxConfiguration.CssRef);
 			props.Add("jsRef", pxConfiguration.JsRef);
 			props.Add("logoVisibility", string.IsNullOrEmpty(pxConfiguration.CustomLogo) ? "hidden" : "visible");
-			props.Add("hostUrl", string.Format(pxConfiguration.CollectorUrl, pxConfiguration.AppId));
+			props.Add("hostUrl", pxConfiguration.CollectorUrl);
 			props.Add("captchaType", pxConfiguration.CaptchaProvider);
 
 			if (pxConfiguration.FirstPartyEnabled)
 			{
-				props.Add("jsClientSrc", string.Format("/{0}/init.js", pxConfiguration.AppId.Substring(2)));
+				props.Add("jsClientSrc", string.Format(CLIENT_SRC_FP, pxConfiguration.AppId.Substring(2)));
 				props.Add("firstPartyEnabled", "1");
-
 			}
 			else
 			{
-				props.Add("jsClientSrc", string.Format("//client.perimeterx.net/{0}/main.min.js", pxConfiguration.AppId));
+				props.Add("jsClientSrc", string.Format(CLIENT_SRC_TP, Regex.Replace(pxConfiguration.ClientHostUrl, "https?:", ""), pxConfiguration.AppId));
 			}
 			return props;
 		}

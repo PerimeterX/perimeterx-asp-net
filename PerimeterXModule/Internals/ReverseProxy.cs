@@ -12,13 +12,13 @@ namespace PerimeterX
 	{
 		void ReversePxClient(HttpContext context);
 		void ReversePxXhr(HttpContext context);
-		bool ShouldReverseClient(string uri);
-		bool ShouldReverseXhr(string uri);
+		bool ShouldReverseClient(HttpContext context);
+		bool ShouldReverseXhr(HttpContext context);
 	}
 
 	public class ReverseProxy : IReverseProxy
 	{
-		private readonly string DEFAULT_CLIENT_VALUE = "";
+		private readonly string DEFAULT_CLIENT_VALUE = string.Empty;
 		private readonly string CONTENT_TYPE_JAVASCRIPT = "application/javascript";
 		private readonly string DEFAULT_JSON_VALUE = "{}";
 		private readonly string CONTENT_TYPE_JSON = "application/json";
@@ -27,8 +27,8 @@ namespace PerimeterX
 		0x01, 0x00, 0x01, 0x00, 0x00, 0x02, 0x02, 0x44, 0x01, 0x00, 0x3b };
 		private readonly string CONTENT_TYPE_GIF = "image/gif";
 
-		private readonly string XHR_PATH = "xhr";
-		private readonly string CLIENT_PATH = "init.js";
+		private readonly string XHR_PATH = "/xhr";
+		private readonly string CLIENT_PATH = "/init.js";
 
 		private string ClientReversePrefix;
 		private string XhrReversePrefix;
@@ -44,21 +44,22 @@ namespace PerimeterX
 		public ReverseProxy(PxModuleConfigurationSection pxConfig)
 		{
 			PxConfig = pxConfig;
-			string prefixFormat = "/{0}/{1}";
 			string appIdPrefix = pxConfig.AppId.Substring(2);
-			ClientReversePrefix = string.Format(prefixFormat, appIdPrefix, CLIENT_PATH);
-			XhrReversePrefix = string.Format(prefixFormat, appIdPrefix, XHR_PATH);
-			CollectorUrl = string.Format(pxConfig.CollectorUrl, pxConfig.AppId);
+			ClientReversePrefix = "/" + appIdPrefix + CLIENT_PATH;
+			XhrReversePrefix = "/" + appIdPrefix + XHR_PATH;
+			CollectorUrl = pxConfig.CollectorUrl;
 		}
 
 		/**
 		 *  <summary>
 		 * Method calls when client request the server
+		 * ProcessRequest will return a boolean value to indicate
+		 * Whether or not to render a predefined request
 		 * </summary>
 		 * <param name="context">HttpContext</param>
 		 * <param name="serverUrl">string</param>
 		 * <param name="uri">string</param>
-		 * <returns>bool, true if re</returns>
+		 * <returns>boolean</returns>
 		 */
 		private bool ProcessRequest(HttpContext context, string serverUrl, string uri)
 		{
@@ -68,7 +69,7 @@ namespace PerimeterX
 				context.Request.Headers.Add(PxConstants.ENFORCER_TRUE_IP_HEADER, PxCommonUtils.GetRequestIP(context, PxConfig));
 				context.Request.Headers.Add(PxConstants.FIRST_PARTY_HEADER, PxConstants.FIRST_PARTY_VALUE);
 
-				// Create a connexion to the Remote Server to redirect all requests
+				// Create a connection to the Remote Server to redirect all requests
 				RemoteServer server = new RemoteServer(context, serverUrl, uri);
 
 				// Create a request with same data in navigator request
@@ -78,8 +79,8 @@ namespace PerimeterX
 				HttpWebResponse response = server.GetResponse(request);
 				if (response == null || !response.StatusCode.Equals(HttpStatusCode.OK))
 				{
-					Debug.WriteLine("ReverseProxy responeded with none 200 status", PxConstants.LOG_CATEGORY);
-					Debug.WriteLineIf(!(response == null), "Response status {0}", PxConstants.LOG_CATEGORY);
+					Debug.WriteLine("ReverseProxy responded  with none 200 status", PxConstants.LOG_CATEGORY);
+					Debug.WriteLineIf(response != null, "Response status {0}", PxConstants.LOG_CATEGORY);
 					return false;
 				}
 
@@ -114,20 +115,19 @@ namespace PerimeterX
 		public void ReversePxClient(HttpContext context)
 		{
 			Debug.WriteLine("Fetching Client", PxConstants.LOG_CATEGORY);
-			string contentType = CONTENT_TYPE_JAVASCRIPT;
-			string defaultResponse = DEFAULT_CLIENT_VALUE;
 			if (!PxConfig.FirstPartyEnabled)
 			{
-				Debug.WriteLine("First party is disabled, rendering default response", PxConstants.LOG_CATEGORY);
-				RenderPredefinedResponse(context, contentType, defaultResponse);
+				Debug.WriteLine("First party is disabled, rendering default JS client response", PxConstants.LOG_CATEGORY);
+				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
+				return;
 			}
-			string uri = string.Format("/{0}/main.min.js", PxConfig.AppId);
+			string uri = "/" + PxConfig.AppId + "/main.min.js";
 			bool success = ProcessRequest(context, PxConfig.ClientHostUrl, uri);
 
 			if (!success)
 			{
-				Debug.WriteLine("Redirect XHR returned bad status, rendering default response", PxConstants.LOG_CATEGORY);
-				RenderPredefinedResponse(context, contentType, defaultResponse);
+				Debug.WriteLine("Redirect JS client returned bad status, rendering default response", PxConstants.LOG_CATEGORY);
+				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
 			}
 
 		}
@@ -140,24 +140,19 @@ namespace PerimeterX
 		 */
 		public void ReversePxXhr(HttpContext context)
 		{
-			string defaultResponse;
-			string contentType;
-
+			string defaultResponse = DEFAULT_JSON_VALUE;
+			string contentType = CONTENT_TYPE_JSON;
 			if (context.Request.Url.AbsolutePath.EndsWith(".gif"))
 			{
 				defaultResponse = Encoding.Default.GetString(DEFAULT_EMPTY_GIF_VALUE);
 				contentType = CONTENT_TYPE_GIF;
 			}
-			else
-			{
-				defaultResponse = DEFAULT_JSON_VALUE;
-				contentType = CONTENT_TYPE_JSON;
-			}
 
 			if (!PxConfig.FirstPartyEnabled || !PxConfig.FirstPartyXhrEnabled)
 			{
-				Debug.WriteLine("First party is disabled, rendering default response", PxConstants.LOG_CATEGORY);
+				Debug.WriteLine(string.Format("First party is disabled, rendering default response with Content-Type: {0}", contentType), PxConstants.LOG_CATEGORY);
 				RenderPredefinedResponse(context, contentType, defaultResponse);
+				return;
 			}
 			string uri = context.Request.RawUrl.Replace(XhrReversePrefix, "");
 
@@ -183,7 +178,7 @@ namespace PerimeterX
 
 			if (!string.IsNullOrEmpty(vid))
 			{
-				Debug.WriteLine(string.Format("Found VID on request, the follwoing VID will be attached to the request: {0}", vid), PxConstants.LOG_CATEGORY);
+				Debug.WriteLine(string.Format("Found VID on request, the following VID will be attached to the request: {0}", vid), PxConstants.LOG_CATEGORY);
 				context.Request.Headers.Add("Cookie", string.Format("pxvid={0}", vid));
 			}
 
@@ -197,30 +192,47 @@ namespace PerimeterX
 
 		/**
 		 * <summary>
-		 * Checks if this reuqest should be forwarded to PerimeterX
+		 * Checks if this is a first party route for the Client JS sensor.
+		 * If the route matche the prefix, the module will redirect the request
 		 * </summary>
-		 * <param name="uri">string, absolut uri</param>
+		 * <param name="context">HttpContext</param>
+		 * <returns>boolean</returns>
 		 */
-		public bool ShouldReverseClient(string uri)
+		public bool ShouldReverseClient(HttpContext context)
 		{
-			return uri.Equals(ClientReversePrefix);
+			if(context.Request.Url.AbsolutePath.Equals(ClientReversePrefix))
+			{
+				ReversePxClient(context);
+				context.ApplicationInstance.CompleteRequest();
+				return true;
+			}
+			return false;
+			
 		}
 
 		/**
 		* <summary>
-		* Checks if this reuqest should be forwarded to PerimeterX
+		* Checks if this is a first party route for XHR requests
+		* If the route matche the prefix, the module will redirect the request
 		* </summary>
-		* <param name="uri">string, absolut uri</param>
+		* <param name="context">HttpContext</param>
+		* <returns>boolean</returns>
 		*/
-		public bool ShouldReverseXhr(string uri)
+		public bool ShouldReverseXhr(HttpContext context)
 		{
-			return uri.StartsWith(XhrReversePrefix);
+			if(context.Request.Url.AbsolutePath.StartsWith(XhrReversePrefix))
+			{
+				ReversePxXhr(context);
+				context.ApplicationInstance.CompleteRequest();
+				return true;
+			}
+			return false;
 		}
 
 
 		/**
 		 * <summary>
-		 * Helper function redners a predefined request, this request will also finish the request and return
+		 * Helper function renders a predefined request, this request will also finish the request and return
 		 * a response
 		 * </summary>
 		 * <param name="contentType">string, value for Content-Type header</param>
@@ -234,7 +246,6 @@ namespace PerimeterX
 			context.Response.Write(response);
 
 			context.Response.End();
-
 		}
 	}
 }

@@ -178,7 +178,7 @@ namespace PerimeterX
 
 				var applicationContext = application.Context;
 
-				if (applicationContext == null || IsProxyRequest(applicationContext))
+				if (applicationContext == null || IsFirstPartyProxyRequest(applicationContext))
 				{
 					return;
 				}
@@ -367,7 +367,7 @@ namespace PerimeterX
 							Action = pxContext.MapBlockAction(),
 							Vid = pxContext.Vid,
 							Page = Convert.ToBase64String(Encoding.UTF8.GetBytes(content)),
-							CollectorUrl = string.Format(config.CollectorUrl, config.AppId)
+							CollectorUrl = config.CollectorUrl
 						}, output);
 					content = output.ToString();
 				}
@@ -388,26 +388,9 @@ namespace PerimeterX
 		/// Checks the url if it should be a proxy request for the client/xhrs
 		/// </summary>
 		/// <param name="context">HTTP context for client</param>
-		private bool IsProxyRequest(HttpContext context)
+		private bool IsFirstPartyProxyRequest(HttpContext context)
 		{
-			PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-			if (ReverseProxy.ShouldReverseClient(context.Request.Url.AbsolutePath))
-			{
-				Debug.WriteLine("Matched client reverse prefix");
-				ReverseProxy.ReversePxClient(context);
-				context.ApplicationInstance.CompleteRequest();
-				return true;
-			}
-
-			if (ReverseProxy.ShouldReverseXhr(context.Request.Url.AbsolutePath))
-			{
-				Debug.WriteLine("Matched XHR reverse prefix");
-				ReverseProxy.ReversePxXhr(context);
-				context.ApplicationInstance.CompleteRequest();
-				return true;
-			}
-
-			return false;
+			return ReverseProxy.ShouldReverseClient(context) || ReverseProxy.ShouldReverseXhr(context);
 		}
 
 		private bool IsFilteredRequest(HttpContext context)

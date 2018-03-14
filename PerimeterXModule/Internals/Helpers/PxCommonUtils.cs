@@ -8,8 +8,8 @@ namespace PerimeterX
 	{
 		/**
 		 * <summary>
-		 * Request helper, extracting the ip from the request according to sockerIpHeader or from 
-		 * the request socker when sockerIpHeader is absent
+		 * Request helper, extracting the ip from the request according to socketIpHeader or from 
+		 * the request socket when socketIpHeader is absent
 		 * </summary>
 		 * <param name="context" >HttpContext</param>
 		 * <param name="pxConfig">PxConfiguration</param>

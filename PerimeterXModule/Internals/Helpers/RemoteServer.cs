@@ -14,8 +14,15 @@ namespace PerimeterX
 {
 	internal class RemoteServer
 	{
-		string _remoteUrl;
-		HttpContext _context;
+		private readonly int BUFFER_SIZE = 256;
+		private readonly string[] RESTRICTED_HEADERS = new string[] {
+			"Connection", "Content-Length", "Date", "Expect", "Host",
+			"If-Modified-Since", "Range", "Transfer-Encoding", "Proxy-Connection",
+			"Accept", "Content-Type", "Referer", "User-Agent"
+		};
+
+		private string remoteUrl;
+		private HttpContext context;
 
 		/// <summary>
 		/// Initialize the communication with the Remote Server
@@ -23,19 +30,8 @@ namespace PerimeterX
 		/// <param name="context">Context</param>
 		public RemoteServer(HttpContext context, string serverUrl, string uri)
 		{
-			_context = context;
-			_remoteUrl = serverUrl + uri;
-		}
-
-		/// <summary>
-		/// Return address to communicate to the remote server
-		/// </summary>
-		public string RemoteUrl
-		{
-			get
-			{
-				return _remoteUrl;
-			}
+			this.context = context;
+			remoteUrl = serverUrl + uri;
 		}
 
 		/// <summary>
@@ -47,56 +43,41 @@ namespace PerimeterX
 			CookieContainer cookieContainer = new CookieContainer();
 
 			// Create a request to the server
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_remoteUrl);
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(remoteUrl);
 
-						// Set some options
-			var requestHeaders = _context.Request.Headers;
+			// Set options
+			var requestHeaders = context.Request.Headers;
 			var proxyHeaders = new WebHeaderCollection();
 
 			foreach (string headerName in requestHeaders)
 			{
-				switch (headerName)
+				// Skip assigment for a restriected header
+				// Let IIS handle it or set it manually
+				if (RESTRICTED_HEADERS.Contains(headerName))
 				{
-					case "Connection":
-					case "Content-Length":
-					case "Date":
-					case "Expect":
-					case "Host":
-					case "If-Modified-Since":
-					case "Range":
-					case "Transfer-Encoding":
-					case "Proxy-Connection":
-						// Let IIS handle these
-					case "Accept":
-					case "Content-Type":
-					case "Referer":
-					case "User-Agent":
-						// Should be set after POST
-						break;
-
-					default:
-						proxyHeaders.Add(headerName, requestHeaders.Get(headerName));
-						break;
+					continue;
 				}
+
+				proxyHeaders.Add(headerName, requestHeaders.Get(headerName));
 			}
 
 			request.Headers = proxyHeaders;
 			request.KeepAlive = true;
 
-			request.Method = _context.Request.HttpMethod;
-			request.UserAgent = _context.Request.UserAgent;
-			request.Referer = _context.Request.Headers.Get("Referer");
-			request.Accept = _context.Request.ContentType;
-			request.Accept = _context.Request.Headers.Get("Accept");
+			request.Method = context.Request.HttpMethod;
+			request.UserAgent = context.Request.UserAgent;
+			request.Referer = context.Request.Headers.Get("Referer");
+			request.ContentType = context.Request.ContentType;
+			request.Accept = context.Request.Headers.Get("Accept");
 
 			// For POST, write the post data extracted from the incoming request
 			if (request.Method == "POST")
 			{
-				Stream clientStream = _context.Request.InputStream;
-				byte[] clientPostData = new byte[_context.Request.InputStream.Length];
-				clientStream.Read(clientPostData, 0, (int)_context.Request.InputStream.Length);
+				Stream clientStream = context.Request.InputStream;
+				byte[] clientPostData = new byte[context.Request.InputStream.Length];
+				clientStream.Read(clientPostData, 0, (int)context.Request.InputStream.Length);
 
-				request.ContentType = _context.Request.ContentType;
+				request.ContentType = context.Request.ContentType;
 				request.ContentLength = clientPostData.Length;
 				Stream stream = request.GetRequestStream();
 				stream.Write(clientPostData, 0, clientPostData.Length);
@@ -111,8 +92,7 @@ namespace PerimeterX
 		/// Send the request to the remote server and return the response
 		/// </summary>
 		/// <param name="request">Request to send to the server </param>
-		/// <returns>Response received from the remote server
-		///           or null if page not found </returns>
+		/// <returns>Response received from the remote server or null on error </returns>
 		public HttpWebResponse GetResponse(HttpWebRequest request)
 		{
 			HttpWebResponse response;
@@ -124,10 +104,6 @@ namespace PerimeterX
 			catch (WebException e)
 			{
 				Debug.WriteLine("Failed to get response: " + e.Message, PxConstants.LOG_CATEGORY);
-				// Send 404 to client 
-				_context.Response.StatusCode = 404;
-				_context.Response.StatusDescription = "Page Not Found";
-				_context.Response.Write("Page not found");
 				return null;
 			}
 
@@ -142,23 +118,19 @@ namespace PerimeterX
 		/// <returns>Response in bytes </returns>
 		public byte[] GetResponseStreamBytes(HttpWebResponse response)
 		{
-			int bufferSize = 256;
-			byte[] buffer = new byte[bufferSize];
-			Stream responseStream;
+			byte[] buffer = new byte[BUFFER_SIZE];
 			MemoryStream memoryStream = new MemoryStream();
-			int remoteResponseCount;
-			byte[] responseData;
 
-			responseStream = response.GetResponseStream();
-			remoteResponseCount = responseStream.Read(buffer, 0, bufferSize);
+			Stream responseStream = response.GetResponseStream();
+			int remoteResponseCount = responseStream.Read(buffer, 0, BUFFER_SIZE);
 
 			while (remoteResponseCount > 0)
 			{
 				memoryStream.Write(buffer, 0, remoteResponseCount);
-				remoteResponseCount = responseStream.Read(buffer, 0, bufferSize);
+				remoteResponseCount = responseStream.Read(buffer, 0, BUFFER_SIZE);
 			}
 
-			responseData = memoryStream.ToArray();
+			byte[] responseData = memoryStream.ToArray();
 
 			memoryStream.Close();
 			responseStream.Close();
@@ -169,26 +141,5 @@ namespace PerimeterX
 			return responseData;
 		}
 
-		/// <summary>
-		/// Set cookies received from remote server to response of navigator
-		/// </summary>
-		/// <param name="response">Response received
-		///                 from the remote server</param>
-		public void SetContextCookies(HttpWebResponse response)
-		{
-			_context.Response.Cookies.Clear();
-
-			foreach (Cookie receivedCookie in response.Cookies)
-			{
-				HttpCookie c = new HttpCookie(receivedCookie.Name,
-								   receivedCookie.Value);
-				c.Domain = _context.Request.Url.Host;
-				c.Expires = receivedCookie.Expires;
-				c.HttpOnly = receivedCookie.HttpOnly;
-				c.Path = receivedCookie.Path;
-				c.Secure = receivedCookie.Secure;
-				_context.Response.Cookies.Add(c);
-			}
-		}
 	}
 }

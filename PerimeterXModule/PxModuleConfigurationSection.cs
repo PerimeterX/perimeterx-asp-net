@@ -54,7 +54,7 @@ namespace PerimeterX
 			set
 			{
 				this["appId"] = value;
-				this["collectorUrl"] = string.Format(CollectorUrl, value);
+				this["collectorUrl"] = string.Format("https://collector-{0}.perimeterx.net", value);
 			}
 		}
 
@@ -455,7 +455,7 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("collectorUrl", DefaultValue = "https://collector-{0}.perimeterx.net")]
+		[ConfigurationProperty("collectorUrl")]
 		public string CollectorUrl
 		{
 			get
