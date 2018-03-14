@@ -367,7 +367,7 @@ namespace PerimeterX
 							Action = pxContext.MapBlockAction(),
 							Vid = pxContext.Vid,
 							Page = Convert.ToBase64String(Encoding.UTF8.GetBytes(content)),
-							CollectorUrl = config.CollectorUrl
+							CollectorUrl = string.Format(config.CollectorUrl, config.AppId);
 						}, output);
 					content = output.ToString();
 				}
