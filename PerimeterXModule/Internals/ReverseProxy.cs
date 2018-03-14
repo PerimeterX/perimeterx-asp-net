@@ -104,7 +104,6 @@ namespace PerimeterX
 				Debug.WriteLine("Unexpected error while processing reverse request: " + e.Message, PxConstants.LOG_CATEGORY);
 				return false;
 			}
-
 		}
 		/**
 		 * <summary>
