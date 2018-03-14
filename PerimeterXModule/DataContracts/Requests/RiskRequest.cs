@@ -14,6 +14,9 @@ namespace PerimeterX
 		[DataMember(Name = "uuid", EmitDefaultValue = false)]
 		public string UUID;
 
+		[DataMember(Name = "firstParty", EmitDefaultValue = false)]
+		public bool? FirstParty;
+
 		[DataMember(Name = "additional", EmitDefaultValue = false)]
 		public Additional Additional;
 	}
