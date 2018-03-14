@@ -212,6 +212,7 @@ Customers are advised to use the first party sensor (where the web sensor is ser
 The following routes will be used in order to serve the sensor and send activities:
  - /\<PREFIX\>/xhr/*
  - /\<PREFIX\>/init.js
+ 
 First Party may also require additional changes on the sensor snippet (client side). Refer to the portal for more information.
 
 **default: true**
