@@ -11,7 +11,7 @@ namespace PerimeterX
 	abstract class TemplateFactory
 	{
 		private static readonly string CLIENT_SRC_FP = "/{0}/init.js";
-			private static readonly string CLIENT_SRC_TP = "{0}/{1}/main.min.js";
+		private static readonly string CLIENT_SRC_TP = "{0}/{1}/main.min.js";
 
 		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest)
 		{
