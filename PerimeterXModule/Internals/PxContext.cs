@@ -156,22 +156,7 @@ namespace PerimeterX
 			BlockReason = BlockReasonEnum.NONE;
 			PassReason = PassReasonEnum.NONE;
 
-			Ip = context.Request.UserHostAddress;
-			// Get IP from custom header
-			string socketIpHeader = pxConfiguration.SocketIpHeader;
-			if (!string.IsNullOrEmpty(socketIpHeader))
-			{
-				var headerVal = context.Request.Headers[socketIpHeader];
-				if (headerVal != null)
-				{
-					var ips = headerVal.Split(new char[] { ',', ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-					IPAddress firstIpAddress;
-					if (ips.Length > 0 && IPAddress.TryParse(ips[0], out firstIpAddress))
-					{
-						Ip = ips[0];
-					}
-				}
-			}
+			Ip = PxCommonUtils.GetRequestIP(context, pxConfiguration);
 
 			HttpVersion = ExtractHttpVersion(context);
 			HttpMethod = context.Request.HttpMethod;

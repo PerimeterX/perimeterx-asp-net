@@ -4,11 +4,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace PerimeterX
 {
 	abstract class TemplateFactory
 	{
+		private static readonly string CLIENT_SRC_FP = "/{0}/init.js";
+		private static readonly string CLIENT_SRC_TP = "{0}/{1}/main.min.js";
 
 		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest)
 		{
@@ -54,6 +57,15 @@ namespace PerimeterX
 			props.Add("hostUrl", string.Format(pxConfiguration.CollectorUrl, pxConfiguration.AppId));
 			props.Add("captchaType", pxConfiguration.CaptchaProvider);
 
+			if (pxConfiguration.FirstPartyEnabled)
+			{
+				props.Add("jsClientSrc", string.Format(CLIENT_SRC_FP, pxConfiguration.AppId.Substring(2)));
+				props.Add("firstPartyEnabled", "1");
+			}
+			else
+			{
+				props.Add("jsClientSrc", string.Format(CLIENT_SRC_TP, Regex.Replace(pxConfiguration.ClientHostUrl, "https?:", ""), pxConfiguration.AppId));
+			}
 			return props;
 		}
 	}
