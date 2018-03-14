@@ -69,7 +69,7 @@ namespace PerimeterX
 				context.Request.Headers.Add(PxConstants.ENFORCER_TRUE_IP_HEADER, PxCommonUtils.GetRequestIP(context, PxConfig));
 				context.Request.Headers.Add(PxConstants.FIRST_PARTY_HEADER, PxConstants.FIRST_PARTY_VALUE);
 
-				// Create a connection to the Remote Server to redirect all requests
+				// Create a connexion to the Remote Server to redirect all requests
 				RemoteServer server = new RemoteServer(context, serverUrl, uri);
 
 				// Create a request with same data in navigator request
@@ -79,8 +79,8 @@ namespace PerimeterX
 				HttpWebResponse response = server.GetResponse(request);
 				if (response == null || !response.StatusCode.Equals(HttpStatusCode.OK))
 				{
-					Debug.WriteLine("ReverseProxy responded  with none 200 status", PxConstants.LOG_CATEGORY);
-					Debug.WriteLineIf(response != null, "Response status {0}", PxConstants.LOG_CATEGORY);
+					Debug.WriteLine("ReverseProxy responeded with none 200 status", PxConstants.LOG_CATEGORY);
+					Debug.WriteLineIf(!(response == null), "Response status {0}", PxConstants.LOG_CATEGORY);
 					return false;
 				}
 

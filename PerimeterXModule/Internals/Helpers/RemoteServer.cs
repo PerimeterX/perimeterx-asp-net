@@ -141,5 +141,23 @@ namespace PerimeterX
 			return responseData;
 		}
 
+		/// <summary>
+		/// Set cookies received from remote server to response of navigator
+		/// </summary>
+		/// <param name="response">Response received from the remote server</param>
+		public void SetContextCookies(HttpWebResponse response)
+		{
+			context.Response.Cookies.Clear();
+			foreach (Cookie receivedCookie in response.Cookies)
+			{
+				HttpCookie c = new HttpCookie(receivedCookie.Name, receivedCookie.Value);
+				c.Domain = context.Request.Url.Host;
+				c.Expires = receivedCookie.Expires;
+				c.HttpOnly = receivedCookie.HttpOnly;
+				c.Path = receivedCookie.Path;
+				c.Secure = receivedCookie.Secure;
+				context.Response.Cookies.Add(c);
+			}
+		}
 	}
 }
