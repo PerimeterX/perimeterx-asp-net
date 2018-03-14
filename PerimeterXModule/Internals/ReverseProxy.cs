@@ -57,7 +57,7 @@ namespace PerimeterX
 		 *  boolean value indicating whether reverse-proxy was 
 		 *  successful
 		 * </summary>
-		 * <param name="context">The original reuqest context</param>
+		 * <param name="context">The original request context</param>
 		 * <param name="serverUrl">string value of the remote server's url</param>
 		 * <param name="uri">string value for the remote server's uri</param>
 		 * <returns>boolean</returns>
@@ -107,7 +107,7 @@ namespace PerimeterX
 		 * <summary>
 		 * Reverse requests for PerimeterX client
 		 * </summary>
-		 * <param name="context">The original reuqest context</param>
+		 * <param name="context">The original request context</param>
 		 */
 		public void ReversePxClient(HttpContext context)
 		{
@@ -133,7 +133,7 @@ namespace PerimeterX
 		 * <summary>
 		 * Reverse proxy any sensor activities back to PerimeterX servers
 		 * </summary>
-		 * <param name="context">The original reuqest context</param>
+		 * <param name="context">The original request context</param>
 		 */
 		public void ReversePxXhr(HttpContext context)
 		{
@@ -192,7 +192,7 @@ namespace PerimeterX
 		 * Checks if this is a first party route for the Client JS sensor.
 		 * If the route matches the prefix, the module will redirect the request
 		 * </summary>
-		 * <param name="context">The original reuqest context</param>
+		 * <param name="context">The original request context</param>
 		 * <returns>boolean</returns>
 		 */
 		public bool ShouldReverseClient(HttpContext context)
@@ -212,7 +212,7 @@ namespace PerimeterX
 		* Checks if this is a first party route for XHR requests
 		* If the route matches the prefix, the module will redirect the request
 		* </summary>
-		 * <param name="context">The original reuqest context</param>
+		 * <param name="context">The original request context</param>
 		* <returns>boolean</returns>
 		*/
 		public bool ShouldReverseXhr(HttpContext context)
