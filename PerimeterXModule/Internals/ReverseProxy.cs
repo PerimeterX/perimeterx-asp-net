@@ -48,7 +48,7 @@ namespace PerimeterX
 			string appIdPrefix = pxConfig.AppId.Substring(2);
 			ClientReversePrefix = "/" + appIdPrefix + CLIENT_FP_PATH;
 			XhrReversePrefix = "/" + appIdPrefix + XHR_PATH;
-			CollectorUrl = string.Format(pxConfig.CollectorUrl, PxConfig.AppId) ;
+			CollectorUrl = string.Format(pxConfig.CollectorUrl, PxConfig.AppId);
 		}
 
 		/**

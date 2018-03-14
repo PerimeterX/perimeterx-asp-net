@@ -14,12 +14,13 @@ Table of Contents
   *   [Dependencies](#dependencies)
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
-  
+
   **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
   *   [Blocking Score](#blocking-score)
   *   [Custom Verification Handler](#custom-verification-handler)
   *   [Enable/Disable Captcha](#captcha-support)
+  *   [First Party Mode](#first-party)
   *   [Select Captcha Provider](#captcha-provider)
   *   [Extracting Real IP Address](#real-ip)
   *   [Override UA header](#override-ua)
@@ -31,7 +32,7 @@ Table of Contents
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
   *   [Base URI](#base-uri)
-  
+
   **[Contributing](#contributing)**
   *   [Tests](#tests)
 
@@ -137,7 +138,7 @@ Example below:
 **default:** 70
 
 ```xml
-... 
+...
   blockingScore="70"
 ...
 ```
@@ -157,10 +158,10 @@ The custom handler class should implement the `IVerificationHandler` interface, 
 The custom logic will reside in the `Handle` method, making use of the following arguments:
 
 - `HttpApplication application` - The currently running ASP.NET application methods, properties and events. Calling [`application.CompleteRequest`](https://msdn.microsoft.com/en-us/library/system.web.httpapplication.completerequest(v=vs.110).aspx), for example, will directly execute the [`EndRequest`](https://msdn.microsoft.com/en-us/library/system.web.httpapplication.endrequest(v=vs.110).aspx) event to return a response to the client.
-- `PxContext pxContext` - The PerimeterX context, containing valuable fields such as `Score`, `UUID`, `BlockAction` etc. 
+- `PxContext pxContext` - The PerimeterX context, containing valuable fields such as `Score`, `UUID`, `BlockAction` etc.
 - `PxModuleConfigurationSection pxConfig` - The current configuration used by the PxModule, representing the `PerimeterX.PxModuleConfigurationSection` settings. Contains fields such as `BlockingScore`.
 
-Common customization options are presenting of a captcha or a custom branded block page. 
+Common customization options are presenting of a captcha or a custom branded block page.
 
 ```xml
 ...
@@ -171,7 +172,7 @@ namespace myUniqueApp
     {
         public void Handle(HttpApplication application, PxContext pxContext, PxModuleConfigurationSection pxConfig)
         {
-            // Custom verification logic goes here. 
+            // Custom verification logic goes here.
             // The following code is only an example of a possible implementation:
 
             if (pxContext.Score >= pxConfig.BlockingScore) // In the case of a high score, present the standard block/captcha page
@@ -185,7 +186,7 @@ namespace myUniqueApp
 ```
 
 #### <a name="captcha-support"></a>Enable/disable captcha in the block page
-***DEPRECATED*** 
+***DEPRECATED***
 
 
 By enabling captcha support, a captcha will be served as part of the block page giving real users the ability to answer, get score clean up and passed to the requested page.
@@ -195,6 +196,30 @@ By enabling captcha support, a captcha will be served as part of the block page 
 ```xml
 ...
   captchaEnabled="true"
+...
+```
+
+#### <a name="first-party"></a>First Party Mode
+
+Enables the module to receive/send data from/to the sensor, acting as a "reverse-proxy" for client requests and sensor activities.
+
+Customers are advised to use the first party sensor (where the web sensor is served locally, from your domain) for two main reasons:
+
+ - Improved performance - serving the sensor as part of the standard site content removes the need to open a new connection to PerimeterX servers when a page is loaded.
+ - Improved detection - third party content may sometimes be blocked by certain browser plugins and privacy addons.
+ - First party sensor directly leads to improved detection, as observed on customers who previously moved away from third party sensor.
+
+The following routes will be used in order to serve the sensor and send activities:
+ - /<PREFIX>/xhr/*
+ - /<PREFIX>/init.js
+First Party may also require additional changes on the sensor snippet (client side). Refer to the portal for more information.
+
+**default: true**
+
+```xml
+...
+  firstPartyEnabled="true"
+  firstPartyXhrEnabled="true"
 ...
 ```
 
@@ -262,7 +287,7 @@ List of routes prefix. The Perimeterx module will skip detection if the prefix m
 ...
 ```
 
-#### <a name="enforcer-specific-routes"></a> Enforcer Specific Routes 
+#### <a name="enforcer-specific-routes"></a> Enforcer Specific Routes
 
 List of routes prefix. If the list is not empty, The Perimeterx module will enforcer only on the url that match the prefix, any other route will be skipped
 
@@ -293,7 +318,7 @@ API Timeout in milliseconds to wait for the PerimeterX server API response.
 Boolean flag to enable or disable page activities
 Sending page activities is asynchronous and not blocking the request
 
-**default:** True 
+**default:** True
 
 ```xml
 ...
@@ -325,7 +350,7 @@ A user can define a different API endpoint as a target URI to send the requests 
 ...
   baseUri="https://sapi.perimeterx.net"
 ...
-``` 
+```
 
 #### <a name="override-ua"></a> Custom User Agent Header
 
