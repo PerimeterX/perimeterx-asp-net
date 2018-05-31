@@ -43,6 +43,7 @@ namespace PerimeterX
 		public string OriginalUUID { get; set; }
 		public object DecodedOriginalToken { get; set; }
 		public bool IsMobileRequest { get; set; }
+		public string MobileHeader { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -93,9 +94,11 @@ namespace PerimeterX
 			// Check if X-PX-AUTHORIZATION exist
 			if (mobileHeader != null)
 			{
+				MobileHeader = mobileHeader;
 				// Extract Original Tokens
 				CookieOrigin = CookieOrigin.HEADER;
 				IsMobileRequest = true;
+
 				// Extact Token
 				string[] splittedToken = mobileHeader.Split(MOBILE_DELIMITER, 2, StringSplitOptions.RemoveEmptyEntries);
 				if (splittedToken.Length > 1 && Array.IndexOf(PxConstants.PX_TOKEN_PREFIX, splittedToken[0]) > -1)

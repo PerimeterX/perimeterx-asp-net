@@ -36,7 +36,7 @@ namespace PerimeterX
 
 				if (context.IsMobileRequest)
 				{
-					string authorizatoinHeader = context.GetHeadersAsDictionary()[PxConstants.MOBILE_HEADER.ToLower()];
+					string authorizatoinHeader = context.MobileHeader;
 					if (!string.IsNullOrEmpty(authorizatoinHeader) && Regex.Match(authorizatoinHeader, MOBILE_PATTERN_ERROR).Success)
 					{
 						context.S2SCallReason = string.Format(CALL_REASON_MOBILE_ERROR, authorizatoinHeader);
