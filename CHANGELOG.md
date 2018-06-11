@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+##[2.5.1] - 2018-11-06
+	- Fixed mobile token extraction in cookie validator
+
 ##[2.5.0] - 2018-14-03
 	- Added support for first party
 
