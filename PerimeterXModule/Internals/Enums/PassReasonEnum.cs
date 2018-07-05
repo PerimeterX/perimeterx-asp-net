@@ -15,10 +15,6 @@ namespace PerimeterX
 		S2S,
 		[EnumMember(Value = "s2s_timeout")]
 		S2S_TIMEOUT,
-		[EnumMember(Value = "captcha")]
-		CAPTCHA,
-		[EnumMember(Value = "captcha_timeout")]
-		CAPTCHA_TIMEOUT,
 		[EnumMember(Value = "error")]
 		ERROR
 	}

@@ -12,8 +12,10 @@ namespace PerimeterX
 	{
 		void ReversePxClient(HttpContext context);
 		void ReversePxXhr(HttpContext context);
+		void ReversePxCaptcha(HttpContext context);
 		bool ShouldReverseClient(HttpContext context);
 		bool ShouldReverseXhr(HttpContext context);
+		bool ShouldReverseCaptcha(HttpContext context);
 	}
 
 	public class ReverseProxy : IReverseProxy
@@ -30,9 +32,11 @@ namespace PerimeterX
 		private readonly string XHR_PATH = "/xhr";
 		private readonly string CLIENT_FP_PATH = "/init.js";
 		private readonly string CLIENT_TP_PATH = "/main.min.js";
+		private readonly string CAPTCHA_FP_PATH = "/captcha";
 
 		private string ClientReversePrefix;
 		private string XhrReversePrefix;
+		private string CaptchaReversePrefix;
 		private string CollectorUrl;
 
 		public bool IsReusable
@@ -48,6 +52,7 @@ namespace PerimeterX
 			string appIdPrefix = pxConfig.AppId.Substring(2);
 			ClientReversePrefix = "/" + appIdPrefix + CLIENT_FP_PATH;
 			XhrReversePrefix = "/" + appIdPrefix + XHR_PATH;
+			CaptchaReversePrefix = "/" + appIdPrefix + CAPTCHA_FP_PATH;
 			CollectorUrl = string.Format(pxConfig.CollectorUrl, PxConfig.AppId);
 		}
 
@@ -120,6 +125,35 @@ namespace PerimeterX
 			}
 			string uri = "/" + PxConfig.AppId + CLIENT_TP_PATH;
 			bool success = ProcessRequest(context, PxConfig.ClientHostUrl, uri);
+
+			if (!success)
+			{
+				Debug.WriteLine("Redirect JS client returned bad status, rendering default response", PxConstants.LOG_CATEGORY);
+				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
+			}
+
+		}
+
+		/**
+		 * <summary>
+		 * Reverse requests for PerimeterX captcha client
+		 * </summary>
+		 * <param name="context">The original request context</param>
+		 */
+		public void ReversePxCaptcha(HttpContext context)
+		{
+			Debug.WriteLine("Fetching Captcha client", PxConstants.LOG_CATEGORY);
+			if (!PxConfig.FirstPartyEnabled)
+			{
+				Debug.WriteLine("First party is disabled, rendering default captcha client response", PxConstants.LOG_CATEGORY);
+				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
+				return;
+			}
+
+			string uri = context.Request.RawUrl.Replace(CaptchaReversePrefix, "");
+
+
+			bool success = ProcessRequest(context, PxConfig.CaptchaHostUrl, uri);
 
 			if (!success)
 			{
@@ -204,7 +238,25 @@ namespace PerimeterX
 				return true;
 			}
 			return false;
-			
+		}
+
+		/**
+		 * <summary>
+		 * Checks if this is a first party route for the Captcha js file.
+		 * If the route matches the prefix, the module will redirect the request
+		 * </summary>
+		 * <param name="context">The original request context</param>
+		 * <returns>boolean</returns>
+		 */
+		public bool ShouldReverseCaptcha(HttpContext context)
+		{
+			if (context.Request.Url.AbsolutePath.Equals(CaptchaReversePrefix))
+			{
+				ReversePxCaptcha(context);
+				context.ApplicationInstance.CompleteRequest();
+				return true;
+			}
+			return false;
 		}
 
 		/**
@@ -244,5 +296,7 @@ namespace PerimeterX
 
 			context.Response.End();
 		}
+
+		
 	}
 }

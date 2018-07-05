@@ -118,22 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="block" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\internals\templates\block.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="reCaptcha" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\internals\templates\reCaptcha.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="funCaptcha" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\internals\templates\funCaptcha.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="blockMobile" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\internals\templates\blockmobile.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="funCaptchaMobile" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\internals\templates\funcaptchamobile.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="reCaptchaMobile" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\internals\templates\recaptchamobile.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  <data name="block_template" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Internals\Templates\block_template.mustache;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>
