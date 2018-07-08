@@ -30,24 +30,4 @@ namespace PerimeterX
 			};
 		}
 	}
-
-	[DataContract]
-	[Serializable]
-	public class CaptchaRequest : Request
-	{
-		[DataMember(Name = "captchaType")]
-		public string CaptchaType { get; set; }
-
-		public static CaptchaRequest CreateCaptchaRequestFromContext(PxContext pxContext, string captchaType)
-		{
-			return new CaptchaRequest
-			{
-				IP = pxContext.Ip,
-				URL = pxContext.FullUrl,
-				URI = pxContext.Uri,
-				Headers = pxContext.Headers.ToArray(),
-				CaptchaType = captchaType
-			};
-		}
-	}
 }

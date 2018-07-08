@@ -14,7 +14,6 @@ namespace PerimeterX
 		public Dictionary<string, string> PxCookies { get; set; }
 		public object DecodedPxCookie { get; set; }
 		public string PxCookieHmac { get; set; }
-		public string PxCaptcha { get; set; }
 		public string Ip { get; set; }
 		public string HttpVersion { get; set; }
 		public string HttpMethod { get; set; }
@@ -141,10 +140,6 @@ namespace PerimeterX
 					if (Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1)
 					{
 						PxCookies[key] = contextCookie.Get(key).Value;
-					}
-					else if (key.Equals(PxConstants.COOKIE_CAPTCHA_PREFIX))
-					{
-						PxCaptcha = contextCookie.Get(key).Value;
 					}
 				}
 			}

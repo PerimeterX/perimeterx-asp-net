@@ -12,16 +12,17 @@ namespace PerimeterX
 	{
 		private static readonly string CLIENT_SRC_FP = "/{0}/init.js";
 		private static readonly string CLIENT_SRC_TP = "{0}/{1}/main.min.js";
+		private static readonly string CAPTCHA_QUERY_PARAMS = "?a={0}&u={1}&v={2}&m={3}";
+		private static readonly string CAPTCHA_SRC_FP = "/{0}/captcha/captcha.js{1}";
+		private static readonly string CAPTCHA_SRC_TP = "{0}/{1}/captcha.js{2}";
+		private static readonly string HOST_FP = "/{0}/xhr";
 
-		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest)
+
+		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest,string action)
 		{
-			if (isMobileRequest)
-			{
-				template = string.Format("{0}Mobile", template);
-			}
 			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
 			string templateStr = getTemplateString(template);
-			return Render.StringToString(templateStr, getProps(pxConfiguration, uuid, vid));
+			return Render.StringToString(templateStr, getProps(pxConfiguration, uuid, vid, isMobileRequest, action));
 
 		}
 
@@ -43,9 +44,10 @@ namespace PerimeterX
 			return templateStr;
 		}
 
-		private static IDictionary<String, String> getProps(PxModuleConfigurationSection pxConfiguration, string uuid, string vid)
+		private static IDictionary<String, String> getProps(PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest, string action)
 		{
 			IDictionary<String, String> props = new Dictionary<String, String>();
+			string captchaParams = string.Format(CAPTCHA_QUERY_PARAMS, action, uuid, vid, isMobileRequest ? "1" : "0"); 
 			props.Add("refId", uuid);
 			props.Add("appId", pxConfiguration.AppId);
 			props.Add("vid", vid);
@@ -54,17 +56,19 @@ namespace PerimeterX
 			props.Add("cssRef", pxConfiguration.CssRef);
 			props.Add("jsRef", pxConfiguration.JsRef);
 			props.Add("logoVisibility", string.IsNullOrEmpty(pxConfiguration.CustomLogo) ? "hidden" : "visible");
-			props.Add("hostUrl", string.Format(pxConfiguration.CollectorUrl, pxConfiguration.AppId));
-			props.Add("captchaType", pxConfiguration.CaptchaProvider);
 
-			if (pxConfiguration.FirstPartyEnabled)
+			if (pxConfiguration.FirstPartyEnabled && !isMobileRequest)
 			{
 				props.Add("jsClientSrc", string.Format(CLIENT_SRC_FP, pxConfiguration.AppId.Substring(2)));
+				props.Add("blockScript", string.Format(CAPTCHA_SRC_FP, pxConfiguration.AppId.Substring(2), captchaParams));
+				props.Add("hostUrl", string.Format(HOST_FP, pxConfiguration.AppId.Substring(2)));
 				props.Add("firstPartyEnabled", "1");
 			}
 			else
 			{
 				props.Add("jsClientSrc", string.Format(CLIENT_SRC_TP, Regex.Replace(pxConfiguration.ClientHostUrl, "https?:", ""), pxConfiguration.AppId));
+				props.Add("hostUrl", string.Format(pxConfiguration.CollectorUrl, pxConfiguration.AppId));
+				props.Add("blockScript", string.Format(CAPTCHA_SRC_TP, pxConfiguration.CaptchaHostUrl,  pxConfiguration.AppId, captchaParams));
 			}
 			return props;
 		}

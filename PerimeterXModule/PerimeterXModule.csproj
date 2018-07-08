@@ -81,9 +81,7 @@
     <Compile Include="Internals\Templates\IMobileResponse.cs" />
     <Compile Include="Internals\Templates\MobileResponse.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
-    <Compile Include="Internals\Validators\Interfaces\IPXCaptchaValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXS2SValidator.cs" />
-    <Compile Include="Internals\Validators\PXCaptchaValidator.cs" />
     <Compile Include="Internals\Validators\PXCookieValidator.cs" />
     <Compile Include="Internals\Validators\PXOriginalTokenValidator.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -105,8 +103,6 @@
     <Compile Include="Internals\ActivityReporter.cs" />
     <Compile Include="DataContracts\Requests\RiskRequestHeader.cs" />
     <Compile Include="DataContracts\Requests\Additional.cs" />
-    <Compile Include="DataContracts\Requests\CaptchaAPIRequest.cs" />
-    <Compile Include="DataContracts\Responses\CaptchaResponse.cs" />
     <Compile Include="DataContracts\Requests\RiskRequest.cs" />
     <Compile Include="DataContracts\Requests\Request.cs" />
     <Compile Include="Internals\Validators\PXS2SValidator.cs" />
@@ -118,17 +114,12 @@
     <Compile Include="Internals\Helpers\HttpHandler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Internals\Templates\block.mustache" />
-    <EmbeddedResource Include="Internals\Templates\reCaptcha.mustache" />
-    <EmbeddedResource Include="Internals\Templates\blockMobile.mustache" />
-    <EmbeddedResource Include="Internals\Templates\funCaptchaMobile.mustache" />
-    <EmbeddedResource Include="Internals\Templates\reCaptchaMobile.mustache" />
+    <EmbeddedResource Include="Internals\Templates\block_template.mustache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <EmbeddedResource Include="Internals\Templates\funCaptcha.mustache" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
