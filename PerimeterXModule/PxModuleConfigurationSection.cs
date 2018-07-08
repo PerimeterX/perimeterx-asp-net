@@ -507,7 +507,7 @@ namespace PerimeterX
 				this["clientHostUrl"] = value;
 			}
 		}
-		[ConfigurationProperty("captchaHostUrl", DefaultValue = "https://captcha.px-cdn.net")]
+		[ConfigurationProperty("captchaHostUrl", DefaultValue = "https://captcha.perimeterx.net")]
 		public string CaptchaHostUrl
 		{
 			get

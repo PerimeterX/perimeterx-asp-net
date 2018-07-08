@@ -52,7 +52,7 @@ namespace PerimeterX
 			string appIdPrefix = pxConfig.AppId.Substring(2);
 			ClientReversePrefix = "/" + appIdPrefix + CLIENT_FP_PATH;
 			XhrReversePrefix = "/" + appIdPrefix + XHR_PATH;
-			CaptchaReversePrefix = "/" + appIdPrefix + CAPTCHA_FP_PATH;
+			CaptchaReversePrefix = "/" + appIdPrefix + CAPTCHA_FP_PATH ;
 			CollectorUrl = string.Format(pxConfig.CollectorUrl, PxConfig.AppId);
 		}
 
@@ -150,7 +150,7 @@ namespace PerimeterX
 				return;
 			}
 
-			string uri = context.Request.RawUrl.Replace(CaptchaReversePrefix, "");
+			string uri = "/" + PxConfig.AppId + context.Request.RawUrl.Replace(CaptchaReversePrefix, "");
 
 
 			bool success = ProcessRequest(context, PxConfig.CaptchaHostUrl, uri);
@@ -250,7 +250,7 @@ namespace PerimeterX
 		 */
 		public bool ShouldReverseCaptcha(HttpContext context)
 		{
-			if (context.Request.Url.AbsolutePath.Equals(CaptchaReversePrefix))
+			if (context.Request.Url.AbsolutePath.StartsWith(CaptchaReversePrefix))
 			{
 				ReversePxCaptcha(context);
 				context.ApplicationInstance.CompleteRequest();

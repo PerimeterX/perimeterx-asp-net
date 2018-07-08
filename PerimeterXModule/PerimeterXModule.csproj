@@ -114,7 +114,7 @@
     <Compile Include="Internals\Helpers\HttpHandler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Internals\Templates\block_template.mustache" />
+    <EmbeddedResource Include="Internals\Templates\block_template.mustache" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

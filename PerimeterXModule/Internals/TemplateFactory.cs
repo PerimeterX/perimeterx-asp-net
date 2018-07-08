@@ -13,7 +13,7 @@ namespace PerimeterX
 		private static readonly string CLIENT_SRC_FP = "/{0}/init.js";
 		private static readonly string CLIENT_SRC_TP = "{0}/{1}/main.min.js";
 		private static readonly string CAPTCHA_QUERY_PARAMS = "?a={0}&u={1}&v={2}&m={3}";
-		private static readonly string CAPTCHA_SRC_FP = "{0}/captcha/captcha.js{1}";
+		private static readonly string CAPTCHA_SRC_FP = "/{0}/captcha/captcha.js{1}";
 		private static readonly string CAPTCHA_SRC_TP = "{0}/{1}/captcha.js{2}";
 		private static readonly string HOST_FP = "/{0}/xhr";
 
