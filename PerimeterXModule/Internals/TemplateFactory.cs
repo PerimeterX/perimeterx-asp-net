@@ -57,7 +57,7 @@ namespace PerimeterX
 			props.Add("jsRef", pxConfiguration.JsRef);
 			props.Add("logoVisibility", string.IsNullOrEmpty(pxConfiguration.CustomLogo) ? "hidden" : "visible");
 
-			if (pxConfiguration.FirstPartyEnabled)
+			if (pxConfiguration.FirstPartyEnabled && !isMobileRequest)
 			{
 				props.Add("jsClientSrc", string.Format(CLIENT_SRC_FP, pxConfiguration.AppId.Substring(2)));
 				props.Add("blockScript", string.Format(CAPTCHA_SRC_FP, pxConfiguration.AppId.Substring(2), captchaParams));
