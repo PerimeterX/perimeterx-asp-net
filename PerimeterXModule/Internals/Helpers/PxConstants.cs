@@ -16,7 +16,6 @@ namespace PerimeterX
 		public const string COOKIE_V3_PREFIX = "_px3";
 		public const string TOKEN_V1_PREFIX = "1";
 		public const string TOKEN_V3_PREFIX = "3";
-		public static readonly string COOKIE_CAPTCHA_PREFIX = "_pxCaptcha";
 		public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
 		public static readonly string MOBILE_HEADER = "X-PX-AUTHORIZATION";
 		public static readonly string ORIGINAL_TOKEN = "X-PX-ORIGINAL-TOKEN";
@@ -31,7 +30,6 @@ namespace PerimeterX
 
 		// Endpoints
 		public const string RISK_API_V2 = "/api/v2/risk";
-		public const string CAPTCHA_API_PATH = "/api/v2/risk/captcha";
 		public const string ACTIVITIES_API_PATH = "/api/v1/collector/s2s";
 		public const string ENFORCER_TELEMETRY_API_PATH = "/api/v2/risk/telemetry";
 

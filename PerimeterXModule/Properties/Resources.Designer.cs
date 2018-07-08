@@ -63,59 +63,9 @@ namespace PerimeterX.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] block {
+        internal static byte[] block_template {
             get {
-                object obj = ResourceManager.GetObject("block", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] blockMobile {
-            get {
-                object obj = ResourceManager.GetObject("blockMobile", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] funCaptcha {
-            get {
-                object obj = ResourceManager.GetObject("funCaptcha", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] funCaptchaMobile {
-            get {
-                object obj = ResourceManager.GetObject("funCaptchaMobile", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] reCaptcha {
-            get {
-                object obj = ResourceManager.GetObject("reCaptcha", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] reCaptchaMobile {
-            get {
-                object obj = ResourceManager.GetObject("reCaptchaMobile", resourceCulture);
+                object obj = ResourceManager.GetObject("block_template", resourceCulture);
                 return ((byte[])(obj));
             }
         }

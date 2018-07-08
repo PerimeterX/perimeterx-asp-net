@@ -21,7 +21,6 @@ Table of Contents
   *   [Custom Verification Handler](#custom-verification-handler)
   *   [Enable/Disable Captcha](#captcha-support)
   *   [First Party Mode](#first-party)
-  *   [Select Captcha Provider](#captcha-provider)
   *   [Extracting Real IP Address](#real-ip)
   *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
@@ -212,7 +211,7 @@ Customers are advised to use the first party sensor (where the web sensor is ser
 The following routes will be used in order to serve the sensor and send activities:
  - /\<PREFIX\>/xhr/*
  - /\<PREFIX\>/init.js
- 
+
 First Party may also require additional changes on the sensor snippet (client side). Refer to the portal for more information.
 
 **default: true**
@@ -221,19 +220,6 @@ First Party may also require additional changes on the sensor snippet (client si
 ...
   firstPartyEnabled="true"
   firstPartyXhrEnabled="true"
-...
-```
-
-#### <a name="captcha-provider"></a>Select CAPTCHA Provider
-
-The CAPTCHA part of the block page can use one of the following:
-* [reCAPTCHA](https://www.google.com/recaptcha)
-* [FunCaptcha](https://www.funcaptcha.com/)
-
-**default: 'reCaptcha'**
-```xml
-...
-  captchaProvider = "funCaptcha"
 ...
 ```
 

@@ -122,19 +122,6 @@ namespace PerimeterX
 			}
 		}
 
-		[ConfigurationProperty("captchaProvider", DefaultValue = "reCaptcha")]
-		public string CaptchaProvider
-		{
-			get
-			{
-				return (string)this["captchaProvider"];
-			}
-			set
-			{
-				this["captchaProvider"] = value;
-			}
-		}
-
 		[ConfigurationProperty("signedWithUserAgent", DefaultValue = true)]
 		public bool SignedWithUserAgent
 		{
@@ -518,6 +505,19 @@ namespace PerimeterX
 			set
 			{
 				this["clientHostUrl"] = value;
+			}
+		}
+		[ConfigurationProperty("captchaHostUrl", DefaultValue = "https://captcha.perimeterx.net")]
+		public string CaptchaHostUrl
+		{
+			get
+			{
+				return (string)this["captchaHostUrl"];
+			}
+
+			set
+			{
+				this["captchaHostUrl"] = value;
 			}
 		}
 	}

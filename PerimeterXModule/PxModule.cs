@@ -46,7 +46,6 @@ namespace PerimeterX
 		private static IActivityReporter reporter;
 		private readonly string validationMarker;
 		private readonly ICookieDecoder cookieDecoder;
-		private readonly IPXCaptchaValidator PxCaptchaValidator;
 		private readonly IPXCookieValidator PxCookieValidator;
 		private readonly IPXS2SValidator PxS2SValidator;
 		private readonly IReverseProxy ReverseProxy;
@@ -59,7 +58,6 @@ namespace PerimeterX
 		private readonly string customVerificationHandler;
 		private readonly bool suppressContentBlock;
 		private readonly bool challengeEnabled;
-		private readonly string captchaProvider;
 		private readonly string[] sensetiveHeaders;
 		private readonly StringCollection fileExtWhitelist;
 		private readonly StringCollection routesWhitelist;
@@ -109,7 +107,6 @@ namespace PerimeterX
 			appId = config.AppId;
 			customVerificationHandler = config.CustomVerificationHandler;
 			suppressContentBlock = config.SuppressContentBlock;
-			captchaProvider = config.CaptchaProvider;
 			challengeEnabled = config.ChallengeEnabled;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
@@ -136,7 +133,6 @@ namespace PerimeterX
 
 			// Set Validators
 			PxS2SValidator = new PXS2SValidator(config, httpHandler);
-			PxCaptchaValidator = new PXCaptchaValidator(config, httpHandler);
 			PxCookieValidator = new PXCookieValidator(config)
 			{
 				PXOriginalTokenValidator = new PXOriginalTokenValidator(config)
@@ -338,7 +334,7 @@ namespace PerimeterX
 
 		public static void ResponseBlockPage(PxContext pxContext, PxModuleConfigurationSection config)
 		{
-			string template = config.CaptchaProvider;
+			string template = "block_template";
 
 			if (pxContext.BlockAction == "j")
 			{
@@ -351,7 +347,7 @@ namespace PerimeterX
 
 			// In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.
 			string content = template == "challenge" && !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData :
-				TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid, pxContext.IsMobileRequest);
+				TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid, pxContext.IsMobileRequest, pxContext.BlockAction);
 
 			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 			if (pxContext.IsMobileRequest)
@@ -390,7 +386,7 @@ namespace PerimeterX
 		/// <param name="context">HTTP context for client</param>
 		private bool IsFirstPartyProxyRequest(HttpContext context)
 		{
-			return ReverseProxy.ShouldReverseClient(context) || ReverseProxy.ShouldReverseXhr(context);
+			return ReverseProxy.ShouldReverseClient(context) || ReverseProxy.ShouldReverseCaptcha(context) || ReverseProxy.ShouldReverseXhr(context);
 		}
 
 		private bool IsFilteredRequest(HttpContext context)
@@ -453,13 +449,6 @@ namespace PerimeterX
 			{
 				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				pxContext = new PxContext(application.Context, config);
-
-				// check captcha after cookie validation to capture vid
-				if (!string.IsNullOrEmpty(pxContext.PxCaptcha) && PxCaptchaValidator.CaptchaVerify(pxContext))
-				{
-					HandleVerification(application);
-					return;
-				}
 
 				// validate using risk cookie
 				IPxCookie pxCookie = PxCookieUtils.BuildCookie(config, pxContext.PxCookies, cookieDecoder);
