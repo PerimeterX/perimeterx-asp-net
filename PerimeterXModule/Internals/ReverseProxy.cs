@@ -207,6 +207,15 @@ namespace PerimeterX
 				}
 			}
 
+			// align xff header
+			if (context.Request.Headers[PxConstants.FORWARDED_FOR_HEADER] != null)
+			{
+				context.Request.Headers[PxConstants.FORWARDED_FOR_HEADER] += string.Format(", {0}", context.Request.UserHostAddress);
+			} else
+			{
+				context.Request.Headers.Add(PxConstants.FORWARDED_FOR_HEADER, context.Request.UserHostAddress);
+			}
+
 			if (!string.IsNullOrEmpty(vid))
 			{
 				Debug.WriteLine(string.Format("Found VID on request, the following VID will be attached to the request: {0}", vid), PxConstants.LOG_CATEGORY);
