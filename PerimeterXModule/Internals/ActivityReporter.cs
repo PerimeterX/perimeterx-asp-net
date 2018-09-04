@@ -111,12 +111,12 @@ namespace PerimeterX
 
                 var content = new StringContent(stringBuilder.ToString(), Encoding.UTF8, "application/json");
                 var response = httpClient.PostAsync(postUri, content).Result;
-		PxLoggingUtils.LogDebug(string.Format("Post request for {0} ({1}), returned {2}", postUri, stringBuilder.ToString(), response));
+                PxLoggingUtils.LogDebug(string.Format("Post request for {0} ({1}), returned {2}", postUri, stringBuilder.ToString(), response));
                 response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-		PxLoggingUtils.LogError(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message));
+                PxLoggingUtils.LogError(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message));
             }
         }
 
