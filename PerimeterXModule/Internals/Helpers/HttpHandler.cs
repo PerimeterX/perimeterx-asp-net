@@ -33,7 +33,7 @@ namespace PerimeterX
             }
             catch (Exception ex)
             {
-				PxLoggingUtils.LogDebug(string.Format("Failed sending POST request for {0} ({1}), returned error: {2}", uri, requestJson, ex.Message));
+                PxLoggingUtils.LogDebug(string.Format("Failed sending POST request for {0} ({1}), returned error: {2}", uri, requestJson, ex.Message));
                 throw ex;
             }
         }
