@@ -26,7 +26,7 @@ namespace PerimeterX
 
 		public static void LogError(String message)
 		{
-			Debug.WriteLine("[PerimeterX - DEBUG] [{0}] - {1}", m_appId, message);
+			Debug.WriteLine("[PerimeterX - ERROR] [{0}] - {1}", m_appId, message);
 		}
 
 	}
