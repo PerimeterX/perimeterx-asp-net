@@ -71,7 +71,7 @@ namespace PerimeterX
             var added = activities.TryAdd(activity);
 	    if (!added)
 	    {
-                PxLoggingUtils.LogError("Failed to post activity");
+                PxLoggingUtils.LogDebug("Failed to post activity");
 	    }
             return added;
         }
