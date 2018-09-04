@@ -310,6 +310,10 @@ namespace PerimeterX
 				Details = details,
 				Headers = pxContext.GetHeadersAsDictionary()
 			};
+			if (eventType.Equals("page_requested"))
+			{
+				activity.HttpMethod = "Post";
+			}
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
