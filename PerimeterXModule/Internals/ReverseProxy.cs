@@ -82,8 +82,11 @@ namespace PerimeterX
 				HttpWebResponse response = server.GetResponse(server.GetRequest());
 				if (response == null || !response.StatusCode.Equals(HttpStatusCode.OK))
 				{
-					Debug.WriteLine("ReverseProxy responeded with none 200 status", PxConstants.LOG_CATEGORY);
-					Debug.WriteLineIf(response != null, "Response status {0}", PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug("ReverseProxy responeded with none 200 status");
+					if (response != null)
+					{
+						PxLoggingUtils.LogDebug(string.Format("Response status {0}", response.StatusCode));
+					}
 					return false;
 				}
 
@@ -104,7 +107,7 @@ namespace PerimeterX
 			}
 			catch (Exception e)
 			{
-				Debug.WriteLine("Unexpected error while processing reverse request: " + e.Message, PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogError("Unexpected error while processing reverse request: " + e.Message);
 				return false;
 			}
 		}
@@ -116,21 +119,15 @@ namespace PerimeterX
 		 */
 		public void ReversePxClient(HttpContext context)
 		{
-			Debug.WriteLine("Fetching Client", PxConstants.LOG_CATEGORY);
+			PxLoggingUtils.LogDebug("Fetching Client");
 			if (!PxConfig.FirstPartyEnabled)
 			{
-				Debug.WriteLine("First party is disabled, rendering default JS client response", PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug("First party is disabled, rendering default JS client response");
 				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
 				return;
 			}
 			string uri = "/" + PxConfig.AppId + CLIENT_TP_PATH;
 			bool success = ProcessRequest(context, PxConfig.ClientHostUrl, uri);
-
-			if (!success)
-			{
-				Debug.WriteLine("Redirect JS client returned bad status, rendering default response", PxConstants.LOG_CATEGORY);
-				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
-			}
 
 		}
 
@@ -142,10 +139,10 @@ namespace PerimeterX
 		 */
 		public void ReversePxCaptcha(HttpContext context)
 		{
-			Debug.WriteLine("Fetching Captcha client", PxConstants.LOG_CATEGORY);
+			PxLoggingUtils.LogDebug("Fetching Captcha client");
 			if (!PxConfig.FirstPartyEnabled)
 			{
-				Debug.WriteLine("First party is disabled, rendering default captcha client response", PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug("First party is disabled, rendering default captcha client response");
 				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
 				return;
 			}
@@ -155,11 +152,7 @@ namespace PerimeterX
 
 			bool success = ProcessRequest(context, PxConfig.CaptchaHostUrl, uri);
 
-			if (!success)
-			{
-				Debug.WriteLine("Redirect JS client returned bad status, rendering default response", PxConstants.LOG_CATEGORY);
-				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
-			}
+
 
 		}
 
@@ -181,7 +174,7 @@ namespace PerimeterX
 
 			if (!PxConfig.FirstPartyEnabled || !PxConfig.FirstPartyXhrEnabled)
 			{
-				Debug.WriteLine(string.Format("First party is disabled, rendering default response with Content-Type: {0}", contentType), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug(string.Format("First party is disabled, rendering default response with Content-Type: {0}", contentType));
 				RenderPredefinedResponse(context, contentType, defaultResponse);
 				return;
 			}
@@ -209,14 +202,14 @@ namespace PerimeterX
 
 			if (!string.IsNullOrEmpty(vid))
 			{
-				Debug.WriteLine(string.Format("Found VID on request, the following VID will be attached to the request: {0}", vid), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug(string.Format("Found VID on request, the following VID will be attached to the request: {0}", vid));
 				context.Request.Headers.Add("Cookie", string.Format("pxvid={0}", vid));
 			}
 
 			bool success = ProcessRequest(context, CollectorUrl, uri);
 			if (!success)
 			{
-				Debug.WriteLine("Redirect XHR returned bad status, rendering default response", PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug("Redirect XHR returned bad status, rendering default response");
 				RenderPredefinedResponse(context, contentType, defaultResponse);
 			}
 		}

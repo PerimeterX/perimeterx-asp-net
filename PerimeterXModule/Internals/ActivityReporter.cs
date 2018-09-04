@@ -52,7 +52,7 @@ namespace PerimeterX
         private readonly BlockingCollection<Activity> activities;
         private readonly int bulkSize;
         private readonly HttpClient httpClient;
-        private readonly string postUri;
+		private readonly string postUri;
         private readonly Options jsonOptions = new Options(false, true);
 
         public ActivityReporter(string baseUri, int capacity = 500, int bulkSize = 10, int timeout = 5000)
@@ -63,13 +63,16 @@ namespace PerimeterX
             this.httpClient = PxConstants.CreateHttpClient(false, timeout, false);
 
             Task.Run(() => SendActivitiesTask());
-            Debug.WriteLine("Reporter initialized", PxConstants.LOG_CATEGORY);
+			PxLoggingUtils.LogDebug("Reporter initialized");
         }
 
         public bool Post(Activity activity)
         {
             var added = activities.TryAdd(activity);
-            Debug.WriteLineIf(!added, "Failed to post activity", PxConstants.LOG_CATEGORY);
+			if (!added)
+			{
+				PxLoggingUtils.LogError("Failed to post activity");
+			}
             return added;
         }
 
@@ -108,12 +111,12 @@ namespace PerimeterX
 
                 var content = new StringContent(stringBuilder.ToString(), Encoding.UTF8, "application/json");
                 var response = httpClient.PostAsync(postUri, content).Result;
-                Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", postUri, stringBuilder.ToString(), response), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug(string.Format("Post request for {0} ({1}), returned {2}", postUri, stringBuilder.ToString(), response));
                 response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogError(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message));
             }
         }
 
