@@ -63,7 +63,7 @@ namespace PerimeterX
             this.httpClient = PxConstants.CreateHttpClient(false, timeout, false);
 
             Task.Run(() => SendActivitiesTask());
-	    PxLoggingUtils.LogDebug("Reporter initialized");
+            PxLoggingUtils.LogDebug("Reporter initialized");
         }
 
         public bool Post(Activity activity)
@@ -71,7 +71,7 @@ namespace PerimeterX
             var added = activities.TryAdd(activity);
 	    if (!added)
 	    {
-	    	PxLoggingUtils.LogError("Failed to post activity");
+                PxLoggingUtils.LogError("Failed to post activity");
 	    }
             return added;
         }
