@@ -52,7 +52,7 @@ namespace PerimeterX
         private readonly BlockingCollection<Activity> activities;
         private readonly int bulkSize;
         private readonly HttpClient httpClient;
-	private readonly string postUri;
+        private readonly string postUri;
         private readonly Options jsonOptions = new Options(false, true);
 
         public ActivityReporter(string baseUri, int capacity = 500, int bulkSize = 10, int timeout = 5000)
