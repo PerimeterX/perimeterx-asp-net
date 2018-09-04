@@ -34,6 +34,7 @@ namespace PerimeterX
 					}
 				}
 			}
+			
 			return context.Request.UserHostAddress;
 		}
 
