@@ -1,4 +1,4 @@
-// 	Copyright © 2016 PerimeterX, Inc.
+// 	Copyright Â© 2016 PerimeterX, Inc.
 // 
 // Permission is hereby granted, free of charge, to any
 // person obtaining a copy of this software and associated
@@ -52,7 +52,7 @@ namespace PerimeterX
         private readonly BlockingCollection<Activity> activities;
         private readonly int bulkSize;
         private readonly HttpClient httpClient;
-		private readonly string postUri;
+	private readonly string postUri;
         private readonly Options jsonOptions = new Options(false, true);
 
         public ActivityReporter(string baseUri, int capacity = 500, int bulkSize = 10, int timeout = 5000)
@@ -63,16 +63,16 @@ namespace PerimeterX
             this.httpClient = PxConstants.CreateHttpClient(false, timeout, false);
 
             Task.Run(() => SendActivitiesTask());
-			PxLoggingUtils.LogDebug("Reporter initialized");
+	    PxLoggingUtils.LogDebug("Reporter initialized");
         }
 
         public bool Post(Activity activity)
         {
             var added = activities.TryAdd(activity);
-			if (!added)
-			{
-				PxLoggingUtils.LogError("Failed to post activity");
-			}
+	    if (!added)
+	    {
+	    	PxLoggingUtils.LogError("Failed to post activity");
+	    }
             return added;
         }
 
