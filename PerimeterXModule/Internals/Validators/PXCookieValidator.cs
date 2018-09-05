@@ -50,7 +50,7 @@ namespace PerimeterX
 							}
 							catch (Exception e)
 							{
-								PxLoggingUtils.LogError(string.Format("Failed to verify original token: {0}", e.Message));
+								PxLoggingUtils.LogDebug(string.Format("Failed to verify original token: {0}", e.Message));
 								context.OriginalTokenError = CALL_REASON_DECRYPTION_FAILED;
 							}
 						}
@@ -114,7 +114,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				PxLoggingUtils.LogError("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Uri);
+				PxLoggingUtils.LogDebug("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Uri);
 				context.S2SCallReason = CALL_REASON_DECRYPTION_FAILED;
 				return false;
 			}
