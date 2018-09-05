@@ -86,7 +86,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				PxLoggingUtils.LogError("Failed to extract assembly version " + ex.Message);
+				PxLoggingUtils.LogDebug("Failed to extract assembly version " + ex.Message);
 			}
 		}
 
@@ -223,7 +223,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				PxLoggingUtils.LogError("Failed to validate request: " + ex.Message);
+				PxLoggingUtils.LogDebug("Failed to validate request: " + ex.Message);
 			}
 		}
 
@@ -294,7 +294,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				PxLoggingUtils.LogError(string.Format("Encountered an error sending enforcer telemetry activity: {0}.", ex.Message));
+				PxLoggingUtils.LogDebug(string.Format("Encountered an error sending enforcer telemetry activity: {0}.", ex.Message));
 			}
 		}
 
