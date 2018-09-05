@@ -116,7 +116,7 @@ namespace PerimeterX
             }
             catch (Exception ex)
             {
-                PxLoggingUtils.LogError(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message));
+                PxLoggingUtils.LogDebug(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message));
             }
         }
 
