@@ -57,7 +57,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine("Failed to verify S2S: " + ex.Message, PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug("Failed to verify S2S: " + ex.Message);
 				PxContext.PassReason = PassReasonEnum.ERROR;
 				if (ex.InnerException is TaskCanceledException)
 				{

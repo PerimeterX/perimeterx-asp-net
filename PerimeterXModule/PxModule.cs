@@ -73,6 +73,7 @@ namespace PerimeterX
 			try
 			{
 				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+				PxLoggingUtils.init(config.AppId);
 				// allocate reporter if needed
 				if (config != null && (config.SendBlockActivites || config.SendPageActivites))
 				{
@@ -85,7 +86,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine("Failed to extract assembly version " + ex.Message, PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug("Failed to extract assembly version " + ex.Message);
 			}
 		}
 
@@ -144,7 +145,7 @@ namespace PerimeterX
 			// Build reverse proxy
 			ReverseProxy = new ReverseProxy(config);
 
-			Debug.WriteLine(ModuleName + " initialized", PxConstants.LOG_CATEGORY);
+			PxLoggingUtils.LogDebug(ModuleName + " initialized");
 		}
 
 		public string ModuleName
@@ -222,7 +223,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine("Failed to validate request: " + ex.Message, PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug("Failed to validate request: " + ex.Message);
 			}
 		}
 
@@ -293,7 +294,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine(string.Format("Encountered an error sending enforcer telemetry activity: {0}.", ex.Message), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug(string.Format("Encountered an error sending enforcer telemetry activity: {0}.", ex.Message));
 			}
 		}
 
@@ -309,6 +310,10 @@ namespace PerimeterX
 				Details = details,
 				Headers = pxContext.GetHeadersAsDictionary()
 			};
+			if (eventType.Equals("page_requested"))
+			{
+				activity.HttpMethod = "Post";
+			}
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
@@ -463,7 +468,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex) // Fail-open approach
 			{
-				Debug.WriteLine(string.Format("Module failed to process request in fault: {0}, passing request", ex.Message), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogError(string.Format("Module failed to process request in fault: {0}, passing request", ex.Message));
 				pxContext.PassReason = PassReasonEnum.ERROR;
 				PostPageRequestedActivity(pxContext);
 			}
@@ -485,17 +490,20 @@ namespace PerimeterX
 			PxModuleConfigurationSection config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 			bool verified = blockingScore > pxContext.Score;
 
-			Debug.WriteLine(string.Format("Request score: {0}, blocking score: {1}, monitor mode status: {2}.", pxContext.Score, blockingScore, config.MonitorMode == true ? "On" : "Off"), PxConstants.LOG_CATEGORY);
+			PxLoggingUtils.LogDebug(string.Format("Request score: {0}, blocking score: {1}, monitor mode status: {2}.", pxContext.Score, blockingScore, config.MonitorMode == true ? "On" : "Off"));
 
 			if (verified)
 			{
-				Debug.WriteLineIf(config.MonitorMode, "Monitor Mode is activated. passing request", PxConstants.LOG_CATEGORY);
-				Debug.WriteLine(string.Format("Valid request to {0}", application.Context.Request.RawUrl), PxConstants.LOG_CATEGORY);
+				if (config.MonitorMode)
+				{
+					PxLoggingUtils.LogDebug("Monitor Mode is activated. passing request");
+				}
+				PxLoggingUtils.LogDebug(string.Format("Valid request to {0}", application.Context.Request.RawUrl));
 				PostPageRequestedActivity(pxContext);
 			}
 			else
 			{
-				Debug.WriteLine(string.Format("Invalid request to {0}", application.Context.Request.RawUrl), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug(string.Format("Invalid request to {0}", application.Context.Request.RawUrl));
 				PostBlockActivity(pxContext);
 			}
 
@@ -509,9 +517,9 @@ namespace PerimeterX
 				}
 				else
 				{
-					Debug.WriteLine(string.Format(
+					PxLoggingUtils.LogDebug(string.Format(
 						"Missing implementation of the configured IVerificationHandler ('customVerificationHandler' attribute): {0}.",
-						customVerificationHandler), PxConstants.LOG_CATEGORY);
+						customVerificationHandler));
 				}
 			}
 			// No custom verification handler -> continue regular flow
@@ -541,18 +549,18 @@ namespace PerimeterX
 				if (customVerificationHandlerType != null)
 				{
 					customVerificationHandler = (IVerificationHandler)Activator.CreateInstance(customVerificationHandlerType, null);
-					Debug.WriteLine(string.Format("Successfully loaded ICustomeVerificationHandler '{0}'.", customHandlerName), PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug(string.Format("Successfully loaded ICustomeVerificationHandler '{0}'.", customHandlerName));
 				}
 			}
 			catch (ReflectionTypeLoadException ex)
 			{
-				Debug.WriteLine(string.Format("Failed to load the ICustomeVerificationHandler '{0}': {1}.",
-											  customHandlerName, ex.Message), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogError(string.Format("Failed to load the ICustomeVerificationHandler '{0}': {1}.",
+											  customHandlerName, ex.Message));
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine(string.Format("Encountered an error while retrieving the ICustomeVerificationHandler '{0}': {1}.",
-											  customHandlerName, ex.Message), PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogError(string.Format("Encountered an error while retrieving the ICustomeVerificationHandler '{0}': {1}.",
+											  customHandlerName, ex.Message));
 			}
 
 			return customVerificationHandler;

@@ -20,7 +20,7 @@ namespace PerimeterX
 
 		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest,string action)
 		{
-			Debug.WriteLine(string.Format("Using {0} template", template), PxConstants.LOG_CATEGORY);
+			PxLoggingUtils.LogDebug(string.Format("Using {0} template", template));
 			string templateStr = getTemplateString(template);
 			return Render.StringToString(templateStr, getProps(pxConfiguration, uuid, vid, isMobileRequest, action));
 

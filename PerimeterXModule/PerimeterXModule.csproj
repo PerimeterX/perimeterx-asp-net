@@ -76,6 +76,7 @@
     <Compile Include="Internals\Enums\PassReasonEnum.cs" />
     <Compile Include="Internals\Helpers\PxCommonUtils.cs" />
     <Compile Include="Internals\Helpers\PxConstants.cs" />
+    <Compile Include="Internals\Helpers\PxLoggingUtils.cs" />
     <Compile Include="Internals\Helpers\RemoteServer.cs" />
     <Compile Include="Internals\ReverseProxy.cs" />
     <Compile Include="Internals\Templates\IMobileResponse.cs" />

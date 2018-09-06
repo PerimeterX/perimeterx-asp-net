@@ -1,4 +1,4 @@
-// 	Copyright © 2016 PerimeterX, Inc.
+// 	Copyright Â© 2016 PerimeterX, Inc.
 // 
 // Permission is hereby granted, free of charge, to any
 // person obtaining a copy of this software and associated
@@ -63,13 +63,16 @@ namespace PerimeterX
             this.httpClient = PxConstants.CreateHttpClient(false, timeout, false);
 
             Task.Run(() => SendActivitiesTask());
-            Debug.WriteLine("Reporter initialized", PxConstants.LOG_CATEGORY);
+            PxLoggingUtils.LogDebug("Reporter initialized");
         }
 
         public bool Post(Activity activity)
         {
             var added = activities.TryAdd(activity);
-            Debug.WriteLineIf(!added, "Failed to post activity", PxConstants.LOG_CATEGORY);
+	    if (!added)
+	    {
+                PxLoggingUtils.LogDebug("Failed to post activity");
+	    }
             return added;
         }
 
@@ -108,12 +111,12 @@ namespace PerimeterX
 
                 var content = new StringContent(stringBuilder.ToString(), Encoding.UTF8, "application/json");
                 var response = httpClient.PostAsync(postUri, content).Result;
-                Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", postUri, stringBuilder.ToString(), response), PxConstants.LOG_CATEGORY);
+                PxLoggingUtils.LogDebug(string.Format("Post request for {0} ({1}), returned {2}", postUri, stringBuilder.ToString(), response));
                 response.EnsureSuccessStatusCode();
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message), PxConstants.LOG_CATEGORY);
+                PxLoggingUtils.LogDebug(string.Format("Failed sending activities (count {0}) - {1}", activities.Count, ex.Message));
             }
         }
 

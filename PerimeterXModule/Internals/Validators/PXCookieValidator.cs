@@ -29,7 +29,7 @@ namespace PerimeterX
 			{
 				if (pxCookie == null)
 				{
-					Debug.WriteLine("Request without risk cookie - " + context.Uri, PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug("Request without risk cookie - " + context.Uri);
 					context.S2SCallReason = CALL_REASON_NO_COOKIE;
 					return false;
 				}
@@ -45,16 +45,16 @@ namespace PerimeterX
 						{
 							try
 							{
-								Debug.WriteLine(string.Format("Found original token in context"), PxConstants.LOG_CATEGORY);
+								PxLoggingUtils.LogDebug(string.Format("Found original token in context"));
 								PXOriginalTokenValidator.Verify(context, context.OriginalToken);
 							}
 							catch (Exception e)
 							{
-								Debug.WriteLine(string.Format("Failed to verify original token: {0}", e.Message) , PxConstants.LOG_CATEGORY);
+								PxLoggingUtils.LogDebug(string.Format("Failed to verify original token: {0}", e.Message));
 								context.OriginalTokenError = CALL_REASON_DECRYPTION_FAILED;
 							}
 						}
-						Debug.WriteLine(string.Format("Mobile sdk error found {0}", context.S2SCallReason), PxConstants.LOG_CATEGORY);
+						PxLoggingUtils.LogDebug(string.Format("Mobile sdk error found {0}", context.S2SCallReason));
 						return false;
 					}
 				}
@@ -62,7 +62,7 @@ namespace PerimeterX
 				// parse cookie and check if cookie valid
 				if (!pxCookie.Deserialize())
 				{
-					Debug.WriteLine("Cookie decryption failed" + context.Uri, PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug("Cookie decryption failed" + context.Uri);
 					context.S2SCallReason = CALL_REASON_DECRYPTION_FAILED;
 					return false;
 				}
@@ -76,7 +76,7 @@ namespace PerimeterX
 
 				if (PxCookieUtils.IsExpired(pxCookie.Timestamp))
 				{
-					Debug.WriteLine("Request with expired cookie - " + context.Uri, PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug("Request with expired cookie - " + context.Uri);
 					context.S2SCallReason = CALL_REASON_EXPIRED_COOKIE;
 					return false;
 				}
@@ -84,27 +84,27 @@ namespace PerimeterX
 				if (pxCookie.Score >= config.BlockingScore)
 				{
 					context.BlockReason = BlockReasonEnum.COOKIE_HIGH_SCORE;
-					Debug.WriteLine(string.Format("Request blocked by risk cookie UUID {0}, VID {1}", pxCookie.Uuid, pxCookie.Vid), PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug(string.Format("Request blocked by risk cookie UUID {0}, VID {1}", pxCookie.Uuid, pxCookie.Vid));
 					return true;
 				}
 
 				if (string.IsNullOrEmpty(pxCookie.Hmac))
 				{
-					Debug.WriteLine("Request with invalid cookie (missing signature) - " + context.Uri, PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug("Request with invalid cookie (missing signature) - " + context.Uri);
 					context.S2SCallReason = CALL_REASON_VALIDATION_FAILED;
 					return false;
 				}
 
 				if (!pxCookie.IsSecured(config.CookieKey, getAdditionalSignedFields(context)))
 				{
-					Debug.WriteLine(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.Hmac, context.Uri), PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug(string.Format("Request with invalid cookie (hash mismatch) {0}, {1}", pxCookie.Hmac, context.Uri));
 					context.S2SCallReason = CALL_REASON_VALIDATION_FAILED;
 					return false;
 				}
 
 				if (context.SensitiveRoute)
 				{
-					Debug.WriteLine(string.Format("Cookie is valid but is a sensitive route {0}", context.Uri), PxConstants.LOG_CATEGORY);
+					PxLoggingUtils.LogDebug(string.Format("Cookie is valid but is a sensitive route {0}", context.Uri));
 					context.S2SCallReason = CALL_REASON_SENSITIVE_ROUTE;
 					return false;
 				}
@@ -114,7 +114,7 @@ namespace PerimeterX
 			}
 			catch (Exception ex)
 			{
-				Debug.WriteLine("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Uri, PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogDebug("Request with invalid cookie (exception: " + ex.Message + ") - " + context.Uri);
 				context.S2SCallReason = CALL_REASON_DECRYPTION_FAILED;
 				return false;
 			}
