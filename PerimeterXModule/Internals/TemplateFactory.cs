@@ -55,20 +55,21 @@ namespace PerimeterX
 			props.Add("customLogo", pxConfiguration.CustomLogo);
 			props.Add("cssRef", pxConfiguration.CssRef);
 			props.Add("jsRef", pxConfiguration.JsRef);
-			props.Add("logoVisibility", string.IsNullOrEmpty(pxConfiguration.CustomLogo) ? "hidden" : "visible");
-			props.Add("firstPartyEnabled", pxConfiguration.FirstPartyEnabled ? "true" : "false");
-		
+			props.Add("logoVisibility", string.IsNullOrEmpty(pxConfiguration.CustomLogo) ? "hidden" : "visible");		
 			if (pxConfiguration.FirstPartyEnabled && !isMobileRequest)
 			{
 				props.Add("jsClientSrc", string.Format(CLIENT_SRC_FP, pxConfiguration.AppId.Substring(2)));
 				props.Add("blockScript", string.Format(CAPTCHA_SRC_FP, pxConfiguration.AppId.Substring(2), captchaParams));
 				props.Add("hostUrl", string.Format(HOST_FP, pxConfiguration.AppId.Substring(2)));
+				props.Add("firstPartyEnabled", "true");
+
 			}
 			else
 			{
 				props.Add("jsClientSrc", string.Format(CLIENT_SRC_TP, Regex.Replace(pxConfiguration.ClientHostUrl, "https?:", ""), pxConfiguration.AppId));
 				props.Add("hostUrl", string.Format(pxConfiguration.CollectorUrl, pxConfiguration.AppId));
 				props.Add("blockScript", string.Format(CAPTCHA_SRC_TP, pxConfiguration.CaptchaHostUrl,  pxConfiguration.AppId, captchaParams));
+				props.Add("firstPartyEnabled", "false");
 			}
 			return props;
 		}
