@@ -62,7 +62,7 @@ namespace PerimeterX
 				props.Add("jsClientSrc", string.Format(CLIENT_SRC_FP, pxConfiguration.AppId.Substring(2)));
 				props.Add("blockScript", string.Format(CAPTCHA_SRC_FP, pxConfiguration.AppId.Substring(2), captchaParams));
 				props.Add("hostUrl", string.Format(HOST_FP, pxConfiguration.AppId.Substring(2)));
-				props.Add("firstPartyEnabled", "1");
+				props.Add("firstPartyEnabled", pxConfiguration.FirstPartyEnabled ? "true" : "false");
 			}
 			else
 			{
