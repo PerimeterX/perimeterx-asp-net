@@ -151,38 +151,6 @@ namespace PerimeterX
 
 
 			bool success = ProcessRequest(context, PxConfig.CaptchaHostUrl, uri);
-
-
-
-		}
-
-		/**
-		 * <summary>
-		 * Reverse requests for PerimeterX captcha client
-		 * </summary>
-		 * <param name="context">The original request context</param>
-		 */
-		public void ReversePxCaptcha(HttpContext context)
-		{
-			Debug.WriteLine("Fetching Captcha client", PxConstants.LOG_CATEGORY);
-			if (!PxConfig.FirstPartyEnabled)
-			{
-				Debug.WriteLine("First party is disabled, rendering default captcha client response", PxConstants.LOG_CATEGORY);
-				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
-				return;
-			}
-
-			string uri = "/" + PxConfig.AppId + context.Request.RawUrl.Replace(CaptchaReversePrefix, "");
-
-
-			bool success = ProcessRequest(context, PxConfig.CaptchaHostUrl, uri);
-
-			if (!success)
-			{
-				Debug.WriteLine("Redirect JS client returned bad status, rendering default response", PxConstants.LOG_CATEGORY);
-				RenderPredefinedResponse(context, CONTENT_TYPE_JAVASCRIPT, DEFAULT_CLIENT_VALUE);
-			}
-
 		}
 
 		/**
