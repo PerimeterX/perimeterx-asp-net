@@ -131,6 +131,8 @@ namespace PerimeterX
 				riskRequest.Additional.OriginalTokenError = PxContext.OriginalTokenError;
 			}
 
+			riskRequest.Additional.SimulatedBlock = PxConfig.MonitorMode;
+
 
 			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
 			var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_V2);
