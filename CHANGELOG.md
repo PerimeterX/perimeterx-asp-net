@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+##[2.7.0] - 2018-09-16
+### Added
+	- Support for simulated_block
+### Fixed
+	- Captcha v2 template and error handling 
+	- Various stablity and performance fixes
+
 ##[2.6.0] - 2018-08-07
 ### Added
 	- Support for captcha v2
