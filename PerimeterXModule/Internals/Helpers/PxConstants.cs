@@ -19,6 +19,7 @@ namespace PerimeterX
 		public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
 		public static readonly string MOBILE_HEADER = "X-PX-AUTHORIZATION";
 		public static readonly string ORIGINAL_TOKEN = "X-PX-ORIGINAL-TOKEN";
+		public static readonly string FORWARDED_FOR_HEADER = "x-forwarded-for";
 		public static readonly string CONFIG_SECTION = "perimeterX/pxModuleConfigurationSection";
 		public static readonly string LOG_CATEGORY = "PxModule";
 		public static readonly string MODULE_VERSION = GetAssemblyVersion();

@@ -27,13 +27,13 @@ namespace PerimeterX
                 var httpResponse = httpClient.SendAsync(requestMessage).Result;
                 httpResponse.EnsureSuccessStatusCode();
                 var responseJson = httpResponse.Content.ReadAsStringAsync().Result;
-                Debug.WriteLine(string.Format("Post request for {0} ({1}), returned {2}", uri, requestJson, responseJson), PxConstants.LOG_CATEGORY);
+                PxLoggingUtils.LogDebug(string.Format("Post request for {0} ({1}), returned {2}", uri, requestJson, responseJson));
 
                 return responseJson;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("Failed sending POST request for {0} ({1}), returned error: {2}", uri, requestJson, ex.Message), PxConstants.LOG_CATEGORY);
+                PxLoggingUtils.LogDebug(string.Format("Failed sending POST request for {0} ({1}), returned error: {2}", uri, requestJson, ex.Message));
                 throw ex;
             }
         }

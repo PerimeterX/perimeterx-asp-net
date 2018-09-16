@@ -103,7 +103,7 @@ namespace PerimeterX
 			}
 			catch (WebException e)
 			{
-				Debug.WriteLine("Failed to get response: " + e.Message, PxConstants.LOG_CATEGORY);
+				PxLoggingUtils.LogError("Failed to get response: " + e.Message);
 				return null;
 			}
 
