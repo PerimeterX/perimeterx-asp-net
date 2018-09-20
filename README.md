@@ -87,8 +87,8 @@ Add site specific configuration (configuration level)
       appId="<PX Application ID>"
       apiToken="<API token>"
       cookieKey="<cookie key>"
-      monitorMode="false"
-      blockingScore="70"
+      monitorMode="true"
+      blockingScore="100"
       >
     </pxModuleConfigurationSection>
   </perimeterX>
@@ -134,11 +134,11 @@ Example below:
 ```
 #### <a name="blocking-score"></a> Changing the Minimum Score for Blocking
 
-**default:** 70
+**default:** 100
 
 ```xml
 ...
-  blockingScore="70"
+  blockingScore="100"
 ...
 ```
 
@@ -322,7 +322,7 @@ Set this flag to false to disable monitor mode
 
 ```xml
 ...
-  monitorMode="false"
+  monitorMode="true"
 ...
 ```
 **default:** true
