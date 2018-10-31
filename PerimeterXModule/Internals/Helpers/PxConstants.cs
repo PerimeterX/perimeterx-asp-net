@@ -28,6 +28,7 @@ namespace PerimeterX
 		public static readonly string ENFORCER_TRUE_IP_HEADER = "x-px-enforcer-true-ip";
 		public static readonly string FIRST_PARTY_HEADER = "X-PX-FIRST-PARTY";
 		public static readonly string FIRST_PARTY_VALUE = "1";
+		public static readonly string COOKIE_HEADER = "cookie";
 
 		// Endpoints
 		public const string RISK_API_V2 = "/api/v2/risk";
