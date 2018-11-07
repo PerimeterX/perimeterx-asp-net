@@ -43,6 +43,7 @@ namespace PerimeterX
 		public object DecodedOriginalToken { get; set; }
 		public bool IsMobileRequest { get; set; }
 		public string MobileHeader { get; set; }
+		public string[] CookieNames;
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -57,6 +58,7 @@ namespace PerimeterX
 			// Get Headers
 
 			// if userAgentOverride is present override the default user-agent
+			CookieNames = extractCookieNames(context.Request.Headers[PxConstants.COOKIE_HEADER]);
 			string userAgentOverride = pxConfiguration.UserAgentOverride;
 			if (!string.IsNullOrEmpty(userAgentOverride))
 			{
@@ -160,6 +162,21 @@ namespace PerimeterX
 			HttpMethod = context.Request.HttpMethod;
 
 			SensitiveRoute = CheckSensitiveRoute(pxConfiguration.SensitiveRoutes, Uri);
+		}
+
+		private string[] extractCookieNames(string cookieHeader)
+		{
+			string[] cookieNames =  null;
+			if (cookieHeader != null)
+			{
+				var cookies = cookieHeader.Split(';');
+				cookieNames = new string[cookies.Length];
+				for (int i = 0; i < cookies.Length; i++)
+				{
+					cookieNames[i] = cookies[i].Split('=')[0].Trim();
+				}
+			}
+			return cookieNames;
 		}
 
 		private bool CheckSensitiveRoute(StringCollection sensitiveRoutes, string uri)

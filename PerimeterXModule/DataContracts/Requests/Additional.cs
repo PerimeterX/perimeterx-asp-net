@@ -44,5 +44,8 @@ namespace PerimeterX
 		[DataMember(Name = "simulated_block")]
 		public object SimulatedBlock;
 
+		[DataMember(Name = "request_cookie_names")]
+		public string[] RequestCookieNames;
+
 	}
 }

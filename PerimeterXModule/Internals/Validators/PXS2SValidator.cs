@@ -91,7 +91,8 @@ namespace PerimeterX
 					HttpVersion = PxContext.HttpVersion,
 					RiskMode = riskMode,
 					PxCookieHMAC = PxContext.PxCookieHmac,
-					CookieOrigin = PxContext.CookieOrigin
+					CookieOrigin = PxContext.CookieOrigin,
+					RequestCookieNames = PxContext.CookieNames
 				},
 				FirstParty = PxConfig.FirstPartyEnabled
 			
