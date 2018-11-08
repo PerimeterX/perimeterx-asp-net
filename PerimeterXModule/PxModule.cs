@@ -383,11 +383,11 @@ namespace PerimeterX
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
-				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", "_pxvid=" + pxContext.Vid);
+				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", PxConstants.VID_COOKIE_PREFIX + "=" + pxContext.Vid);
 			}
 			if (!string.IsNullOrEmpty(pxContext.Pxhd))
 			{
-				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", "_pxhd=" + pxContext.Pxhd);
+				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", PxConstants.PXHD_COOKIE_PREFIX + "=" + pxContext.Pxhd);
 			}
 		}
 

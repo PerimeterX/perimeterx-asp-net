@@ -146,14 +146,14 @@ namespace PerimeterX
 						PxCookies[key] = contextCookie.Get(key).Value;
 					}
 				}
-				if (PxCookies.ContainsKey("_pxvid"))
+				if (PxCookies.ContainsKey(PxConstants.VID_COOKIE_PREFIX))
 				{
-					Vid = PxCookies["_pxvid"];
+					Vid = PxCookies[PxConstants.VID_COOKIE_PREFIX];
 					VidSource = PxConstants.VID_COOKIE;
 				}
-				if (PxCookies.ContainsKey("_pxhd"))
+				if (PxCookies.ContainsKey(PxConstants.PXHD_COOKIE_PREFIX))
 				{
-					Pxhd = PxCookies["_pxhd"];
+					Pxhd = PxCookies[PxConstants.PXHD_COOKIE_PREFIX];
 				}
 
 			}
