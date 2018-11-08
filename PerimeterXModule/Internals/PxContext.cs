@@ -44,6 +44,8 @@ namespace PerimeterX
 		public bool IsMobileRequest { get; set; }
 		public string MobileHeader { get; set; }
 		public string[] CookieNames;
+		public string VidSource { get; set; }
+		public string Pxhd { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -144,6 +146,16 @@ namespace PerimeterX
 						PxCookies[key] = contextCookie.Get(key).Value;
 					}
 				}
+				if (PxCookies.ContainsKey("_pxvid"))
+				{
+					Vid = PxCookies["_pxvid"];
+					VidSource = PxConstants.VID_COOKIE;
+				}
+				if (PxCookies.ContainsKey("_pxhd"))
+				{
+					Pxhd = PxCookies["_pxhd"];
+				}
+
 			}
 
 
