@@ -251,7 +251,8 @@ namespace PerimeterX
 					BlockUuid = pxContext.UUID,
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					RiskScore = pxContext.Score,
-					RiskRoundtripTime = pxContext.RiskRoundtripTime
+					RiskRoundtripTime = pxContext.RiskRoundtripTime,
+					BlockAction = pxContext.BlockAction
 				});
 			}
 		}
@@ -313,6 +314,10 @@ namespace PerimeterX
 			if (eventType.Equals("page_requested"))
 			{
 				activity.HttpMethod = "Post";
+				if (!string.IsNullOrEmpty(pxContext.Pxhd))
+				{
+					activity.pxhd = pxContext.Pxhd;
+				}
 			}
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
@@ -381,10 +386,6 @@ namespace PerimeterX
 		private static void SetPxhdAndVid(PxContext pxContext)
 		{
 
-			if (!string.IsNullOrEmpty(pxContext.Vid))
-			{
-				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", PxConstants.VID_COOKIE_PREFIX + "=" + pxContext.Vid);
-			}
 			if (!string.IsNullOrEmpty(pxContext.Pxhd))
 			{
 				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", PxConstants.PXHD_COOKIE_PREFIX + "=" + pxContext.Pxhd);
