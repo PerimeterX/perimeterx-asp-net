@@ -314,11 +314,12 @@ namespace PerimeterX
 			if (eventType.Equals("page_requested"))
 			{
 				activity.HttpMethod = "Post";
-				if (!string.IsNullOrEmpty(pxContext.Pxhd))
-				{
-					activity.pxhd = pxContext.Pxhd;
-				}
 			}
+			if ((eventType.Equals("page_requested") || eventType.Equals("block")) && (!string.IsNullOrEmpty(pxContext.Pxhd)))
+			{
+				activity.pxhd = pxContext.Pxhd;
+			}
+
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
