@@ -128,8 +128,8 @@ On both cases if the URL is not a valid format an exception will be thrown
 Example below:
 ```xml
 ...
-  jsRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-  cssRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+  jsRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+  cssRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 ...
 ```
 #### <a name="blocking-score"></a> Changing the Minimum Score for Blocking
