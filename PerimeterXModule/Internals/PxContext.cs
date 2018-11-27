@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Web;
 using System;
-using System.Net;
 using System.Collections.Specialized;
 using System.Linq;
+using PerimeterX.DataContracts.Cookies;
 
 namespace PerimeterX
 {
@@ -44,6 +44,7 @@ namespace PerimeterX
 		public bool IsMobileRequest { get; set; }
 		public string MobileHeader { get; set; }
 		public string[] CookieNames;
+		public DataEnrichmentCookie DataEnrichment { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -144,8 +145,9 @@ namespace PerimeterX
 						PxCookies[key] = contextCookie.Get(key).Value;
 					}
 				}
-			}
 
+				DataEnrichment = PxCookieUtils.GetDataEnrichmentCookie(PxCookies, pxConfiguration.CookieKey);
+			}
 
 			Hostname = context.Request.Url.Host;
 

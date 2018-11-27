@@ -62,6 +62,29 @@ namespace PerimeterX
 			}
 			return sb.ToString();
 		}
-	}
 
+		public static DataEnrichmentCookie GetDataEnrichmentCookie(Dictionary<string, string> PxCookies, string cookieKey)
+		{
+			DataEnrichmentCookie dataEnrichment = new DataEnrichmentCookie(JSON.DeserializeDynamic("{}"), false);
+			if (PxCookies.ContainsKey(PxConstants.COOKIE_DATA_ENRICHMENT_PREFIX))
+			{
+				string rawCookie = PxCookies[PxConstants.COOKIE_DATA_ENRICHMENT_PREFIX];
+				string[] splitRawCookie = rawCookie.Split(new char[] { ':' }, 2);
+				if (splitRawCookie.Length != 2)
+				{
+					return dataEnrichment;
+				}
+
+				string hmac = splitRawCookie[0];
+				string encodedPayload = splitRawCookie[1];
+				bool isValid = IsHMACValid(cookieKey, encodedPayload, hmac);
+				dataEnrichment.IsValid = isValid;
+				byte[] bytes = Convert.FromBase64String(encodedPayload);
+				string decodedPayload = Encoding.UTF8.GetString(bytes);
+				dataEnrichment.JsonPayload = JSON.DeserializeDynamic(decodedPayload);
+			}
+			
+			return dataEnrichment;
+		}
+	}
 }
