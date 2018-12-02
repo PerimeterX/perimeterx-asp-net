@@ -14,6 +14,7 @@ Table of Contents
   *   [Dependencies](#dependencies)
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
+  *   [Upgrading](#upgrade)
 
   **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
@@ -93,6 +94,9 @@ Add site specific configuration (configuration level)
     </pxModuleConfigurationSection>
   </perimeterX>
 ```
+## <a name="upgrade"></a> Upgrading
+
+TBD
 
 ### <a name="configuration"></a> Configuration Options
 
