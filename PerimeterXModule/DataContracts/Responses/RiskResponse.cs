@@ -25,6 +25,9 @@ namespace PerimeterX
 
 		[DataMember(Name = "error_msg")]
 		public string ErrorMessage;
+
+		[DataMember(Name = "data_enrichment")]
+		public object DataEnrichment;
 	}
 
 

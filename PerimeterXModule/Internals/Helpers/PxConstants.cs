@@ -10,10 +10,11 @@ namespace PerimeterX
 	public static class PxConstants
 	{
 		public static readonly string HEX_ALPHABET = "0123456789abcdef";
-		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX };
+		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX, COOKIE_DATA_ENRICHMENT_PREFIX };
 		public static readonly string[] PX_TOKEN_PREFIX = { TOKEN_V1_PREFIX, TOKEN_V3_PREFIX };
 		public const string COOKIE_V1_PREFIX = "_px";
 		public const string COOKIE_V3_PREFIX = "_px3";
+		public const string COOKIE_DATA_ENRICHMENT_PREFIX = "_pxde";
 		public const string TOKEN_V1_PREFIX = "1";
 		public const string TOKEN_V3_PREFIX = "3";
 		public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
@@ -31,7 +32,7 @@ namespace PerimeterX
 		public static readonly string COOKIE_HEADER = "cookie";
 
 		// Endpoints
-		public const string RISK_API_V2 = "/api/v2/risk";
+		public const string RISK_API_PATH = "/api/v3/risk";
 		public const string ACTIVITIES_API_PATH = "/api/v1/collector/s2s";
 		public const string ENFORCER_TELEMETRY_API_PATH = "/api/v2/risk/telemetry";
 
