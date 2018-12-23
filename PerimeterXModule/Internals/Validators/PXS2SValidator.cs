@@ -62,7 +62,8 @@ namespace PerimeterX
 					var dataEnrichmentPayload = JSON.DeserializeDynamic(dataEnrichmentString);
 					dataEnrichment = new DataEnrichmentCookie(dataEnrichmentPayload, true);
 				}
-				PxContext.DataEnrichment = dataEnrichment;
+				PxContext.IsPxdeVerified = dataEnrichment.IsValid;
+				PxContext.Pxde = dataEnrichment.JsonPayload;
 			}
 			catch (Exception ex)
 			{

@@ -44,7 +44,8 @@ namespace PerimeterX
 		public bool IsMobileRequest { get; set; }
 		public string MobileHeader { get; set; }
 		public string[] CookieNames;
-		public DataEnrichmentCookie DataEnrichment { get; set; }
+		private bool IsPxdeVerified { get; set; }
+		private dynamic Pxde { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -146,7 +147,9 @@ namespace PerimeterX
 					}
 				}
 
-				DataEnrichment = PxCookieUtils.GetDataEnrichmentCookie(PxCookies, pxConfiguration.CookieKey);
+				DataEnrichmentCookie deCookie = PxCookieUtils.GetDataEnrichmentCookie(PxCookies, pxConfiguration.CookieKey);
+				IsPxdeVerified = deCookie.IsValid;
+				Pxde = deCookie.JsonPayload;
 			}
 
 			Hostname = context.Request.Url.Host;
