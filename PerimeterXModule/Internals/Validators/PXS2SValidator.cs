@@ -55,15 +55,15 @@ namespace PerimeterX
 					retVal = false;
 				}
 
-				DataEnrichmentCookie dataEnrichment = new DataEnrichmentCookie(JSON.DeserializeDynamic("{}"), true);
+				DataEnrichmentCookie deCookie = new DataEnrichmentCookie(JSON.DeserializeDynamic("{}"), true);
 				if (riskResponse.DataEnrichment != null)
 				{
 					string dataEnrichmentString = riskResponse.DataEnrichment.ToString();
 					var dataEnrichmentPayload = JSON.DeserializeDynamic(dataEnrichmentString);
-					dataEnrichment = new DataEnrichmentCookie(dataEnrichmentPayload, true);
+					deCookie = new DataEnrichmentCookie(dataEnrichmentPayload, true);
 				}
-				PxContext.IsPxdeVerified = dataEnrichment.IsValid;
-				PxContext.Pxde = dataEnrichment.JsonPayload;
+				PxContext.IsPxdeVerified = deCookie.IsValid;
+				PxContext.Pxde = deCookie.JsonPayload;
 			}
 			catch (Exception ex)
 			{

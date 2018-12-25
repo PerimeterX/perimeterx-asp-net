@@ -44,8 +44,8 @@ namespace PerimeterX
 		public bool IsMobileRequest { get; set; }
 		public string MobileHeader { get; set; }
 		public string[] CookieNames;
-		private bool IsPxdeVerified { get; set; }
-		private dynamic Pxde { get; set; }
+		public bool IsPxdeVerified { get; set; }
+		public dynamic Pxde { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
