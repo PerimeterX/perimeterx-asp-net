@@ -94,9 +94,9 @@ Add site specific configuration (configuration level)
     </pxModuleConfigurationSection>
   </perimeterX>
 ```
-## <a name="upgrade"></a> Upgrading
+### <a name="upgrade"></a> Upgrading
 
-TBD
+Contact [PerimeterX Support](support@perimeterx.com) for details.
 
 ### <a name="configuration"></a> Configuration Options
 
