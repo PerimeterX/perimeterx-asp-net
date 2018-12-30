@@ -17,13 +17,11 @@ namespace PerimeterX
 		private static readonly string CAPTCHA_SRC_TP = "{0}/{1}/captcha.js{2}";
 		private static readonly string HOST_FP = "/{0}/xhr";
 
-
 		public static string getTemplate(string template, PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest,string action)
 		{
 			PxLoggingUtils.LogDebug(string.Format("Using {0} template", template));
 			string templateStr = getTemplateString(template);
 			return Render.StringToString(templateStr, getProps(pxConfiguration, uuid, vid, isMobileRequest, action));
-
 		}
 
 		private static string getTemplateString(string template)
@@ -44,7 +42,7 @@ namespace PerimeterX
 			return templateStr;
 		}
 
-		private static IDictionary<String, String> getProps(PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest, string action)
+		public static IDictionary<String, String> getProps(PxModuleConfigurationSection pxConfiguration, string uuid, string vid, bool isMobileRequest, string action)
 		{
 			IDictionary<String, String> props = new Dictionary<String, String>();
 			string captchaParams = string.Format(CAPTCHA_QUERY_PARAMS, action, uuid, vid, isMobileRequest ? "1" : "0"); 

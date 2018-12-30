@@ -38,7 +38,7 @@ namespace PerimeterX
             }
         }
 
-        public void Dispose()
+		public void Dispose()
         {
             this.httpClient.Dispose();
             this.httpClient = null;

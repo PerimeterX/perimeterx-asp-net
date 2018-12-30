@@ -1,0 +1,6 @@
+﻿namespace PerimeterX
+{
+	interface IJsonResponse
+	{
+	}
+}
