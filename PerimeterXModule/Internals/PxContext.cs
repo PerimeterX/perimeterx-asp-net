@@ -45,6 +45,8 @@ namespace PerimeterX
 		public string MobileHeader { get; set; }
 		public string[] CookieNames;
 		public DataEnrichmentCookie DataEnrichment { get; set; }
+		public string CustomBlockUrl { get;  set; }
+		public bool RedirectOnCustomUrl { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -164,6 +166,9 @@ namespace PerimeterX
 			HttpMethod = context.Request.HttpMethod;
 
 			SensitiveRoute = CheckSensitiveRoute(pxConfiguration.SensitiveRoutes, Uri);
+
+			CustomBlockUrl = pxConfiguration.CustomBlockUrl;
+			RedirectOnCustomUrl = pxConfiguration.RedirectOnCustomUrl;
 		}
 
 		private string[] extractCookieNames(string cookieHeader)

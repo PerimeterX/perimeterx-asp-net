@@ -381,7 +381,7 @@ namespace PerimeterX
 			{
 				foreach (var prefix in routesWhitelist)
 				{
-					if (url.StartsWith(prefix))
+					if (url.StartsWith(prefix) || url == pxContext.CustomBlockUrl)
 					{
 						return true;
 					}

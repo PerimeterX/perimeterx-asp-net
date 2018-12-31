@@ -117,19 +117,19 @@ namespace PerimeterX.Internals
 				return;
 			}
 
-			if (config.CustomBlockUrl != "")
+			if (pxContext.CustomBlockUrl != "")
 			{
-				if (config.RedirectOnCustomUrl)
+				if (pxContext.RedirectOnCustomUrl)
 				{
 					string uri = pxContext.ApplicationContext.Request.Url.AbsoluteUri;
 					string encodedUri = Convert.ToBase64String(Encoding.UTF8.GetBytes(uri));
-					string redirectUrl = string.Format("{0}?url={1}&uuid={2}&vid={3}", config.CustomBlockUrl, encodedUri, pxContext.UUID, pxContext.Vid);
+					string redirectUrl = string.Format("{0}?url={1}&uuid={2}&vid={3}", pxContext.CustomBlockUrl, encodedUri, pxContext.UUID, pxContext.Vid);
 					PxLoggingUtils.LogDebug("Redirecting to custom block page: " + redirectUrl);
 					pxContext.ApplicationContext.Response.Redirect(redirectUrl);
 					return;
 				}
 
-				HttpResponseMessage response = httpClient.GetAsync(config.CustomBlockUrl).Result;
+				HttpResponseMessage response = httpClient.GetAsync(pxContext.CustomBlockUrl).Result;
 				if ((int)response.StatusCode >= 300)
 				{
 					pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
