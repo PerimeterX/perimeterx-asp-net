@@ -42,7 +42,7 @@ namespace PerimeterX.Internals
 
 		public string injectCaptchaScript(string vid, string uuid)
 		{
-			return "<script type=\"text/javascript\">window._pxVid = " + vid + "; window._pxUuid = " + uuid + ";</script>";
+			return "<script type=\"text/javascript\">window._pxVid = \"" + vid + "\"; window._pxUuid = \"" + uuid + "\";</script>";
 		}
 
 		public void ResponseBlockPage(PxContext pxContext, PxModuleConfigurationSection config)
@@ -117,11 +117,11 @@ namespace PerimeterX.Internals
 				return;
 			}
 
-			if (config.CustomBlockUrl != null)
+			if (config.CustomBlockUrl != "")
 			{
 				if (config.RedirectOnCustomUrl)
 				{
-					string uri = pxContext.Uri;
+					string uri = pxContext.ApplicationContext.Request.Url.AbsoluteUri;
 					string encodedUri = Convert.ToBase64String(Encoding.UTF8.GetBytes(uri));
 					string redirectUrl = string.Format("{0}?url={1}&uuid={2}&vid={3}", config.CustomBlockUrl, encodedUri, pxContext.UUID, pxContext.Vid);
 					PxLoggingUtils.LogDebug("Redirecting to custom block page: " + redirectUrl);
@@ -144,20 +144,13 @@ namespace PerimeterX.Internals
 					StringBuilder builder = new StringBuilder(content);
 					builder.Replace("</head>", injectCaptchaScript(pxContext.Vid, pxContext.UUID) + "</head>");
 					builder.Replace("::BLOCK_REF::", pxContext.UUID);
+					content = builder.ToString();
 				}
 
 				pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 				pxContext.ApplicationContext.Response.Write(content);
 				return;
 			}
-
-			//TODO: Api protection?
-
-			/*px_logger.debug("Enforcing action: " .. parse_action(ngx.ctx.px_action) .. " page is served")
-        local html = px_template.get_template(ngx.ctx.px_action, uuid, vid)
-        ngx_say(html);
-        ngx_exit(ngx.OK);
-        return*/
 
 			PxLoggingUtils.LogDebug("Enforcing action: " + pxContext.MapBlockAction() + " page is served");
 			pxContext.ApplicationContext.Response.Write(content);

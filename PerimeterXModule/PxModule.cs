@@ -328,7 +328,7 @@ namespace PerimeterX
 			reporter.Post(activity);
 		}
 
-		public static void BlockRequest(PxContext pxContext, PxModuleConfigurationSection config)
+		public void BlockRequest(PxContext pxContext, PxModuleConfigurationSection config)
 		{
 			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 			pxContext.ApplicationContext.Response.TrySkipIisCustomErrors = true;
@@ -338,7 +338,7 @@ namespace PerimeterX
 			}
 			else
 			{
-				PxBlock.ResponseBlockPage(pxContext, config);
+				pxBlock.ResponseBlockPage(pxContext, config);
 			}
 		}
 
