@@ -30,8 +30,7 @@ namespace PerimeterX.Internals
 			if (jsonHeaderExists)
 			{
 				string[] values = jsonHeader.Split(',');
-				string value = Array.Find(values, v => v == "application/json");
-				if (value == "application/json")
+				if (Array.Exists(values, "application/json"))
 				{
 					return true;
 				}
@@ -49,13 +48,13 @@ namespace PerimeterX.Internals
 		{
 			string template = "block_template";
 
-			if (pxContext.BlockAction == "j")
+			if (pxContext.BlockAction == "r")
 			{
-				template = "challenge";
+				template = "ratelimit";
 			}
 
 			// In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.
-			string content = template == "challenge" && !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData :
+			string content = pxContext.BlockAction == "j" && !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData :
 				TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid, pxContext.IsMobileRequest, pxContext.BlockAction);
 
 			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
