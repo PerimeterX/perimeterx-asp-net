@@ -22,7 +22,6 @@ Table of Contents
   *   [Enable/Disable Captcha](#captcha-support)
   *   [First Party Mode](#first-party)
   *   [Extracting Real IP Address](#real-ip)
-  *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
   *   [Sensitive Routes](#sensitive-routes)
   *   [Whitelist Routes](#whitelist-routes)
@@ -31,6 +30,7 @@ Table of Contents
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
   *   [Base URI](#base-uri)
+  *   [Override UA header](#override-ua)
 
   **[Contributing](#contributing)**
   *   [Tests](#tests)
@@ -351,22 +351,46 @@ The user's user agent can be returned to the PerimeterX module using a name of a
 ...
 ```
 
+#### <a name="data-enrichment"></a> Data Enrichment
+
+Users can use the additional activity handler to retrieve information for the request using the data-enrichment object. First, check that the data enrichment object is verified, then you can access it's properties.
+
+```c#
+...
+
+namespace MyApp
+{
+    public class MyVerificationHandler : IVerificationHandler
+    {
+        public void Handle(HttpApplication application, PxContext pxContext, PxModuleConfigurationSection pxConfig)
+        {
+          ...
+          if (pxContext.IsPxdeVerified) {
+            dynamic pxde = pxContext.Pxde;
+            // do something with the data enrichment
+          }
+          ...          
+        }
+    }
+}
+```
+
 <a name="contributing"></a> Contributing
 ----------------------------------------
 
 The following steps are welcome when contributing to our project.
-###Fork/Clone
+### Fork/Clone
 First and foremost, [Create a fork](https://guides.github.com/activities/forking/) of the repository, and clone it locally.
 Create a branch on your fork, preferably using a self descriptive branch name.
 
-###Code/Run
+### Code/Run
 Code your way out of your mess, and help improve our project by implementing missing features, adding capabilities or fixing bugs.
 
 To run the code, simply follow the steps in the [installation guide](#installation). Grab the keys from the PerimeterX Portal, and try refreshing your page several times continuously. If no default behaviours have been overridden, you should see the PerimeterX block page. Solve the CAPTCHA to clean yourself and start fresh again.
 
-###Pull Request
+### Pull Request
 After you have completed the process, create a pull request to the Upstream repository. Please provide a complete and thorough description explaining the changes. Remember this code has to be read by our maintainers, so keep it simple, smart and accurate.
 
-###Thanks
+### Thanks
 After all, you are helping us by contributing to this project, and we want to thank you for it.
 We highly appreciate your time invested in contributing to our project, and are glad to have people like you - kind helpers.
