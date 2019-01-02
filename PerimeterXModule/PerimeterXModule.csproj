@@ -68,6 +68,7 @@
     <Compile Include="DataContracts\Cookies\RiskCookieScores.cs" />
     <Compile Include="Internals\Cookies\Interface\IPxCookie.cs" />
     <Compile Include="Internals\Cookies\PxCookieV1.cs" />
+    <Compile Include="Internals\Cookies\DataEnrichmentCookie.cs" />
     <Compile Include="Internals\Cookies\PxCookieV3.cs" />
     <Compile Include="DataContracts\Cookies\DecodedCookieV1.cs" />
     <Compile Include="Internals\Enums\BlockReasonEnum.cs" />

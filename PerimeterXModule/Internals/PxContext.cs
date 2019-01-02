@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Web;
 using System;
-using System.Net;
 using System.Collections.Specialized;
 using System.Linq;
+using PerimeterX.DataContracts.Cookies;
 
 namespace PerimeterX
 {
@@ -46,6 +46,8 @@ namespace PerimeterX
 		public string[] CookieNames;
 		public string VidSource { get; set; }
 		public string Pxhd { get; set; }
+    public bool IsPxdeVerified { get; set; }
+		public dynamic Pxde { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -155,9 +157,10 @@ namespace PerimeterX
 				{
 					Pxhd = PxCookies[PxConstants.PXHD_COOKIE_PREFIX];
 				}
-
+				DataEnrichmentCookie deCookie = PxCookieUtils.GetDataEnrichmentCookie(PxCookies, pxConfiguration.CookieKey);
+				IsPxdeVerified = deCookie.IsValid;
+				Pxde = deCookie.JsonPayload;
 			}
-
 
 			Hostname = context.Request.Url.Host;
 
