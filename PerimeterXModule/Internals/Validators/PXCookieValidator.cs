@@ -71,7 +71,6 @@ namespace PerimeterX
 				context.Score = pxCookie.Score;
 				context.UUID = pxCookie.Uuid;
 				context.Vid = pxCookie.Vid;
-				context.VidSource = PxConstants.RISK_COOKIE;
 				context.BlockAction = pxCookie.BlockAction;
 				context.PxCookieHmac = pxCookie.Hmac;
 

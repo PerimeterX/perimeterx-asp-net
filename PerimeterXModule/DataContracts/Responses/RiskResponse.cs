@@ -14,12 +14,6 @@ namespace PerimeterX
 		[DataMember(Name = "uuid")]
 		public string Uuid;
 
-		[DataMember(Name = "vid")]
-		public string Vid;
-
-		[DataMember(Name = "pxhd")]
-		public string Pxhd;
-
 		[DataMember(Name = "score")]
 		public int Score;
 

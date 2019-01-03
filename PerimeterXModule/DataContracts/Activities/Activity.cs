@@ -32,8 +32,5 @@ namespace PerimeterX
 
 		[DataMember(Name = "http_method", EmitDefaultValue = false)]
 		public string HttpMethod;
-
-		[DataMember(Name = "pxhd", EmitDefaultValue = false)]
-		public string pxhd;
 	}
 }

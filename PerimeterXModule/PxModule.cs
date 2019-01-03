@@ -251,8 +251,7 @@ namespace PerimeterX
 					BlockUuid = pxContext.UUID,
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					RiskScore = pxContext.Score,
-					RiskRoundtripTime = pxContext.RiskRoundtripTime,
-					BlockAction = pxContext.BlockAction
+					RiskRoundtripTime = pxContext.RiskRoundtripTime
 				});
 			}
 		}
@@ -315,11 +314,6 @@ namespace PerimeterX
 			{
 				activity.HttpMethod = "Post";
 			}
-			if ((eventType.Equals("page_requested") || eventType.Equals("block")) && (!string.IsNullOrEmpty(pxContext.Pxhd)))
-			{
-				activity.pxhd = pxContext.Pxhd;
-			}
-
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
@@ -361,8 +355,6 @@ namespace PerimeterX
 				TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid, pxContext.IsMobileRequest, pxContext.BlockAction);
 
 			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-
-
 			if (pxContext.IsMobileRequest)
 			{
 				pxContext.ApplicationContext.Response.ContentType = "application/json";
@@ -382,15 +374,6 @@ namespace PerimeterX
 				}
 			}
 			pxContext.ApplicationContext.Response.Write(content);
-		}
-
-		private static void SetPxhdAndVid(PxContext pxContext)
-		{
-
-			if (!string.IsNullOrEmpty(pxContext.Pxhd))
-			{
-				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", PxConstants.PXHD_COOKIE_PREFIX + "=" + pxContext.Pxhd);
-			}
 		}
 
 		public void Dispose()
@@ -523,7 +506,6 @@ namespace PerimeterX
 				PxLoggingUtils.LogDebug(string.Format("Invalid request to {0}", application.Context.Request.RawUrl));
 				PostBlockActivity(pxContext);
 			}
-			SetPxhdAndVid(pxContext);
 
 			// If implemented, run the customVerificationHandler.
 			if (!string.IsNullOrEmpty(customVerificationHandler))

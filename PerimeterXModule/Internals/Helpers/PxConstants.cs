@@ -10,13 +10,11 @@ namespace PerimeterX
 	public static class PxConstants
 	{
 		public static readonly string HEX_ALPHABET = "0123456789abcdef";
-		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX, VID_COOKIE_PREFIX, PXHD_COOKIE_PREFIX, COOKIE_DATA_ENRICHMENT_PREFIX };
+		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX, COOKIE_DATA_ENRICHMENT_PREFIX };
 		public static readonly string[] PX_TOKEN_PREFIX = { TOKEN_V1_PREFIX, TOKEN_V3_PREFIX };
 		public const string COOKIE_V1_PREFIX = "_px";
 		public const string COOKIE_V3_PREFIX = "_px3";
-		public const string VID_COOKIE_PREFIX = "_pxvid";
-		public const string PXHD_COOKIE_PREFIX = "_pxhd";
-    public const string COOKIE_DATA_ENRICHMENT_PREFIX = "_pxde";
+		public const string COOKIE_DATA_ENRICHMENT_PREFIX = "_pxde";
 		public const string TOKEN_V1_PREFIX = "1";
 		public const string TOKEN_V3_PREFIX = "3";
 		public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
@@ -32,8 +30,6 @@ namespace PerimeterX
 		public static readonly string FIRST_PARTY_HEADER = "X-PX-FIRST-PARTY";
 		public static readonly string FIRST_PARTY_VALUE = "1";
 		public static readonly string COOKIE_HEADER = "cookie";
-		public static readonly string VID_COOKIE = "VID_COOKIE";
-		public static readonly string RISK_COOKIE = "RISK_COOKIE";
 
 		// Endpoints
 		public const string RISK_API_PATH = "/api/v3/risk";
