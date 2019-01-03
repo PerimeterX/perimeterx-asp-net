@@ -11,6 +11,12 @@ namespace PerimeterX
 		[DataMember(Name = "vid", EmitDefaultValue = false)]
 		public string Vid;
 
+		[DataMember(Name = "pxhd", EmitDefaultValue = false)]
+		public string Pxhd;
+
+		[DataMember(Name = "vid_source", EmitDefaultValue = false)]
+		public string VidSource;
+
 		[DataMember(Name = "uuid", EmitDefaultValue = false)]
 		public string UUID;
 

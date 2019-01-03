@@ -26,6 +26,15 @@ namespace PerimeterX
 			{
 				RiskResponse riskResponse = SendRiskResponse(PxContext);
 				PxContext.MadeS2SCallReason = true;
+				if (riskResponse.Vid != null)
+				{
+					PxContext.Vid = riskResponse.Vid;
+				}
+				if (riskResponse.Pxhd != null)
+				{
+					PxContext.Pxhd = riskResponse.Pxhd;
+				}
+
 				if (riskResponse.Score >= 0 && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
 				{
 					int score = riskResponse.Score;
@@ -90,7 +99,6 @@ namespace PerimeterX
 
 			RiskRequest riskRequest = new RiskRequest
 			{
-				Vid = PxContext.Vid,
 				Request = Request.CreateRequestFromContext(PxContext),
 				Additional = new Additional
 				{
@@ -110,6 +118,11 @@ namespace PerimeterX
 			if (!string.IsNullOrEmpty(PxContext.Vid))
 			{
 				riskRequest.Vid = PxContext.Vid;
+			}
+
+			if (!string.IsNullOrEmpty(PxContext.Pxhd))
+			{
+				riskRequest.Pxhd = PxContext.Pxhd;
 			}
 
 			if (!string.IsNullOrEmpty(PxContext.UUID))
