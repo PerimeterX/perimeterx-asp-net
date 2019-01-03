@@ -46,6 +46,8 @@ namespace PerimeterX
 		public string[] CookieNames;
 		public bool IsPxdeVerified { get; set; }
 		public dynamic Pxde { get; set; }
+    public string CustomBlockUrl { get;  set; }
+		public bool RedirectOnCustomUrl { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -167,6 +169,9 @@ namespace PerimeterX
 			HttpMethod = context.Request.HttpMethod;
 
 			SensitiveRoute = CheckSensitiveRoute(pxConfiguration.SensitiveRoutes, Uri);
+
+			CustomBlockUrl = pxConfiguration.CustomBlockUrl;
+			RedirectOnCustomUrl = pxConfiguration.RedirectOnCustomUrl;
 		}
 
 		private string[] extractCookieNames(string cookieHeader)

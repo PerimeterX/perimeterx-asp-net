@@ -507,6 +507,7 @@ namespace PerimeterX
 				this["clientHostUrl"] = value;
 			}
 		}
+
 		[ConfigurationProperty("captchaHostUrl", DefaultValue = "https://captcha.perimeterx.net")]
 		public string CaptchaHostUrl
 		{
@@ -518,6 +519,34 @@ namespace PerimeterX
 			set
 			{
 				this["captchaHostUrl"] = value;
+			}
+		}
+
+		[ConfigurationProperty("customBlockUrl", DefaultValue = null)]
+		public string CustomBlockUrl
+		{
+			get
+			{
+				return (string)this["customBlockUrl"];
+			}
+
+			set
+			{
+				this["customBlockUrl"] = value;
+			}
+		}
+
+		[ConfigurationProperty("redirectOnCustomUrl", DefaultValue = false)]
+		public bool RedirectOnCustomUrl
+		{
+			get
+			{
+				return (bool)this["redirectOnCustomUrl"];
+			}
+
+			set
+			{
+				this["redirectOnCustomUrl"] = value;
 			}
 		}
 	}

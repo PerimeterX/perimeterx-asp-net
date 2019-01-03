@@ -30,6 +30,7 @@ Table of Contents
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
   *   [Base URI](#base-uri)
+  *   [Customize Default Block Page](#customize-block-page)
   *   [Override UA header](#override-ua)
 
   **[Contributing](#contributing)**
@@ -107,8 +108,9 @@ Configuration options are set in `pxModuleConfigurationSection`
 - apiToken
 
 #### <a name="custom-block-page"></a> Customizing Default Block Pages
-###### Custom Logo
-Adding a custom logo to the blocking page is by providing the pxConfig a key ```customLogo``` , the logo will be displayed at the top div of the the block page The logo's ```max-heigh``` property would be 150px and width would be set to ```auto```
+
+##### Custom Logo
+Adding a custom logo to the blocking page is by providing the pxConfig a key ```customLogo``` , the logo will be displayed at the top div of the the block page The logo's ```max-height``` property would be 150px and width would be set to ```auto```
 
 The key ```customLogo``` expects a valid URL address such as ```https://s.perimeterx.net/logo.png```
 
@@ -119,7 +121,7 @@ Example below:
 ...
 ```
 
-Custom JS/CSS
+##### Custom JS/CSS
 
 The block page can be modified with a custom CSS by adding to the ```pxConfig``` the key ```cssRef``` and providing a valid URL to the css In addition there is also the option to add a custom JS file by adding ```jsRef``` key to the ```pxConfig``` and providing the JS file that will be loaded with the block page, this key also expects a valid URL
 
@@ -132,6 +134,54 @@ Example below:
   cssRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 ...
 ```
+
+##### Redirect to a Custom Block Page URL
+Customizes the block page to meet branding and message requirements by specifying the URL of the block page HTML file. The page can also implement CAPTCHA. 
+
+**Default:** "" (empty string)
+
+Example:
+
+```xml
+customBlockUrl = "http://sub.domain.com/block.html"
+```
+
+> Note: This URI is whitelisted automatically to avoid infinite redirects.
+
+##### <a name="redirect_on_custom_url"></a> Redirect on Custom URL
+
+The `redirectOnCustomUrl` boolean flag to redirect users to a block page.
+
+**Default:** false
+
+Example:
+
+```xml
+  redirectOnCustomUrl = "false"
+```
+
+By default, when a user exceeds the blocking threshold and blocking is enabled, the user is redirected to the block page defined by the `customBlockUrl` variable. The defined block page displays a **307 (Temporary Redirect)** HTTP Response Code.
+
+When the flag is set to false, a **403 (Unauthorized)** HTTP Response Code is displayed on the blocked page URL.
+
+
+Setting the flag to true (enabling redirects) results in the following URL upon blocking:
+
+```
+http://www.example.com/block.html?url=L3NvbWVwYWdlP2ZvbyUzRGJhcg==&uuid=e8e6efb0-8a59-11e6-815c-3bdad80c1d39&vid=08320300-6516-11e6-9308-b9c827550d47
+```
+
+Setting the flag to false does not require the block page to include any of the examples below, as they are injected into the blocking page via the PerimeterX ASP.NET Enforcer.
+
+> NOTE: The `url` parameter should be built with the URL *Encoded* query parameters (of the original request) with both the original path and variables Base64 Encoded (to avoid collisions with block page query params).
+
+##### Custom Block Pages Requirements
+
+As of version 2.8.0, Captcha logic is being handled through the JavaScript snippet and not through the Enforcer.
+
+Users who have Custom Block Pages must include the new script tag and a new div in the _.html_ block page.
+
+
 #### <a name="blocking-score"></a> Changing the Minimum Score for Blocking
 
 **default:** 100
