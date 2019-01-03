@@ -32,6 +32,7 @@ namespace PerimeterX
 					PxContext.Score = score;
 					PxContext.UUID = riskResponse.Uuid;
 					PxContext.BlockAction = riskResponse.RiskResponseAction;
+					PxContext.Pxhd = riskResponse.Pxhd;
 
 					if (PxContext.BlockAction == PxConstants.JS_CHALLENGE_ACTION &&
 						!string.IsNullOrEmpty(riskResponse.RiskResponseActionData.Body))
@@ -87,14 +88,22 @@ namespace PerimeterX
 			{
 				riskMode = ModuleMode.MONITOR_MODE;
 			}
-
+			string vid = PxContext.Vid;
+			string pxhd = PxContext.Pxhd;
+			string callReason = PxContext.S2SCallReason;
+			if (PxContext.Pxhd != null && PxContext.Vid != null && PxContext.S2SCallReason == "no_cookie")
+			{
+				callReason = "no_cookie_w_vid";
+			}
 			RiskRequest riskRequest = new RiskRequest
 			{
-				Vid = PxContext.Vid,
+				Vid = vid,
+				Pxhd = pxhd,
+				VidSource = PxContext.VidSource,
 				Request = Request.CreateRequestFromContext(PxContext),
 				Additional = new Additional
 				{
-					CallReason = PxContext.S2SCallReason,
+					CallReason = callReason,
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					HttpMethod = PxContext.HttpMethod,
 					HttpVersion = PxContext.HttpVersion,

@@ -46,8 +46,10 @@ namespace PerimeterX
 		public string[] CookieNames;
 		public bool IsPxdeVerified { get; set; }
 		public dynamic Pxde { get; set; }
-    public string CustomBlockUrl { get;  set; }
+		public string CustomBlockUrl { get;  set; }
 		public bool RedirectOnCustomUrl { get; set; }
+		public string VidSource { get; set; }
+		public string Pxhd { get; set; }
 
 		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -152,6 +154,15 @@ namespace PerimeterX
 				DataEnrichmentCookie deCookie = PxCookieUtils.GetDataEnrichmentCookie(PxCookies, pxConfiguration.CookieKey);
 				IsPxdeVerified = deCookie.IsValid;
 				Pxde = deCookie.JsonPayload;
+				if (PxCookies.ContainsKey(PxConstants.COOKIE_VID_PREFIX))
+				{
+					Vid = PxCookies[PxConstants.COOKIE_VID_PREFIX];
+					VidSource = PxConstants.VID_COOKIE;
+				}
+				if (PxCookies.ContainsKey(PxConstants.COOKIE_PXHD_PREFIX))
+				{
+					Pxhd = PxCookies[PxConstants.COOKIE_PXHD_PREFIX];
+				}
 			}
 
 			Hostname = context.Request.Url.Host;
