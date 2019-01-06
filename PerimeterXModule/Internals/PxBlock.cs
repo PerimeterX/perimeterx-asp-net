@@ -30,7 +30,7 @@ namespace PerimeterX.Internals
 			if (jsonHeaderExists)
 			{
 				string[] values = jsonHeader.Split(',');
-				if (Array.Exists(values, "application/json"))
+				if (Array.Exists(values, element => element == "application/json"))
 				{
 					return true;
 				}
