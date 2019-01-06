@@ -252,6 +252,7 @@ namespace PerimeterX
 			{
 				PostActivity(pxContext, "block", new ActivityDetails
 				{
+					BlockAction = pxContext.BlockAction,
 					BlockReason = pxContext.BlockReason,
 					BlockUuid = pxContext.UUID,
 					ModuleVersion = PxConstants.MODULE_VERSION,
@@ -313,7 +314,7 @@ namespace PerimeterX
 				SocketIP = pxContext.Ip,
 				Url = pxContext.FullUrl,
 				Details = details,
-				Headers = pxContext.GetHeadersAsDictionary()
+				Headers = pxContext.GetHeadersAsDictionary(),
 			};
 			if (eventType.Equals("page_requested"))
 			{
@@ -323,6 +324,11 @@ namespace PerimeterX
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
 				activity.Vid = pxContext.Vid;
+			}
+
+			if (!string.IsNullOrEmpty(pxContext.Pxhd) && (eventType == "page_requested" || eventType == "block"))
+			{
+				activity.Pxhd = pxContext.Pxhd;
 			}
 
 			reporter.Post(activity);
@@ -472,7 +478,8 @@ namespace PerimeterX
 				PxLoggingUtils.LogDebug(string.Format("Invalid request to {0}", application.Context.Request.RawUrl));
 				PostBlockActivity(pxContext);
 			}
-
+		
+			SetPxhdAndVid(pxContext);
 			// If implemented, run the customVerificationHandler.
 			if (!string.IsNullOrEmpty(customVerificationHandler))
 			{
@@ -493,6 +500,16 @@ namespace PerimeterX
 			{
 				BlockRequest(pxContext, config);
 				application.CompleteRequest();
+			}
+		}
+
+		private static void SetPxhdAndVid(PxContext pxContext)
+		{
+
+			if (!string.IsNullOrEmpty(pxContext.Pxhd))
+			{
+				string pxhd = PxConstants.COOKIE_PXHD_PREFIX + "=" + pxContext.Pxhd;
+				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", pxhd);
 			}
 		}
 

@@ -28,6 +28,10 @@ namespace PerimeterX
 
 		[DataMember(Name = "data_enrichment")]
 		public object DataEnrichment;
+
+		[DataMember(Name = "pxhd")]
+		public string Pxhd;
+
 	}
 
 
