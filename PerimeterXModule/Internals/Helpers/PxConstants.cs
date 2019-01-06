@@ -10,12 +10,12 @@ namespace PerimeterX
 	public static class PxConstants
 	{
 		public static readonly string HEX_ALPHABET = "0123456789abcdef";
-		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX, COOKIE_DATA_ENRICHMENT_PREFIX, COOKIE_PXHD_PREFIX, COOKIE_VID_PREFIX};
+		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX, COOKIE_DATA_ENRICHMENT_PREFIX, COOKIE_PXHD_PREFIX, COOKIE_VID_PREFIX, "_" + COOKIE_VID_PREFIX };
 		public static readonly string[] PX_TOKEN_PREFIX = { TOKEN_V1_PREFIX, TOKEN_V3_PREFIX };
 		public const string COOKIE_V1_PREFIX = "_px";
 		public const string COOKIE_V3_PREFIX = "_px3";
 		public const string COOKIE_PXHD_PREFIX = "_pxhd";
-		public const string COOKIE_VID_PREFIX = "_pxvid";
+		public const string COOKIE_VID_PREFIX = "pxvid";
 		public const string VID_COOKIE = "vid_cookie";
 		public const string RISK_COOKIE = "risk_cookie";
 		public const string COOKIE_DATA_ENRICHMENT_PREFIX = "_pxde";

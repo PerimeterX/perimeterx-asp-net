@@ -159,6 +159,11 @@ namespace PerimeterX
 					Vid = PxCookies[PxConstants.COOKIE_VID_PREFIX];
 					VidSource = PxConstants.VID_COOKIE;
 				}
+				if (PxCookies.ContainsKey("_" + PxConstants.COOKIE_VID_PREFIX))
+				{
+					Vid = PxCookies["_" + PxConstants.COOKIE_VID_PREFIX];
+					VidSource = PxConstants.VID_COOKIE;
+				}
 				if (PxCookies.ContainsKey(PxConstants.COOKIE_PXHD_PREFIX))
 				{
 					Pxhd = PxCookies[PxConstants.COOKIE_PXHD_PREFIX];
