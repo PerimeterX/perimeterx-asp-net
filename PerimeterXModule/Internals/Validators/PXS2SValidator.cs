@@ -91,7 +91,7 @@ namespace PerimeterX
 			string vid = PxContext.Vid;
 			string pxhd = PxContext.Pxhd;
 			string callReason = PxContext.S2SCallReason;
-			if (PxContext.Pxhd != null && PxContext.Vid != null && PxContext.S2SCallReason == "no_cookie")
+			if (PxContext.Pxhd != null && PxContext.S2SCallReason == "no_cookie")
 			{
 				callReason = "no_cookie_w_vid";
 			}
