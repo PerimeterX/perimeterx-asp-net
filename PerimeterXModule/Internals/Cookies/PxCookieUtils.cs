@@ -11,18 +11,17 @@ namespace PerimeterX
     {
         public static IPxCookie BuildCookie(PxModuleConfigurationSection config, Dictionary<string, string> cookies, ICookieDecoder cookieDecoder)
         {
-            if (cookies.Count == 0)
-            {
-                return null;
-            }
-
             if (cookies.ContainsKey(PxConstants.COOKIE_V1_PREFIX))
             {
                 return new PxCookieV1(cookieDecoder, cookies[PxConstants.COOKIE_V1_PREFIX]);
             }
+			else if(cookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX))
+			{
+				return new PxCookieV3(cookieDecoder, cookies[PxConstants.COOKIE_V3_PREFIX]);
+			}
 
-            return new PxCookieV3(cookieDecoder, cookies[PxConstants.COOKIE_V3_PREFIX]);
-        }
+			return null;
+		}
 
         public static T Deserialize<T>(ICookieDecoder cookieDecoder, string rawCookie)
         {
