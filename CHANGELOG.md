@@ -3,9 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## [2.8.0] - 2018-12-25
+## [2.8.0] - 2018-01-13
 ### Added
-- Added data enrichment to context
+- Added PXHD handling
+- Added cookie names extraction
+- Added data enrichment cookie handling to context
+- Added custom block page with redirects feature
 
 ## [2.7.0] - 2018-09-16
 ### Added
