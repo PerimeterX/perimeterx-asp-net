@@ -30,7 +30,6 @@ Table of Contents
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
   *   [Base URI](#base-uri)
-  *   [Customize Default Block Page](#customize-block-page)
   *   [Override UA header](#override-ua)
 
   **[Contributing](#contributing)**
