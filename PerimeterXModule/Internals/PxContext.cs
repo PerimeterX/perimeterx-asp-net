@@ -50,8 +50,9 @@ namespace PerimeterX
 		public bool RedirectOnCustomUrl { get; set; }
 		public string VidSource { get; set; }
 		public string Pxhd { get; set; }
+        public bool MonitorRequest { get; set; }
 
-		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
+        public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
 			ApplicationContext = context;
 
@@ -188,9 +189,21 @@ namespace PerimeterX
 
 			CustomBlockUrl = pxConfiguration.CustomBlockUrl;
 			RedirectOnCustomUrl = pxConfiguration.RedirectOnCustomUrl;
+
+            MonitorRequest = shouldMonitorRequest(context.Request.Url.AbsolutePath, pxConfiguration);
 		}
 
-		private string[] extractCookieNames(string cookieHeader)
+        private bool shouldMonitorRequest(String uri, PxModuleConfigurationSection pxConfiguration)
+        {
+            var mitigationUrls = pxConfiguration.MitigationUrls;
+            if (uri != null && mitigationUrls.Contains(uri))
+             {
+                return false;
+             }
+            return pxConfiguration.MonitorMode;
+        }
+
+        private string[] extractCookieNames(string cookieHeader)
 		{
 			string[] cookieNames =  null;
 			if (cookieHeader != null)

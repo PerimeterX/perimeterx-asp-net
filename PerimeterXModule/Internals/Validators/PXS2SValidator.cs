@@ -84,7 +84,7 @@ namespace PerimeterX
 		public RiskResponse SendRiskResponse(PxContext PxContext)
 		{
 			var riskMode = ModuleMode.BLOCK_MODE;
-			if (PxConfig.MonitorMode == true)
+			if (PxConfig.MonitorMode)
 			{
 				riskMode = ModuleMode.MONITOR_MODE;
 			}
