@@ -96,7 +96,14 @@ Add site specific configuration (configuration level)
 ```
 ### <a name="upgrade"></a> Upgrading
 
-Contact [PerimeterX Support](support@perimeterx.com) for details.
+1. In Visual Studio, right click on the solution and Select **Manage NuGet packages for solution**. 
+2. Search for `perimeterxmodule` in the updates section, and update.
+
+- OR - 
+
+Run `Install-Package PerimeterXModule` in the Package Manager Console
+
+For more information, contact [PerimeterX Support](support@perimeterx.com).
 
 ### <a name="configuration"></a> Configuration Options
 
