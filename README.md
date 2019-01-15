@@ -14,6 +14,7 @@ Table of Contents
   *   [Dependencies](#dependencies)
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
+  *   [Upgrading](#upgrade)
 
   **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
@@ -93,6 +94,16 @@ Add site specific configuration (configuration level)
     </pxModuleConfigurationSection>
   </perimeterX>
 ```
+### <a name="upgrade"></a> Upgrading
+
+1. In Visual Studio, right click on the solution and Select **Manage NuGet packages for solution**. 
+2. Search for `perimeterxmodule` in the updates section, and update.
+
+- OR - 
+
+Run `Install-Package PerimeterXModule` in the Package Manager Console
+
+For more information, contact [PerimeterX Support](support@perimeterx.com).
 
 ### <a name="configuration"></a> Configuration Options
 
