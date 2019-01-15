@@ -552,11 +552,12 @@ namespace PerimeterX
         }
 
         [ConfigurationProperty("mitigationUrls")]
-        public List<string> MitigationUrls
+        [TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+        public StringCollection MitigationUrls
         {
             get
             {
-                return (List<string>) this["mitigationUrls"];
+                return (StringCollection) this["mitigationUrls"];
             }
 
             set
@@ -566,4 +567,3 @@ namespace PerimeterX
         }
     }
 }
-
