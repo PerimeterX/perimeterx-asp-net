@@ -195,6 +195,10 @@ namespace PerimeterX
 
         private bool shouldMonitorRequest(String uri, PxModuleConfigurationSection pxConfiguration)
         {
+            if (uri.IndexOf("/", StringComparison.Ordinal) == 0) 
+            {
+                uri = uri.Substring(1);
+                }
             var mitigationUrls = pxConfiguration.MitigationUrls;
             if (uri != null && mitigationUrls.Contains(uri))
              {
