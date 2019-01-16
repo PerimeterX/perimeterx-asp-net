@@ -104,6 +104,8 @@ To upgrade to the latest Enforcer version:
 
 Run `Install-Package PerimeterXModule` in the Package Manager Console
 
+Your Enforcer version is now upgraded to the latest enforcer version.
+
 For more information, contact [PerimeterX Support](support@perimeterx.com).
 
 ### <a name="configuration"></a> Configuration Options
