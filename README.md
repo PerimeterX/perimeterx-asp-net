@@ -32,6 +32,8 @@ Table of Contents
   *   [Monitor Mode](#monitor-mode)
   *   [Base URI](#base-uri)
   *   [Override UA header](#override-ua)
+  *   [Mitigation Urls](#mitigiation-urls)
+
 
   **[Contributing](#contributing)**
   *   [Tests](#tests)
@@ -419,6 +421,13 @@ The user's user agent can be returned to the PerimeterX module using a name of a
 Users can use the additional activity handler to retrieve information for the request using the data-enrichment object. First, check that the data enrichment object is verified, then you can access it's properties.
 
 ```c#
+...
+
+#### <a name="mitigiation-urls"></a> Mitigation Urls
+
+Users can define custom paths that allow blocking. All other paths will be set to monitoring mode.
+```c#
+mitigiation-urls="path1, path2"
 ...
 
 namespace MyApp

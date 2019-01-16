@@ -496,7 +496,7 @@ namespace PerimeterX
 				}
 			}
 			// No custom verification handler -> continue regular flow
-			else if (!verified && !config.MonitorMode)
+			else if (!verified && !pxContext.MonitorRequest)
 			{
 				BlockRequest(pxContext, config);
 				application.CompleteRequest();
