@@ -23,7 +23,7 @@ namespace PerimeterX
 		[DataMember(Name = "pxhd", EmitDefaultValue = false)]
 		public string Pxhd;
 
-		[DataMember(Name = "vid_source", EmitDefaultValue = false)]
+		[DataMember(Name = "enforcer_vid_source", EmitDefaultValue = false)]
 		public string VidSource;
 	}
 }
