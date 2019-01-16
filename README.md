@@ -95,11 +95,12 @@ Add site specific configuration (configuration level)
   </perimeterX>
 ```
 ### <a name="upgrade"></a> Upgrading
+To upgrade to the latest Enforcer version:
 
 1. In Visual Studio, right click on the solution and Select **Manage NuGet packages for solution**. 
 2. Search for `perimeterxmodule` in the updates section, and update.
 
-- OR - 
+   **OR** 
 
 Run `Install-Package PerimeterXModule` in the Package Manager Console
 
