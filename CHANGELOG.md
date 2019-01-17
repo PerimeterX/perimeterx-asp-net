@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## [2.8.0] - 2018-01-13
+## [3.0.0] - 2019-01-17
 ### Added
 - Added PXHD handling
 - Added cookie names extraction
