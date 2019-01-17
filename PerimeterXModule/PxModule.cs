@@ -508,7 +508,7 @@ namespace PerimeterX
 
 			if (!string.IsNullOrEmpty(pxContext.Pxhd))
 			{
-				string pxhd = PxConstants.COOKIE_PXHD_PREFIX + "=" + pxContext.Pxhd;
+				string pxhd = PxConstants.COOKIE_PXHD_PREFIX + "=" + pxContext.Pxhd + "; path=/";
 				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", pxhd);
 			}
 		}

@@ -551,7 +551,7 @@ namespace PerimeterX
             }
         }
 
-        [ConfigurationProperty("mitigationUrls")]
+        [ConfigurationProperty("mitigationUrls", DefaultValue = "")]
         [TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
         public StringCollection MitigationUrls
         {
