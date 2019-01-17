@@ -47,5 +47,7 @@ namespace PerimeterX
 		[DataMember(Name = "request_cookie_names")]
 		public string[] RequestCookieNames;
 
+		[DataMember(Name = "enforcer_vid_source", EmitDefaultValue = false)]
+		public string VidSource;
 	}
 }
