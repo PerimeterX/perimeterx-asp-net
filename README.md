@@ -5,7 +5,7 @@
 [PerimeterX](http://www.perimeterx.com) ASP.NET SDK
 ===================================================
 
-> Latest stable version: [v2.7.1](https://www.nuget.org/packages/PerimeterXModule/2.7.1)
+> Latest stable version: [v3.0.0](https://www.nuget.org/packages/PerimeterXModule/3.0.0)
 
 Table of Contents
 -----------------
@@ -14,6 +14,7 @@ Table of Contents
   *   [Dependencies](#dependencies)
   *   [Installation](#installation)
   *   [Basic Usage Example](#basic-usage)
+  *   [Upgrading](#upgrade)
 
   **[Configuration](#configuration)**
   *   [Customizing Default Block Pages](#custom-block-page)
@@ -22,7 +23,6 @@ Table of Contents
   *   [Enable/Disable Captcha](#captcha-support)
   *   [First Party Mode](#first-party)
   *   [Extracting Real IP Address](#real-ip)
-  *   [Override UA header](#override-ua)
   *   [Filter Sensitive Headers](#sensitive-headers)
   *   [Sensitive Routes](#sensitive-routes)
   *   [Whitelist Routes](#whitelist-routes)
@@ -31,6 +31,9 @@ Table of Contents
   *   [Send Page Activities](#send-page-activities)
   *   [Monitor Mode](#monitor-mode)
   *   [Base URI](#base-uri)
+  *   [Override UA header](#override-ua)
+  *   [Mitigation Urls](#mitigiation-urls)
+
 
   **[Contributing](#contributing)**
   *   [Tests](#tests)
@@ -87,12 +90,25 @@ Add site specific configuration (configuration level)
       appId="<PX Application ID>"
       apiToken="<API token>"
       cookieKey="<cookie key>"
-      monitorMode="false"
-      blockingScore="70"
+      monitorMode="true"
+      blockingScore="100"
       >
     </pxModuleConfigurationSection>
   </perimeterX>
 ```
+### <a name="upgrade"></a> Upgrading
+To upgrade to the latest Enforcer version:
+
+1. In Visual Studio, right click on the solution and Select **Manage NuGet packages for solution**. 
+2. Search for `perimeterxmodule` in the updates section, and update.
+
+   **OR** 
+
+Run `Install-Package PerimeterXModule` in the Package Manager Console
+
+Your Enforcer version is now upgraded to the latest enforcer version.
+
+For more information, contact [PerimeterX Support](support@perimeterx.com).
 
 ### <a name="configuration"></a> Configuration Options
 
@@ -107,8 +123,9 @@ Configuration options are set in `pxModuleConfigurationSection`
 - apiToken
 
 #### <a name="custom-block-page"></a> Customizing Default Block Pages
-###### Custom Logo
-Adding a custom logo to the blocking page is by providing the pxConfig a key ```customLogo``` , the logo will be displayed at the top div of the the block page The logo's ```max-heigh``` property would be 150px and width would be set to ```auto```
+
+##### Custom Logo
+Adding a custom logo to the blocking page is by providing the pxConfig a key ```customLogo``` , the logo will be displayed at the top div of the the block page The logo's ```max-height``` property would be 150px and width would be set to ```auto```
 
 The key ```customLogo``` expects a valid URL address such as ```https://s.perimeterx.net/logo.png```
 
@@ -119,7 +136,7 @@ Example below:
 ...
 ```
 
-Custom JS/CSS
+##### Custom JS/CSS
 
 The block page can be modified with a custom CSS by adding to the ```pxConfig``` the key ```cssRef``` and providing a valid URL to the css In addition there is also the option to add a custom JS file by adding ```jsRef``` key to the ```pxConfig``` and providing the JS file that will be loaded with the block page, this key also expects a valid URL
 
@@ -128,17 +145,65 @@ On both cases if the URL is not a valid format an exception will be thrown
 Example below:
 ```xml
 ...
-  jsRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-  cssRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+  jsRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+  cssRef="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
 ...
 ```
+
+##### Redirect to a Custom Block Page URL
+Customizes the block page to meet branding and message requirements by specifying the URL of the block page HTML file. The page can also implement CAPTCHA. 
+
+**Default:** "" (empty string)
+
+Example:
+
+```xml
+customBlockUrl = "http://sub.domain.com/block.html"
+```
+
+> Note: This URI is whitelisted automatically to avoid infinite redirects.
+
+##### <a name="redirect_on_custom_url"></a> Redirect on Custom URL
+
+The `redirectOnCustomUrl` boolean flag to redirect users to a block page.
+
+**Default:** false
+
+Example:
+
+```xml
+  redirectOnCustomUrl = "false"
+```
+
+By default, when a user exceeds the blocking threshold and blocking is enabled, the user is redirected to the block page defined by the `customBlockUrl` variable. The defined block page displays a **307 (Temporary Redirect)** HTTP Response Code.
+
+When the flag is set to false, a **403 (Unauthorized)** HTTP Response Code is displayed on the blocked page URL.
+
+
+Setting the flag to true (enabling redirects) results in the following URL upon blocking:
+
+```
+http://www.example.com/block.html?url=L3NvbWVwYWdlP2ZvbyUzRGJhcg==&uuid=e8e6efb0-8a59-11e6-815c-3bdad80c1d39&vid=08320300-6516-11e6-9308-b9c827550d47
+```
+
+Setting the flag to false does not require the block page to include any of the examples below, as they are injected into the blocking page via the PerimeterX ASP.NET Enforcer.
+
+> NOTE: The `url` parameter should be built with the URL *Encoded* query parameters (of the original request) with both the original path and variables Base64 Encoded (to avoid collisions with block page query params).
+
+##### Custom Block Pages Requirements
+
+As of version 2.8.0, Captcha logic is being handled through the JavaScript snippet and not through the Enforcer.
+
+Users who have Custom Block Pages must include the new script tag and a new div in the _.html_ block page.
+
+
 #### <a name="blocking-score"></a> Changing the Minimum Score for Blocking
 
-**default:** 70
+**default:** 100
 
 ```xml
 ...
-  blockingScore="70"
+  blockingScore="100"
 ...
 ```
 
@@ -322,7 +387,7 @@ Set this flag to false to disable monitor mode
 
 ```xml
 ...
-  monitorMode="false"
+  monitorMode="true"
 ...
 ```
 **default:** true
@@ -351,22 +416,53 @@ The user's user agent can be returned to the PerimeterX module using a name of a
 ...
 ```
 
+#### <a name="data-enrichment"></a> Data Enrichment
+
+Users can use the additional activity handler to retrieve information for the request using the data-enrichment object. First, check that the data enrichment object is verified, then you can access it's properties.
+
+```c#
+...
+
+#### <a name="mitigiation-urls"></a> Mitigation Urls
+
+Users can define custom paths that allow blocking. All other paths will be set to monitoring mode.
+```c#
+mitigiation-urls="path1, path2"
+...
+
+namespace MyApp
+{
+    public class MyVerificationHandler : IVerificationHandler
+    {
+        public void Handle(HttpApplication application, PxContext pxContext, PxModuleConfigurationSection pxConfig)
+        {
+          ...
+          if (pxContext.IsPxdeVerified) {
+            dynamic pxde = pxContext.Pxde;
+            // do something with the data enrichment
+          }
+          ...          
+        }
+    }
+}
+```
+
 <a name="contributing"></a> Contributing
 ----------------------------------------
 
 The following steps are welcome when contributing to our project.
-###Fork/Clone
+### Fork/Clone
 First and foremost, [Create a fork](https://guides.github.com/activities/forking/) of the repository, and clone it locally.
 Create a branch on your fork, preferably using a self descriptive branch name.
 
-###Code/Run
+### Code/Run
 Code your way out of your mess, and help improve our project by implementing missing features, adding capabilities or fixing bugs.
 
 To run the code, simply follow the steps in the [installation guide](#installation). Grab the keys from the PerimeterX Portal, and try refreshing your page several times continuously. If no default behaviours have been overridden, you should see the PerimeterX block page. Solve the CAPTCHA to clean yourself and start fresh again.
 
-###Pull Request
+### Pull Request
 After you have completed the process, create a pull request to the Upstream repository. Please provide a complete and thorough description explaining the changes. Remember this code has to be read by our maintainers, so keep it simple, smart and accurate.
 
-###Thanks
+### Thanks
 After all, you are helping us by contributing to this project, and we want to thank you for it.
 We highly appreciate your time invested in contributing to our project, and are glad to have people like you - kind helpers.

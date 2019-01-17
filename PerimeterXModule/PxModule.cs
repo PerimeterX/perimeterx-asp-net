@@ -36,6 +36,8 @@ using System.Linq;
 using System.Reflection;
 using System.Collections;
 using Jil;
+using System.Collections.Generic;
+using PerimeterX.Internals;
 
 namespace PerimeterX
 {
@@ -49,6 +51,7 @@ namespace PerimeterX
 		private readonly IPXCookieValidator PxCookieValidator;
 		private readonly IPXS2SValidator PxS2SValidator;
 		private readonly IReverseProxy ReverseProxy;
+		private readonly PxBlock pxBlock;
 
 		private readonly bool enabled;
 		private readonly bool sendPageActivites;
@@ -144,6 +147,8 @@ namespace PerimeterX
 
 			// Build reverse proxy
 			ReverseProxy = new ReverseProxy(config);
+
+			pxBlock = new PxBlock(config);
 
 			PxLoggingUtils.LogDebug(ModuleName + " initialized");
 		}
@@ -247,6 +252,7 @@ namespace PerimeterX
 			{
 				PostActivity(pxContext, "block", new ActivityDetails
 				{
+					BlockAction = pxContext.BlockAction,
 					BlockReason = pxContext.BlockReason,
 					BlockUuid = pxContext.UUID,
 					ModuleVersion = PxConstants.MODULE_VERSION,
@@ -308,7 +314,7 @@ namespace PerimeterX
 				SocketIP = pxContext.Ip,
 				Url = pxContext.FullUrl,
 				Details = details,
-				Headers = pxContext.GetHeadersAsDictionary()
+				Headers = pxContext.GetHeadersAsDictionary(),
 			};
 			if (eventType.Equals("page_requested"))
 			{
@@ -320,10 +326,15 @@ namespace PerimeterX
 				activity.Vid = pxContext.Vid;
 			}
 
+			if (!string.IsNullOrEmpty(pxContext.Pxhd) && (eventType == "page_requested" || eventType == "block"))
+			{
+				activity.Pxhd = pxContext.Pxhd;
+			}
+
 			reporter.Post(activity);
 		}
 
-		public static void BlockRequest(PxContext pxContext, PxModuleConfigurationSection config)
+		public void BlockRequest(PxContext pxContext, PxModuleConfigurationSection config)
 		{
 			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
 			pxContext.ApplicationContext.Response.TrySkipIisCustomErrors = true;
@@ -333,47 +344,8 @@ namespace PerimeterX
 			}
 			else
 			{
-				ResponseBlockPage(pxContext, config);
+				pxBlock.ResponseBlockPage(pxContext, config);
 			}
-		}
-
-		public static void ResponseBlockPage(PxContext pxContext, PxModuleConfigurationSection config)
-		{
-			string template = "block_template";
-
-			if (pxContext.BlockAction == "j")
-			{
-				template = "challenge";
-			}
-			else if (pxContext.BlockAction == "b")
-			{
-				template = "block";
-			}
-
-			// In the case of a challenge, the challenge response is taken directly from BlockData. Otherwise, generate html template.
-			string content = template == "challenge" && !string.IsNullOrEmpty(pxContext.BlockData) ? pxContext.BlockData :
-				TemplateFactory.getTemplate(template, config, pxContext.UUID, pxContext.Vid, pxContext.IsMobileRequest, pxContext.BlockAction);
-
-			pxContext.ApplicationContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-			if (pxContext.IsMobileRequest)
-			{
-				pxContext.ApplicationContext.Response.ContentType = "application/json";
-				using (var output = new StringWriter())
-				{
-					JSON.Serialize(
-						new MobileResponse()
-						{
-							AppId = config.AppId,
-							Uuid = pxContext.UUID,
-							Action = pxContext.MapBlockAction(),
-							Vid = pxContext.Vid,
-							Page = Convert.ToBase64String(Encoding.UTF8.GetBytes(content)),
-							CollectorUrl = string.Format(config.CollectorUrl, config.AppId)
-						}, output);
-					content = output.ToString();
-				}
-			}
-			pxContext.ApplicationContext.Response.Write(content);
 		}
 
 		public void Dispose()
@@ -415,7 +387,7 @@ namespace PerimeterX
 			{
 				foreach (var prefix in routesWhitelist)
 				{
-					if (url.StartsWith(prefix))
+					if (url.StartsWith(prefix) || url == pxContext.CustomBlockUrl)
 					{
 						return true;
 					}
@@ -506,7 +478,8 @@ namespace PerimeterX
 				PxLoggingUtils.LogDebug(string.Format("Invalid request to {0}", application.Context.Request.RawUrl));
 				PostBlockActivity(pxContext);
 			}
-
+		
+			SetPxhdAndVid(pxContext);
 			// If implemented, run the customVerificationHandler.
 			if (!string.IsNullOrEmpty(customVerificationHandler))
 			{
@@ -523,10 +496,20 @@ namespace PerimeterX
 				}
 			}
 			// No custom verification handler -> continue regular flow
-			else if (!verified && !config.MonitorMode)
+			else if (!verified && !pxContext.MonitorRequest)
 			{
 				BlockRequest(pxContext, config);
 				application.CompleteRequest();
+			}
+		}
+
+		private static void SetPxhdAndVid(PxContext pxContext)
+		{
+
+			if (!string.IsNullOrEmpty(pxContext.Pxhd))
+			{
+				string pxhd = PxConstants.COOKIE_PXHD_PREFIX + "=" + pxContext.Pxhd + "; path=/";
+				pxContext.ApplicationContext.Response.AddHeader("Set-Cookie", pxhd);
 			}
 		}
 

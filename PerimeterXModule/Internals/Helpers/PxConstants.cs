@@ -10,10 +10,15 @@ namespace PerimeterX
 	public static class PxConstants
 	{
 		public static readonly string HEX_ALPHABET = "0123456789abcdef";
-		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX };
+		public static readonly string[] PX_COOKIES_PREFIX = { COOKIE_V1_PREFIX, COOKIE_V3_PREFIX, COOKIE_DATA_ENRICHMENT_PREFIX, COOKIE_PXHD_PREFIX, COOKIE_VID_PREFIX, "_" + COOKIE_VID_PREFIX };
 		public static readonly string[] PX_TOKEN_PREFIX = { TOKEN_V1_PREFIX, TOKEN_V3_PREFIX };
 		public const string COOKIE_V1_PREFIX = "_px";
 		public const string COOKIE_V3_PREFIX = "_px3";
+		public const string COOKIE_PXHD_PREFIX = "_pxhd";
+		public const string COOKIE_VID_PREFIX = "pxvid";
+		public const string VID_COOKIE = "vid_cookie";
+		public const string RISK_COOKIE = "risk_cookie";
+		public const string COOKIE_DATA_ENRICHMENT_PREFIX = "_pxde";
 		public const string TOKEN_V1_PREFIX = "1";
 		public const string TOKEN_V3_PREFIX = "3";
 		public static readonly string PX_VALIDATED_HEADER = "X-PX-VALIDATED";
@@ -28,9 +33,10 @@ namespace PerimeterX
 		public static readonly string ENFORCER_TRUE_IP_HEADER = "x-px-enforcer-true-ip";
 		public static readonly string FIRST_PARTY_HEADER = "X-PX-FIRST-PARTY";
 		public static readonly string FIRST_PARTY_VALUE = "1";
+		public static readonly string COOKIE_HEADER = "cookie";
 
 		// Endpoints
-		public const string RISK_API_V2 = "/api/v2/risk";
+		public const string RISK_API_PATH = "/api/v3/risk";
 		public const string ACTIVITIES_API_PATH = "/api/v1/collector/s2s";
 		public const string ENFORCER_TELEMETRY_API_PATH = "/api/v2/risk/telemetry";
 

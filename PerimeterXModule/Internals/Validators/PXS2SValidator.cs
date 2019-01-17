@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using PerimeterX.DataContracts.Cookies;
 
 namespace PerimeterX
 {
@@ -25,13 +26,13 @@ namespace PerimeterX
 			{
 				RiskResponse riskResponse = SendRiskResponse(PxContext);
 				PxContext.MadeS2SCallReason = true;
-
 				if (riskResponse.Score >= 0 && !string.IsNullOrEmpty(riskResponse.RiskResponseAction))
 				{
 					int score = riskResponse.Score;
 					PxContext.Score = score;
 					PxContext.UUID = riskResponse.Uuid;
 					PxContext.BlockAction = riskResponse.RiskResponseAction;
+					PxContext.Pxhd = riskResponse.Pxhd;
 
 					if (PxContext.BlockAction == PxConstants.JS_CHALLENGE_ACTION &&
 						!string.IsNullOrEmpty(riskResponse.RiskResponseActionData.Body))
@@ -54,6 +55,16 @@ namespace PerimeterX
 					PxContext.S2SHttpErrorMessage = riskResponse.ErrorMessage;
 					retVal = false;
 				}
+
+				DataEnrichmentCookie deCookie = new DataEnrichmentCookie(JSON.DeserializeDynamic("{}"), true);
+				if (riskResponse.DataEnrichment != null)
+				{
+					string dataEnrichmentString = riskResponse.DataEnrichment.ToString();
+					var dataEnrichmentPayload = JSON.DeserializeDynamic(dataEnrichmentString);
+					deCookie = new DataEnrichmentCookie(dataEnrichmentPayload, true);
+				}
+				PxContext.IsPxdeVerified = deCookie.IsValid;
+				PxContext.Pxde = deCookie.JsonPayload;
 			}
 			catch (Exception ex)
 			{
@@ -72,29 +83,36 @@ namespace PerimeterX
 
 		public RiskResponse SendRiskResponse(PxContext PxContext)
 		{
-
 			var riskMode = ModuleMode.BLOCK_MODE;
-			if (PxConfig.MonitorMode == true)
+			if (PxConfig.MonitorMode)
 			{
 				riskMode = ModuleMode.MONITOR_MODE;
 			}
-
+			string vid = PxContext.Vid;
+			string pxhd = PxContext.Pxhd;
+			string callReason = PxContext.S2SCallReason;
+			if (PxContext.Pxhd != null && PxContext.S2SCallReason == "no_cookie")
+			{
+				callReason = "no_cookie_w_vid";
+			}
 			RiskRequest riskRequest = new RiskRequest
 			{
-				Vid = PxContext.Vid,
+				Vid = vid,
+				Pxhd = pxhd,
 				Request = Request.CreateRequestFromContext(PxContext),
 				Additional = new Additional
 				{
-					CallReason = PxContext.S2SCallReason,
+					CallReason = callReason,
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					HttpMethod = PxContext.HttpMethod,
 					HttpVersion = PxContext.HttpVersion,
 					RiskMode = riskMode,
 					PxCookieHMAC = PxContext.PxCookieHmac,
-					CookieOrigin = PxContext.CookieOrigin
+					CookieOrigin = PxContext.CookieOrigin,
+					RequestCookieNames = PxContext.CookieNames,
+					VidSource = PxContext.VidSource
 				},
 				FirstParty = PxConfig.FirstPartyEnabled
-			
 			};
 
 			if (!string.IsNullOrEmpty(PxContext.Vid))
@@ -133,9 +151,8 @@ namespace PerimeterX
 
 			riskRequest.Additional.SimulatedBlock = PxConfig.MonitorMode;
 
-
 			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
-			var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_V2);
+			var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_PATH);
 			return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
 		}
 	}

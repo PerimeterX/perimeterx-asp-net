@@ -31,7 +31,11 @@ namespace PerimeterX
 
         [DataMember(Name = "risk_rtt")]
         public long RiskRoundtripTime;
-    }
+
+	[DataMember(Name = "block_action")]
+	public string BlockAction;
+
+	}
 
     [DataContract]
     public class EnforcerTelemetryActivityDetails : IActivityDetails

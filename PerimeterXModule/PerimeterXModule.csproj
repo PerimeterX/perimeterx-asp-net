@@ -63,11 +63,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internals\PxBlock.cs" />
     <Compile Include="Internals\Cookies\PxCookieUtils.cs" />
     <Compile Include="DataContracts\Cookies\DecodedCookieV3.cs" />
     <Compile Include="DataContracts\Cookies\RiskCookieScores.cs" />
     <Compile Include="Internals\Cookies\Interface\IPxCookie.cs" />
     <Compile Include="Internals\Cookies\PxCookieV1.cs" />
+    <Compile Include="Internals\Cookies\DataEnrichmentCookie.cs" />
     <Compile Include="Internals\Cookies\PxCookieV3.cs" />
     <Compile Include="DataContracts\Cookies\DecodedCookieV1.cs" />
     <Compile Include="Internals\Enums\BlockReasonEnum.cs" />
@@ -79,7 +81,9 @@
     <Compile Include="Internals\Helpers\PxLoggingUtils.cs" />
     <Compile Include="Internals\Helpers\RemoteServer.cs" />
     <Compile Include="Internals\ReverseProxy.cs" />
+    <Compile Include="Internals\Templates\IJsonResponse.cs" />
     <Compile Include="Internals\Templates\IMobileResponse.cs" />
+    <Compile Include="Internals\Templates\JsonResponse.cs" />
     <Compile Include="Internals\Templates\MobileResponse.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXCookieValidator.cs" />
     <Compile Include="Internals\Validators\Interfaces\IPXS2SValidator.cs" />

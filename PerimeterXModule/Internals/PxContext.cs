@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Web;
 using System;
-using System.Net;
 using System.Collections.Specialized;
 using System.Linq;
+using PerimeterX.DataContracts.Cookies;
 
 namespace PerimeterX
 {
@@ -43,8 +43,16 @@ namespace PerimeterX
 		public object DecodedOriginalToken { get; set; }
 		public bool IsMobileRequest { get; set; }
 		public string MobileHeader { get; set; }
+		public string[] CookieNames;
+		public bool IsPxdeVerified { get; set; }
+		public dynamic Pxde { get; set; }
+		public string CustomBlockUrl { get;  set; }
+		public bool RedirectOnCustomUrl { get; set; }
+		public string VidSource { get; set; }
+		public string Pxhd { get; set; }
+        public bool MonitorRequest { get; set; }
 
-		public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
+        public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
 			ApplicationContext = context;
 
@@ -57,6 +65,7 @@ namespace PerimeterX
 			// Get Headers
 
 			// if userAgentOverride is present override the default user-agent
+			CookieNames = extractCookieNames(context.Request.Headers[PxConstants.COOKIE_HEADER]);
 			string userAgentOverride = pxConfiguration.UserAgentOverride;
 			if (!string.IsNullOrEmpty(userAgentOverride))
 			{
@@ -142,8 +151,25 @@ namespace PerimeterX
 						PxCookies[key] = contextCookie.Get(key).Value;
 					}
 				}
-			}
 
+				DataEnrichmentCookie deCookie = PxCookieUtils.GetDataEnrichmentCookie(PxCookies, pxConfiguration.CookieKey);
+				IsPxdeVerified = deCookie.IsValid;
+				Pxde = deCookie.JsonPayload;
+				if (PxCookies.ContainsKey(PxConstants.COOKIE_VID_PREFIX))
+				{
+					Vid = PxCookies[PxConstants.COOKIE_VID_PREFIX];
+					VidSource = PxConstants.VID_COOKIE;
+				}
+				if (PxCookies.ContainsKey("_" + PxConstants.COOKIE_VID_PREFIX))
+				{
+					Vid = PxCookies["_" + PxConstants.COOKIE_VID_PREFIX];
+					VidSource = PxConstants.VID_COOKIE;
+				}
+				if (PxCookies.ContainsKey(PxConstants.COOKIE_PXHD_PREFIX))
+				{
+					Pxhd = PxCookies[PxConstants.COOKIE_PXHD_PREFIX];
+				}
+			}
 
 			Hostname = context.Request.Url.Host;
 
@@ -160,6 +186,49 @@ namespace PerimeterX
 			HttpMethod = context.Request.HttpMethod;
 
 			SensitiveRoute = CheckSensitiveRoute(pxConfiguration.SensitiveRoutes, Uri);
+
+			CustomBlockUrl = pxConfiguration.CustomBlockUrl;
+			RedirectOnCustomUrl = pxConfiguration.RedirectOnCustomUrl;
+
+            MonitorRequest = shouldMonitorRequest(context.Request.Url.AbsolutePath, pxConfiguration);
+		}
+
+        private bool shouldMonitorRequest(String uri, PxModuleConfigurationSection pxConfiguration)
+        {
+            if (uri.IndexOf("/", StringComparison.Ordinal) == 0) 
+            {
+                uri = uri.Substring(1);
+            }
+
+			var mitigationUrls = pxConfiguration.MitigationUrls;
+			if (mitigationUrls.Count > 0)
+			{
+				if (mitigationUrls.Contains(uri))
+				{
+					return false;
+				}
+				return true;
+			}
+			else
+			{
+				return pxConfiguration.MonitorMode;
+			} 
+           
+        }
+
+        private string[] extractCookieNames(string cookieHeader)
+		{
+			string[] cookieNames =  null;
+			if (cookieHeader != null)
+			{
+				var cookies = cookieHeader.Split(';');
+				cookieNames = new string[cookies.Length];
+				for (int i = 0; i < cookies.Length; i++)
+				{
+					cookieNames[i] = cookies[i].Split('=')[0].Trim();
+				}
+			}
+			return cookieNames;
 		}
 
 		private bool CheckSensitiveRoute(StringCollection sensitiveRoutes, string uri)

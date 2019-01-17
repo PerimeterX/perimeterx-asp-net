@@ -19,5 +19,8 @@ namespace PerimeterX
 
 		[DataMember(Name = "additional", EmitDefaultValue = false)]
 		public Additional Additional;
+
+		[DataMember(Name = "pxhd", EmitDefaultValue = false)]
+		public string Pxhd;
 	}
 }
