@@ -99,7 +99,6 @@ namespace PerimeterX
 			{
 				Vid = vid,
 				Pxhd = pxhd,
-				VidSource = PxContext.VidSource,
 				Request = Request.CreateRequestFromContext(PxContext),
 				Additional = new Additional
 				{
@@ -110,10 +109,10 @@ namespace PerimeterX
 					RiskMode = riskMode,
 					PxCookieHMAC = PxContext.PxCookieHmac,
 					CookieOrigin = PxContext.CookieOrigin,
-					RequestCookieNames = PxContext.CookieNames
+					RequestCookieNames = PxContext.CookieNames,
+					VidSource = PxContext.VidSource
 				},
 				FirstParty = PxConfig.FirstPartyEnabled
-			
 			};
 
 			if (!string.IsNullOrEmpty(PxContext.Vid))
