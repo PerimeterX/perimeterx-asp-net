@@ -285,7 +285,7 @@ namespace PerimeterX
 					OsName = osVersion,
 					NodeName = nodeName,
 					EnforcerConfigs = serializedConfig
-				}
+				},
 			};
 
 			try
@@ -293,7 +293,8 @@ namespace PerimeterX
 				var stringBuilder = new StringBuilder();
 				using (var stringOutput = new StringWriter(stringBuilder))
 				{
-					JSON.SerializeDynamic(activity, stringOutput, Options.IncludeInherited);
+					
+					JSON.SerializeDynamic(activity, stringOutput, Options.ExcludeNullsIncludeInherited);
 				}
 
 				httpHandler.Post(stringBuilder.ToString(), PxConstants.ENFORCER_TELEMETRY_API_PATH);
