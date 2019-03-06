@@ -204,11 +204,7 @@ namespace PerimeterX
             var mitigationUrls = pxConfiguration.MitigationUrls;
             if (mitigationUrls.Count > 0)
             {
-                if (mitigationUrls.Contains(uri))
-                {
-                    return false;
-                }
-                return true;
+                return !mitigationUrls.Contains(uri);
             }
 
             if (!string.IsNullOrEmpty(pxConfiguration.ByPassMonitorHeader))
