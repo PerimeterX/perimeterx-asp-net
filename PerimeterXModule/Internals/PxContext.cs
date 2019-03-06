@@ -195,29 +195,31 @@ namespace PerimeterX
 
         private bool shouldMonitorRequest(HttpContext context, PxModuleConfigurationSection pxConfiguration)
         {
-			string uri = context.Request.Url.AbsolutePath;
-            if (uri.IndexOf("/", StringComparison.Ordinal) == 0) 
+            string uri = context.Request.Url.AbsolutePath;
+            if (uri.IndexOf("/", StringComparison.Ordinal) == 0)
             {
                 uri = uri.Substring(1);
             }
 
-			var mitigationUrls = pxConfiguration.MitigationUrls;
-			if (mitigationUrls.Count > 0)
-			{
-				if (mitigationUrls.Contains(uri))
-				{
-					return false;
-				}
-				return true;
-			}
-			
-			if (!string.IsNullOrEmpty(pxConfiguration.ByPassMonitorHeader)) {
-				if (context.Request.Headers[pxConfiguration.ByPassMonitorHeader] == "1") {
-					return false;
-				}
-			}
+            var mitigationUrls = pxConfiguration.MitigationUrls;
+            if (mitigationUrls.Count > 0)
+            {
+                if (mitigationUrls.Contains(uri))
+                {
+                    return false;
+                }
+                return true;
+            }
 
-			return pxConfiguration.MonitorMode;      
+            if (!string.IsNullOrEmpty(pxConfiguration.ByPassMonitorHeader))
+            {
+                if (context.Request.Headers[pxConfiguration.ByPassMonitorHeader] == "1")
+                {
+                    return false;
+                }
+            }
+
+            return pxConfiguration.MonitorMode;
         }
 
         private string[] extractCookieNames(string cookieHeader)
