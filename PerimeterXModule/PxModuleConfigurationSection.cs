@@ -565,5 +565,19 @@ namespace PerimeterX
                 this["mitigationUrls"] = value;
             }
         }
+
+        [ConfigurationProperty("bypassMonitorHeader", DefaultValue = "")]
+        public string ByPassMonitorHeader
+        {
+            get
+            {
+                return (string)this["bypassMonitorHeader"];
+            }
+
+            set
+            {
+                this["bypassMonitorHeader"] = value;
+            }
+        }
     }
 }

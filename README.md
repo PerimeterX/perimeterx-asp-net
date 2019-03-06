@@ -33,6 +33,7 @@ Table of Contents
   *   [Base URI](#base-uri)
   *   [Override UA header](#override-ua)
   *   [Mitigation Urls](#mitigiation-urls)
+  *   [Test Block Flow on Monitoring Mode](#bypass-monitor-header)
 
 
   **[Contributing](#contributing)**
@@ -445,6 +446,23 @@ namespace MyApp
         }
     }
 }
+```
+
+#### <a name=“bypass-monitor-header”></a> Test Block Flow on Monitoring Mode
+
+Allows you to test an enforcer’s blocking flow while you are still in Monitor Mode.
+
+When the header name is set (eg. `x-px-block`) and the value is set to `1`, when there is a block response (for example from using a User-Agent header with the value of `PhantomJS/1.0`) the Monitor Mode is bypassed and full block mode is applied. If one of the conditions is missing you will stay in Monitor Mode. This is done per request.
+To stay in Monitor Mode, set the header value to `0`.
+
+The Header name is configurable using the `bypassMonitorHeader` property.
+
+**Default:** not set
+
+```xml
+...
+  bypassMonitorHeader="x-px-block"
+...
 ```
 
 <a name="contributing"></a> Contributing
