@@ -190,30 +190,32 @@ namespace PerimeterX
 			CustomBlockUrl = pxConfiguration.CustomBlockUrl;
 			RedirectOnCustomUrl = pxConfiguration.RedirectOnCustomUrl;
 
-            MonitorRequest = shouldMonitorRequest(context.Request.Url.AbsolutePath, pxConfiguration);
+            MonitorRequest = shouldMonitorRequest(context, pxConfiguration);
 		}
 
-        private bool shouldMonitorRequest(String uri, PxModuleConfigurationSection pxConfiguration)
+        private bool shouldMonitorRequest(HttpContext context, PxModuleConfigurationSection pxConfiguration)
         {
-            if (uri.IndexOf("/", StringComparison.Ordinal) == 0) 
+            string uri = context.Request.Url.AbsolutePath;
+            if (uri.IndexOf("/", StringComparison.Ordinal) == 0)
             {
                 uri = uri.Substring(1);
             }
 
-			var mitigationUrls = pxConfiguration.MitigationUrls;
-			if (mitigationUrls.Count > 0)
-			{
-				if (mitigationUrls.Contains(uri))
-				{
-					return false;
-				}
-				return true;
-			}
-			else
-			{
-				return pxConfiguration.MonitorMode;
-			} 
-           
+            var mitigationUrls = pxConfiguration.MitigationUrls;
+            if (mitigationUrls.Count > 0)
+            {
+                return !mitigationUrls.Contains(uri);
+            }
+
+            if (!string.IsNullOrEmpty(pxConfiguration.ByPassMonitorHeader))
+            {
+                if (context.Request.Headers[pxConfiguration.ByPassMonitorHeader] == "1")
+                {
+                    return false;
+                }
+            }
+
+            return pxConfiguration.MonitorMode;
         }
 
         private string[] extractCookieNames(string cookieHeader)
