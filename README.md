@@ -34,6 +34,7 @@ Table of Contents
   *   [Override UA header](#override-ua)
   *   [Mitigation Urls](#mitigiation-urls)
 
+  **[Advanced Blocking Response](#advancedBlockingResponse)**
 
   **[Contributing](#contributing)**
   *   [Tests](#tests)
@@ -446,6 +447,38 @@ namespace MyApp
     }
 }
 ```
+
+<a name="advancedBlockingResponse"></a> Advanced Blocking Response
+------------------------------------------------------------------
+In special cases, (such as XHR post requests) a full Captcha page render might not be an option. In such cases, using the Advanced Blocking Response returns a JSON object containing all the information needed to render your own Captcha challenge implementation, be it a popup modal, a section on the page, etc. The Advanced Blocking Response occurs when a request contains the *Accept* header with the value of `application/json`. A sample JSON response appears as follows:
+
+```javascript
+{
+    "appId": String,
+    "jsClientSrc": String,
+    "firstPartyEnabled": Boolean,
+    "vid": String,
+    "uuid": String,
+    "hostUrl": String,
+    "blockScript": String
+}
+```
+
+Once you have the JSON response object, you can pass it to your implementation (with query strings or any other solution) and render the Captcha challenge.
+
+In addition, you can add the `_pxOnCaptchaSuccess` callback function on the window object of your Captcha page to react according to the Captcha status. For example when using a modal, you can use this callback to close the modal once the Captcha is successfullt solved. <br/> An example of using the `_pxOnCaptchaSuccess` callback is as follows:
+
+```javascript
+window._pxOnCaptchaSuccess = function(isValid) {
+    if(isValid) {
+        alert("yay");
+    } else {
+        alert("nay");
+    }
+}
+```
+
+For details on how to create a custom Captcha page, refer to the [documentation](https://console.perimeterx.com/docs/server_integration_new.html#custom-captcha-section)
 
 <a name="contributing"></a> Contributing
 ----------------------------------------
