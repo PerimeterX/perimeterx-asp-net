@@ -187,21 +187,27 @@ namespace PerimeterX
 				{
 					return;
 				}
-
-				//check if this is a telemetry command
-				if (IsTelemetryCommand(applicationContext))
+				try
 				{
-					if(IsTelemetryCommandValid(applicationContext))
+					//check if this is a telemetry command
+					if (IsTelemetryCommand(applicationContext))
 					{
-						//command is valid. send telemetry
-						PostEnforcerTelemetryActivity();
+						if (IsTelemetryCommandValid(applicationContext))
+						{
+							//command is valid. send telemetry
+							PostEnforcerTelemetryActivity();
+						}
+
+						// it's not a "real" request. Stop the HTTP pipeline chain
+						application.CompleteRequest();
+						return;
 					}
-					
-					// it's not a "real" request. Stop the HTTP pipeline chain
-					application.CompleteRequest();
-					return;
 				}
-					
+				catch (Exception ex)
+				{
+					PxLoggingUtils.LogDebug("Failed to validate Telemetry command request: " + ex.Message);
+				}
+
 				if (validationMarker == applicationContext.Request.Headers[PxConstants.PX_VALIDATED_HEADER])
 				{
 					return;
