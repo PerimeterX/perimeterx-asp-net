@@ -345,7 +345,7 @@ namespace PerimeterX
 					OsName = osVersion,
 					NodeName = nodeName,
 					EnforcerConfigs = serializedConfig
-				},
+				}
 			};
 
 			try
