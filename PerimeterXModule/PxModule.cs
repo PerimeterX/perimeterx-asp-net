@@ -38,6 +38,7 @@ using System.Collections;
 using Jil;
 using System.Collections.Generic;
 using PerimeterX.Internals;
+using System.Web.Script.Serialization;
 
 namespace PerimeterX
 {
@@ -161,10 +162,7 @@ namespace PerimeterX
 		public void Init(HttpApplication application)
 		{
 			application.BeginRequest += this.Application_BeginRequest;
-
-			// Send Enforcer Telemetry config upon module initialization.
 			nodeName = application.Context.Server.MachineName;
-			PostEnforcerTelemetryActivity();
 		}
 
 		private void Application_BeginRequest(object source, EventArgs e)
@@ -190,6 +188,20 @@ namespace PerimeterX
 					return;
 				}
 
+				//check if this is a telemetry command
+				if (IsTelemetryCommand(applicationContext))
+				{
+					if(IsTelemetryCommandValid(applicationContext))
+					{
+						//command is valid. send telemetry
+						PostEnforcerTelemetryActivity();
+					}
+					
+					// it's not a "real" request. Stop the HTTP pipeline chain
+					application.CompleteRequest();
+					return;
+				}
+					
 				if (validationMarker == applicationContext.Request.Headers[PxConstants.PX_VALIDATED_HEADER])
 				{
 					return;
@@ -230,6 +242,47 @@ namespace PerimeterX
 			{
 				PxLoggingUtils.LogDebug("Failed to validate request: " + ex.Message);
 			}
+		}
+
+		private bool IsTelemetryCommandValid(HttpContext applicationContext)
+		{
+			//extract header value and decode it from base64 string
+			string headerValue = applicationContext.Request.Headers[PxConstants.ENFORCER_TELEMETRY_HEADER];
+			string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(headerValue));
+
+			//value is in the form of timestamp:hmac_val
+			string[] splittedValue = decodedString.Split(new Char[] { ':' });
+			if (splittedValue.Length != 2)
+			{
+				PxLoggingUtils.LogDebug("Malformed header value - " + PxConstants.ENFORCER_TELEMETRY_HEADER + " = " + headerValue);
+				return false;
+			}
+
+			//timestamp
+			DateTime expirationTime = (new DateTime(1970, 1, 1)).AddMilliseconds(double.Parse(splittedValue[0]));
+			if ((expirationTime - DateTime.UtcNow).Ticks < 0)
+			{
+				//commmand is expired
+				PxLoggingUtils.LogDebug("Telemetry command is expired");
+				return false;
+			}
+
+			//check hmac integrity
+			string generatedHmac = BitConverter.ToString(new HMACSHA256(cookieKeyBytes).ComputeHash(Encoding.UTF8.GetBytes(splittedValue[0]))).Replace("-","");
+			if(generatedHmac != splittedValue[1].ToUpper())
+			{
+				PxLoggingUtils.LogDebug("hmac validation failed. original = " + splittedValue[1] + ", generated = " + generatedHmac);
+				return false;
+			}
+
+			return true;
+		}
+
+		private bool IsTelemetryCommand(HttpContext applicationContext)
+		{
+			//we got Telemetry command request
+			PxLoggingUtils.LogDebug("Received command to send enforcer telemetry");
+			return applicationContext.Request.Headers[PxConstants.ENFORCER_TELEMETRY_HEADER] != null;
 		}
 
 		private void PostPageRequestedActivity(PxContext pxContext)
@@ -273,6 +326,13 @@ namespace PerimeterX
 				serializedConfig = json.ToString();
 			}
 
+			//remove cookieKey and ApiToken from telemetry
+			var jsSerializer = new JavaScriptSerializer();
+			Dictionary<string, object> dict = (Dictionary<string, object>)jsSerializer.DeserializeObject(serializedConfig);
+			dict.Remove("CookieKey");
+			dict.Remove("ApiToken");
+			serializedConfig = new JavaScriptSerializer().Serialize(dict);
+
 			var activity = new Activity
 			{
 				Type = "enforcer_telemetry",
@@ -281,7 +341,7 @@ namespace PerimeterX
 				Details = new EnforcerTelemetryActivityDetails
 				{
 					ModuleVersion = PxConstants.MODULE_VERSION,
-					UpdateReason = EnforcerTelemetryUpdateReasonEnum.INITIAL_CONFIG,
+					UpdateReason = EnforcerTelemetryUpdateReasonEnum.COMMAND,
 					OsName = osVersion,
 					NodeName = nodeName,
 					EnforcerConfigs = serializedConfig
