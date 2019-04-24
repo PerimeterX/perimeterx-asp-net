@@ -353,7 +353,6 @@ namespace PerimeterX
 				var stringBuilder = new StringBuilder();
 				using (var stringOutput = new StringWriter(stringBuilder))
 				{
-					
 					JSON.SerializeDynamic(activity, stringOutput, Options.ExcludeNullsIncludeInherited);
 				}
 
