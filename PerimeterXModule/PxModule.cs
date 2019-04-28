@@ -192,15 +192,8 @@ namespace PerimeterX
 					//check if this is a telemetry command
 					if (IsTelemetryCommand(applicationContext))
 					{
-						if (IsTelemetryCommandValid(applicationContext))
-						{
-							//command is valid. send telemetry
-							PostEnforcerTelemetryActivity();
-						}
-
-						// it's not a "real" request. Stop the HTTP pipeline chain
-						application.CompleteRequest();
-						return;
+						//command is valid. send telemetry
+						PostEnforcerTelemetryActivity();
 					}
 				}
 				catch (Exception ex)
@@ -250,10 +243,19 @@ namespace PerimeterX
 			}
 		}
 
-		private bool IsTelemetryCommandValid(HttpContext applicationContext)
+		private bool IsTelemetryCommand(HttpContext applicationContext)
 		{
 			//extract header value and decode it from base64 string
 			string headerValue = applicationContext.Request.Headers[PxConstants.ENFORCER_TELEMETRY_HEADER];
+			if(headerValue == null)
+			{
+				return false;
+			}
+
+			//we got Telemetry command request
+			PxLoggingUtils.LogDebug("Received command to send enforcer telemetry");
+
+			//base 64 decode
 			string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(headerValue));
 
 			//value is in the form of timestamp:hmac_val
@@ -274,21 +276,14 @@ namespace PerimeterX
 			}
 
 			//check hmac integrity
-			string generatedHmac = BitConverter.ToString(new HMACSHA256(cookieKeyBytes).ComputeHash(Encoding.UTF8.GetBytes(splittedValue[0]))).Replace("-","");
-			if(generatedHmac != splittedValue[1].ToUpper())
+			string generatedHmac = BitConverter.ToString(new HMACSHA256(cookieKeyBytes).ComputeHash(Encoding.UTF8.GetBytes(splittedValue[0]))).Replace("-", "");
+			if (generatedHmac != splittedValue[1].ToUpper())
 			{
 				PxLoggingUtils.LogDebug("hmac validation failed. original = " + splittedValue[1] + ", generated = " + generatedHmac);
 				return false;
 			}
 
 			return true;
-		}
-
-		private bool IsTelemetryCommand(HttpContext applicationContext)
-		{
-			//we got Telemetry command request
-			PxLoggingUtils.LogDebug("Received command to send enforcer telemetry");
-			return applicationContext.Request.Headers[PxConstants.ENFORCER_TELEMETRY_HEADER] != null;
 		}
 
 		private void PostPageRequestedActivity(PxContext pxContext)
