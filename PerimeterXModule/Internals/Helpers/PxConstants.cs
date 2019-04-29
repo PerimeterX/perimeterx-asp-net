@@ -34,6 +34,7 @@ namespace PerimeterX
 		public static readonly string FIRST_PARTY_HEADER = "X-PX-FIRST-PARTY";
 		public static readonly string FIRST_PARTY_VALUE = "1";
 		public static readonly string COOKIE_HEADER = "cookie";
+		public static readonly string ENFORCER_TELEMETRY_HEADER = "X-PX-ENFORCER-TELEMETRY";
 
 		// Endpoints
 		public const string RISK_API_PATH = "/api/v3/risk";
