@@ -586,7 +586,16 @@ namespace PerimeterX
 			{
 				var customVerificationHandlerType =
 					AppDomain.CurrentDomain.GetAssemblies()
-							 .SelectMany(a => a.GetTypes())
+							 .SelectMany(a => {
+								 try
+								 {
+									 return a.GetTypes();
+								 }
+								 catch
+								 {
+									 return new Type[0];
+								 }
+							 })
 							 .FirstOrDefault(t => t.GetInterface(typeof(IVerificationHandler).Name) != null &&
 												  t.Name.Equals(customHandlerName) && t.IsClass && !t.IsAbstract);
 
