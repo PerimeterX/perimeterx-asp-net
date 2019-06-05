@@ -59,7 +59,7 @@ namespace PerimeterX
 		private readonly bool sendBlockActivities;
 		private readonly int blockingScore;
 		private readonly string appId;
-		private readonly string customVerificationHandler;
+		private readonly IVerificationHandler customVerificationHandlerInstance;
 		private readonly bool suppressContentBlock;
 		private readonly bool challengeEnabled;
 		private readonly string[] sensetiveHeaders;
@@ -110,7 +110,7 @@ namespace PerimeterX
 			cookieKeyBytes = Encoding.UTF8.GetBytes(cookieKey);
 			blockingScore = config.BlockingScore;
 			appId = config.AppId;
-			customVerificationHandler = config.CustomVerificationHandler;
+			customVerificationHandlerInstance = GetCustomVerificationHandler(config.CustomVerificationHandler);
 			suppressContentBlock = config.SuppressContentBlock;
 			challengeEnabled = config.ChallengeEnabled;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
@@ -542,19 +542,9 @@ namespace PerimeterX
 		
 			SetPxhdAndVid(pxContext);
 			// If implemented, run the customVerificationHandler.
-			if (!string.IsNullOrEmpty(customVerificationHandler))
+			if (customVerificationHandlerInstance != null)
 			{
-				IVerificationHandler customVerificationHandlerInstance = GetCustomVerificationHandler(customVerificationHandler);
-				if (customVerificationHandlerInstance != null)
-				{
-					customVerificationHandlerInstance.Handle(application, pxContext, config);
-				}
-				else
-				{
-					PxLoggingUtils.LogDebug(string.Format(
-						"Missing implementation of the configured IVerificationHandler ('customVerificationHandler' attribute): {0}.",
-						customVerificationHandler));
-				}
+				customVerificationHandlerInstance.Handle(application, pxContext, config);
 			}
 			// No custom verification handler -> continue regular flow
 			else if (!verified && !pxContext.MonitorRequest)
@@ -580,20 +570,39 @@ namespace PerimeterX
 		/// <returns>If found, returns the IVerificationHandler class instance. Otherwise, returns null.</returns>
 		private static IVerificationHandler GetCustomVerificationHandler(string customHandlerName)
 		{
-			IVerificationHandler customVerificationHandler = null;
+			if (string.IsNullOrEmpty(customHandlerName))
+			{
+				return null;
+			}
 
 			try
 			{
 				var customVerificationHandlerType =
 					AppDomain.CurrentDomain.GetAssemblies()
-							 .SelectMany(a => a.GetTypes())
+							 .SelectMany(a => {
+								 try
+								 {
+									 return a.GetTypes();
+								 }
+								 catch
+								 {
+									 return new Type[0];
+								 }
+							 })
 							 .FirstOrDefault(t => t.GetInterface(typeof(IVerificationHandler).Name) != null &&
 												  t.Name.Equals(customHandlerName) && t.IsClass && !t.IsAbstract);
 
 				if (customVerificationHandlerType != null)
 				{
-					customVerificationHandler = (IVerificationHandler)Activator.CreateInstance(customVerificationHandlerType, null);
+					var instance = (IVerificationHandler)Activator.CreateInstance(customVerificationHandlerType, null);
 					PxLoggingUtils.LogDebug(string.Format("Successfully loaded ICustomeVerificationHandler '{0}'.", customHandlerName));
+					return instance;
+				}
+				else
+				{
+					PxLoggingUtils.LogDebug(string.Format(
+						"Missing implementation of the configured IVerificationHandler ('customVerificationHandler' attribute): {0}.",
+						customHandlerName));
 				}
 			}
 			catch (ReflectionTypeLoadException ex)
@@ -607,7 +616,7 @@ namespace PerimeterX
 											  customHandlerName, ex.Message));
 			}
 
-			return customVerificationHandler;
+			return null;
 		}
 	}
 }
