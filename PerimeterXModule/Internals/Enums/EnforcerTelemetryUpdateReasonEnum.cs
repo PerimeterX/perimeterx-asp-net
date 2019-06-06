@@ -5,7 +5,7 @@ namespace PerimeterX
 {
     public enum EnforcerTelemetryUpdateReasonEnum
     {
-        [EnumMember(Value = "initial_config")]
-        INITIAL_CONFIG
+        [EnumMember(Value = "command")]
+        COMMAND
     }
 }

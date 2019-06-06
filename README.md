@@ -5,7 +5,7 @@
 [PerimeterX](http://www.perimeterx.com) ASP.NET SDK
 ===================================================
 
-> Latest stable version: [v3.0.0](https://www.nuget.org/packages/PerimeterXModule/3.0.0)
+> Latest stable version: [v3.1.0](https://www.nuget.org/packages/PerimeterXModule/3.1.0)
 
 Table of Contents
 -----------------
@@ -33,6 +33,7 @@ Table of Contents
   *   [Base URI](#base-uri)
   *   [Override UA header](#override-ua)
   *   [Mitigation Urls](#mitigiation-urls)
+  *   [Test Block Flow on Monitoring Mode](#bypass-monitor-header)
 
   **[Advanced Blocking Response](#advancedBlockingResponse)**
 
@@ -100,10 +101,10 @@ Add site specific configuration (configuration level)
 ### <a name="upgrade"></a> Upgrading
 To upgrade to the latest Enforcer version:
 
-1. In Visual Studio, right click on the solution and Select **Manage NuGet packages for solution**. 
+1. In Visual Studio, right click on the solution and Select **Manage NuGet packages for solution**.
 2. Search for `perimeterxmodule` in the updates section, and update.
 
-   **OR** 
+   **OR**
 
 Run `Install-Package PerimeterXModule` in the Package Manager Console
 
@@ -152,7 +153,7 @@ Example below:
 ```
 
 ##### Redirect to a Custom Block Page URL
-Customizes the block page to meet branding and message requirements by specifying the URL of the block page HTML file. The page can also implement CAPTCHA. 
+Customizes the block page to meet branding and message requirements by specifying the URL of the block page HTML file. The page can also implement CAPTCHA.
 
 **Default:** "" (empty string)
 
@@ -212,7 +213,7 @@ Users who have Custom Block Pages must include the new script tag and a new div 
 
 A custom verification handler can be called by the PxModule instead of the default behavior, to allow a user to customize the behavior based on the risk score returned by PerimeterX.
 
-The custom handler class should implement the `IVerificationHandler` interface, and its name should be added to the configuration section:   
+The custom handler class should implement the `IVerificationHandler` interface, and its name should be added to the configuration section:
 
 ```xml
 ...
@@ -442,10 +443,27 @@ namespace MyApp
             dynamic pxde = pxContext.Pxde;
             // do something with the data enrichment
           }
-          ...          
+          ...
         }
     }
 }
+```
+
+#### <a name=“bypass-monitor-header”></a> Test Block Flow on Monitoring Mode
+
+Allows you to test an enforcer’s blocking flow while you are still in Monitor Mode.
+
+When the header name is set (eg. `x-px-block`) and the value is set to `1`, when there is a block response (for example from using a User-Agent header with the value of `PhantomJS/1.0`) the Monitor Mode is bypassed and full block mode is applied. If one of the conditions is missing you will stay in Monitor Mode. This is done per request.
+To stay in Monitor Mode, set the header value to `0`.
+
+The Header name is configurable using the `bypassMonitorHeader` property.
+
+**Default:** not set
+
+```xml
+...
+  bypassMonitorHeader="x-px-block"
+...
 ```
 
 <a name="advancedBlockingResponse"></a> Advanced Blocking Response

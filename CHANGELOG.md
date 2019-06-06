@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [3.1.0] - 2019-06-05
+### Added
+- Send telemetry on demand by header
+- Support for testing blocking flow in monitor mode
+
+### Fixed
+- CustomVerificationHandler handling
+
 ## [3.0.0] - 2019-01-17
 ### Added
 - Added PXHD handling
@@ -14,7 +22,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 ### Added
 - Support for simulated_block
 ### Fixed
-- Captcha v2 template and error handling 
+- Captcha v2 template and error handling
 - Various stablity and performance fixes
 
 ## [2.6.0] - 2018-08-07
