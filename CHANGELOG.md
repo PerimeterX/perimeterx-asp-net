@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [3.1.1] - 2019-07-03
+### Fixed
+- customBlockUrl redirect flow
+- customBlockUrl whitelisting
+
 ## [3.1.0] - 2019-06-05
 ### Added
 - Send telemetry on demand by header
