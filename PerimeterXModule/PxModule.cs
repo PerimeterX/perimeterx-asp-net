@@ -445,12 +445,9 @@ namespace PerimeterX
 
 			var url = context.Request.Url.AbsolutePath;
 
-			// customblockUrl check
-			if (customBlockUrl != null)
-			{
-				if (url == customBlockUrl) {
-					return true;
-				}
+			// custom block url check
+			if (customBlockUrl != null && url == customBlockUrl) {
+				return true;
 			}
 
 			// whitelist routes prefix
