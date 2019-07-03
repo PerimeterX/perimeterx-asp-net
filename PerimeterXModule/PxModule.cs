@@ -68,6 +68,7 @@ namespace PerimeterX
 		private readonly StringCollection useragentsWhitelist;
 		private readonly StringCollection enforceSpecificRoutes;
 		private readonly string cookieKey;
+		private readonly string customBlockUrl;
 		private readonly byte[] cookieKeyBytes;
 		private readonly string osVersion;
 		private string nodeName;
@@ -219,7 +220,7 @@ namespace PerimeterX
 						BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.IgnoreCase | BindingFlags.FlattenHierarchy);
 					// Remove the ReadOnly property
 					ro.SetValue(headers, false, null);
-					// Invoke the protected InvalidateCachedArrays method 
+					// Invoke the protected InvalidateCachedArrays method
 					hdr.InvokeMember("InvalidateCachedArrays",
 						BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Instance,
 						null, headers, null);
@@ -442,13 +443,19 @@ namespace PerimeterX
 				return true;
 			}
 
-			// whitelist routes prefix
 			var url = context.Request.Url.AbsolutePath;
+
+			// custom block url check
+			if (customBlockUrl != null && url == customBlockUrl) {
+				return true;
+			}
+
+			// whitelist routes prefix
 			if (routesWhitelist != null)
 			{
 				foreach (var prefix in routesWhitelist)
 				{
-					if (url.StartsWith(prefix) || url == pxContext.CustomBlockUrl)
+					if (url.StartsWith(prefix))
 					{
 						return true;
 					}
@@ -539,7 +546,7 @@ namespace PerimeterX
 				PxLoggingUtils.LogDebug(string.Format("Invalid request to {0}", application.Context.Request.RawUrl));
 				PostBlockActivity(pxContext);
 			}
-		
+
 			SetPxhdAndVid(pxContext);
 			// If implemented, run the customVerificationHandler.
 			if (customVerificationHandlerInstance != null)
@@ -565,7 +572,7 @@ namespace PerimeterX
 		}
 
 		/// <summary>
-		/// Uses reflection to check whether an IVerificationHandler was implemented by the customer. 
+		/// Uses reflection to check whether an IVerificationHandler was implemented by the customer.
 		/// </summary>
 		/// <returns>If found, returns the IVerificationHandler class instance. Otherwise, returns null.</returns>
 		private static IVerificationHandler GetCustomVerificationHandler(string customHandlerName)
