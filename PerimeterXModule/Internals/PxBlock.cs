@@ -120,7 +120,7 @@ namespace PerimeterX.Internals
 			{
 				if (pxContext.RedirectOnCustomUrl)
 				{
-					string uri = pxContext.ApplicationContext.Request.Url.AbsoluteUri;
+					string uri = pxContext.ApplicationContext.Request.Url.PathAndQuery;
 					string encodedUri = Convert.ToBase64String(Encoding.UTF8.GetBytes(uri));
 					string redirectUrl = string.Format("{0}?url={1}&uuid={2}&vid={3}", pxContext.CustomBlockUrl, encodedUri, pxContext.UUID, pxContext.Vid);
 					PxLoggingUtils.LogDebug("Redirecting to custom block page: " + redirectUrl);
