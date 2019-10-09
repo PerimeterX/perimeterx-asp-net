@@ -296,7 +296,8 @@ namespace PerimeterX
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					PassReason = pxContext.PassReason,
 					RiskRoundtripTime = pxContext.RiskRoundtripTime,
-					ClientUuid = pxContext.UUID
+					ClientUuid = pxContext.UUID,
+                    httpMethod = pxContext.HttpMethod
 				});
 			}
 		}
@@ -312,8 +313,9 @@ namespace PerimeterX
 					BlockUuid = pxContext.UUID,
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					RiskScore = pxContext.Score,
-					RiskRoundtripTime = pxContext.RiskRoundtripTime
-				});
+					RiskRoundtripTime = pxContext.RiskRoundtripTime,
+                    httpMethod = pxContext.HttpMethod
+                });
 			}
 		}
 
@@ -378,10 +380,7 @@ namespace PerimeterX
 				Details = details,
 				Headers = pxContext.GetHeadersAsDictionary(),
 			};
-			if (eventType.Equals("page_requested"))
-			{
-				activity.HttpMethod = "Post";
-			}
+
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
