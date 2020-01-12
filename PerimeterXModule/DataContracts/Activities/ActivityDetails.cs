@@ -38,7 +38,9 @@ namespace PerimeterX
         [DataMember(Name = "http_method")]
         public string httpMethod;
 
-	}
+        [DataMember(Name = "simulated_block")]
+        public bool? SimulatedBlock;
+    }
 
     [DataContract]
     public class EnforcerTelemetryActivityDetails : IActivityDetails

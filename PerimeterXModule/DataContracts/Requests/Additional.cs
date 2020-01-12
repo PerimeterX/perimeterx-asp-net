@@ -41,9 +41,6 @@ namespace PerimeterX
 		[DataMember(Name = "px_decoded_original_token")]
 		public object DecodedOriginalToken;
 
-		[DataMember(Name = "simulated_block")]
-		public object SimulatedBlock;
-
 		[DataMember(Name = "request_cookie_names")]
 		public string[] RequestCookieNames;
 

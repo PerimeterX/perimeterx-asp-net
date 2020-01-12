@@ -302,7 +302,7 @@ namespace PerimeterX
 			}
 		}
 
-		private void PostBlockActivity(PxContext pxContext)
+		private void PostBlockActivity(PxContext pxContext, PxModuleConfigurationSection config)
 		{
 			if (sendBlockActivities)
 			{
@@ -314,7 +314,8 @@ namespace PerimeterX
 					ModuleVersion = PxConstants.MODULE_VERSION,
 					RiskScore = pxContext.Score,
 					RiskRoundtripTime = pxContext.RiskRoundtripTime,
-                    httpMethod = pxContext.HttpMethod
+                    httpMethod = pxContext.HttpMethod,
+                    SimulatedBlock = config.MonitorMode == true
                 });
 			}
 		}
@@ -543,7 +544,7 @@ namespace PerimeterX
 			else
 			{
 				PxLoggingUtils.LogDebug(string.Format("Invalid request to {0}", application.Context.Request.RawUrl));
-				PostBlockActivity(pxContext);
+				PostBlockActivity(pxContext, config);
 			}
 
 			SetPxhdAndVid(pxContext);
