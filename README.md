@@ -496,7 +496,7 @@ window._pxOnCaptchaSuccess = function(isValid) {
 }
 ```
 
-For details on how to create a custom Captcha page, refer to the [documentation](https://console.perimeterx.com/docs/server_integration_new.html#custom-captcha-section)
+For details on how to create a custom Captcha page, refer to the [documentation](https://docs.perimeterx.com/pxconsole/docs/customize-challenge-page)
 
 <a name="contributing"></a> Contributing
 ----------------------------------------
