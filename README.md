@@ -112,6 +112,12 @@ Your Enforcer version is now upgraded to the latest enforcer version.
 
 For more information, contact [PerimeterX Support](support@perimeterx.com).
 
+### <a name="additional-info"></a> Additional Info
+
+#### <a name="uri-delimiters"></a> URI Delimiters
+
+PerimeterX processes URI paths with general- and sub-delimiters according to RFC 3986. General delimiters (e.g., `?`, `#`) are used to separate parts of the URI. Sub-delimiters (e.g., `$`, `&`) are not used to split the URI as they are considered valid characters in the URI path.
+
 ### <a name="configuration"></a> Configuration Options
 
 #### Configuring Required Parameters
