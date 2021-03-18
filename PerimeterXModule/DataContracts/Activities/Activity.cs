@@ -30,9 +30,6 @@ namespace PerimeterX
         [DataMember(Name = "details", EmitDefaultValue = false)]
         public IActivityDetails Details;
 
-		[DataMember(Name = "http_method", EmitDefaultValue = false)]
-		public string HttpMethod;
-
 		[DataMember(Name = "pxhd", EmitDefaultValue = false)]
 		public string Pxhd;
 	}
