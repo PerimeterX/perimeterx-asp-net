@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
 ## [3.1.3] - 2022-07-21
 ### Added
-- Added simulated_block for block activities
-- Added http_method to async activities
+- Simulated block indication on block activities
+- HTTP method on async activities
 
 ## [3.1.2] - 2019-09-22
 ### Fixed
