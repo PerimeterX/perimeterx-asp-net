@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [3.1.4] - 2022-12-05
+### Added
+- Compatibility with .NET Framework 4.7 and higher
+
 ## [3.1.3] - 2022-07-21
 ### Added
 - Simulated block indication on block activities
