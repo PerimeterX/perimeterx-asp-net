@@ -514,10 +514,9 @@ namespace PerimeterX
 				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				pxContext = new PxContext(application.Context, config);
 
-                //CI
                 if (loginData != null)
                 {
-                    loginData.extractCredentials(pxContext, application.Context.Request);
+                    pxContext.LoginCredentialsFields = loginData.ExtractCredentials(pxContext, application.Context.Request);
                 }
 
 				// validate using risk cookie

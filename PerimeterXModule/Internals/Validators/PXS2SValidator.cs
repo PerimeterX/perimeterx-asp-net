@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using PerimeterX.DataContracts.Cookies;
+using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {
@@ -149,9 +150,27 @@ namespace PerimeterX
 				riskRequest.Additional.OriginalTokenError = PxContext.OriginalTokenError;
 			}
 
+			SetCredentialsIntelligenceOnRisk(PxContext, riskRequest.Additional);
+
 			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
 			var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_PATH);
 			return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
+		}
+
+		public void SetCredentialsIntelligenceOnRisk(PxContext pxContext, Additional riskRequest)
+		{
+			LoginCredentialsFields loginCredentialsFields = pxContext.LoginCredentialsFields;
+
+            if (loginCredentialsFields != null)
+			{
+                riskRequest.Username = loginCredentialsFields.Username;
+				riskRequest.Version = loginCredentialsFields.Version;	
+				riskRequest.Password = loginCredentialsFields.Password;
+				if (loginCredentialsFields.Version == "multistep_sso")
+				{
+					riskRequest.SsoStep = loginCredentialsFields.SsoStep;
+				}
+            }
 		}
 	}
 }

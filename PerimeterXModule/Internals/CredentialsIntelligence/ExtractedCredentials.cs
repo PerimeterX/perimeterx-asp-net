@@ -5,10 +5,10 @@ namespace PerimeterX.Internals.CredentialsIntelligence
     public class ExtractedCredentials
     {
         [DataMember(Name = "username")]
-        private string Username;
+        public string Username { get; set; }
 
         [DataMember(Name = "password")]
-        private string Password;
+        public string Password { get; set; }
 
         public ExtractedCredentials(string username, string password)
         {

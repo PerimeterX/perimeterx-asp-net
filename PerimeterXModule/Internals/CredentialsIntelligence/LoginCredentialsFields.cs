@@ -21,8 +21,24 @@ namespace PerimeterX.Internals.CredentialsIntelligence
         [DataMember(Name = "version")]
         public string Version;
 
-        [DataMember(Name = "ssoDtep", IsRequired = false)]
+        [DataMember(Name = "ssoStep", IsRequired = false)]
         public string SsoStep;
 
+        public LoginCredentialsFields(string username, string password, string rawUsername, string version, string SsoStep)
+        {
+            this.Username = username;
+            this.Password = password;
+            this.RawUsername = rawUsername;
+            this.Version = version;
+            this.SsoStep = SsoStep;
+        }
+
+        public LoginCredentialsFields(string username, string password, string rawUsername, string version)
+        {
+            this.Username = username;
+            this.Password = password;
+            this.RawUsername = rawUsername;
+            this.Version = version;
+        }
     }
 }

@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Net;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Web;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace PerimeterX
 {
@@ -66,6 +69,21 @@ namespace PerimeterX
 				// repeat BaseAdd invocation for any other headers to be added
 				// Then set the collection back to ReadOnly
 				ro.SetValue(headers, true, null);
+			}
+		}
+
+		public static bool IsEmailAddress(string str)
+		{
+			return Regex.IsMatch(str, PxConstants.EMAIL_ADDRESS_REGEX, RegexOptions.IgnoreCase);
+        }
+
+		public static string Sha256(string str)
+		{
+			using (SHA256 sha256 = SHA256.Create())
+			{
+				byte[] inputBytes = Encoding.UTF8.GetBytes(str);
+				byte[] hash = sha256.ComputeHash(inputBytes);
+				return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
 			}
 		}
 	}

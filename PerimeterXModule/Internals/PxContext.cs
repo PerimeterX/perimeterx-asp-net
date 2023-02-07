@@ -4,6 +4,7 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using PerimeterX.DataContracts.Cookies;
+using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {
@@ -51,6 +52,7 @@ namespace PerimeterX
 		public string VidSource { get; set; }
 		public string Pxhd { get; set; }
         public bool MonitorRequest { get; set; }
+		public LoginCredentialsFields LoginCredentialsFields { get; set; }
 
         public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{

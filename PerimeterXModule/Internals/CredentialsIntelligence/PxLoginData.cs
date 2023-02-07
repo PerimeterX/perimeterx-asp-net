@@ -26,7 +26,7 @@ namespace PerimeterX
             this.loginCredentialsExtractor = loginCredentialsExraction;
         }
 
-        public LoginCredentialsFields extractCredentials(PxContext context, HttpRequest request)
+        public LoginCredentialsFields ExtractCredentials(PxContext context, HttpRequest request)
         {
             ExtractorObject extarctionDetails = FindMatchCredentialsDetails(request);
             if (extarctionDetails != null)
@@ -135,17 +135,7 @@ namespace PerimeterX
         {
             using (var reader = new StreamReader(request.InputStream))
             {
-                try
-                {
-                    var content = await reader.ReadToEndAsync();
-                    return content;
-                }
-                catch (Exception ex)
-                {
-                    // Handle the exception
-                    Console.WriteLine(ex.Message);
-                    return null;
-                }
+                return await reader.ReadToEndAsync();
             }
         }
 
@@ -191,8 +181,6 @@ namespace PerimeterX
                 var value = new StringBuilder();
                 foreach (var line in lines)
                 {
-                    
-
                     if (line.StartsWith("Content-Disposition"))
                     {
                         key = line.Split(new[] { "name=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim('\"');
