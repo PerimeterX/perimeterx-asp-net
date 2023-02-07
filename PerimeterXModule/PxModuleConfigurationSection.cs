@@ -579,5 +579,52 @@ namespace PerimeterX
                 this["bypassMonitorHeader"] = value;
             }
         }
+
+        [ConfigurationProperty("loginCredentialsExtractionEnabled", DefaultValue = false)]
+        public bool LoginCredentialsExtractionEnabled
+        {
+            get
+            {
+                return (bool)this["loginCredentialsExtractionEnabled"];
+            }
+
+            set
+            {
+                this["loginCredentialsExtractionEnabled"] = value;
+            }
+        }
+
+        [ConfigurationProperty("loginCredentialsExtraction", DefaultValue = "")]
+        public string LoginCredentialsExtraction
+        {
+            get
+            {
+                return (string)this["loginCredentialsExtraction"];
+            }
+
+            set
+            {
+                this["loginCredentialsExtraction"] = value;
+            }
+
+        }
+
+    
+
+        [ConfigurationProperty("ciVersion", DefaultValue = "v2")]
+        public string CiVersion
+        {
+            get
+            {
+                return (string)this["ciVersion"];
+            }
+
+            set
+            {
+                this["ciVersion"] = value;
+            }
+
+        }
+
     }
 }

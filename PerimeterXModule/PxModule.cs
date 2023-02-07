@@ -39,6 +39,7 @@ using Jil;
 using System.Collections.Generic;
 using PerimeterX.Internals;
 using System.Web.Script.Serialization;
+using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {
@@ -72,8 +73,11 @@ namespace PerimeterX
 		private readonly byte[] cookieKeyBytes;
 		private readonly string osVersion;
 		private string nodeName;
+		private bool loginCredentialsExtractionEnabled;
+		private PxLoginData loginData;
 
-		static PxModule()
+
+        static PxModule()
 		{
 			try
 			{
@@ -120,8 +124,11 @@ namespace PerimeterX
 			useragentsWhitelist = config.UseragentsWhitelist;
 			enforceSpecificRoutes = config.EnforceSpecificRoutes;
 
-			// Set Decoder
-			if (config.EncryptionEnabled)
+
+			extractCredentialsIntelligence(config);
+
+            // Set Decoder
+            if (config.EncryptionEnabled)
 			{
 				cookieDecoder = new EncryptedCookieDecoder(cookieKeyBytes);
 			}
@@ -159,6 +166,18 @@ namespace PerimeterX
 		{
 			get { return "PxModule"; }
 		}
+
+		private void extractCredentialsIntelligence(PxModuleConfigurationSection config)
+		{
+			List<ExtractorObject> loginCredentialsExtraction;
+			loginCredentialsExtractionEnabled = config.LoginCredentialsExtractionEnabled;
+            
+			if (loginCredentialsExtractionEnabled && config.LoginCredentialsExtraction != "")
+            {
+                loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
+                loginData = new PxLoginData(config.CiVersion, loginCredentialsExtraction);
+            }
+        }
 
 		public void Init(HttpApplication application)
 		{
@@ -494,6 +513,12 @@ namespace PerimeterX
 			{
 				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				pxContext = new PxContext(application.Context, config);
+
+                //CI
+                if (loginData != null)
+                {
+                    loginData.extractCredentials(pxContext, application.Context.Request);
+                }
 
 				// validate using risk cookie
 				IPxCookie pxCookie = PxCookieUtils.BuildCookie(config, pxContext.PxCookies, cookieDecoder);
