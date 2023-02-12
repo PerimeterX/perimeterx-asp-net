@@ -40,6 +40,7 @@ using System.Collections.Generic;
 using PerimeterX.Internals;
 using System.Web.Script.Serialization;
 using PerimeterX.Internals.CredentialsIntelligence;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PerimeterX
 {
@@ -516,7 +517,11 @@ namespace PerimeterX
 
                 if (loginData != null)
                 {
-                    pxContext.LoginCredentialsFields = loginData.ExtractCredentials(pxContext, application.Context.Request);
+                    LoginCredentialsFields loginCredentialsFields = loginData.ExtractCredentials(pxContext, application.Context.Request);
+                    if (loginCredentialsFields != null)
+					{
+						pxContext.LoginCredentialsFields = loginCredentialsFields;
+                    }
                 }
 
 				// validate using risk cookie
@@ -562,6 +567,9 @@ namespace PerimeterX
 				{
 					PxLoggingUtils.LogDebug("Monitor Mode is activated. passing request");
 				}
+
+				HandleCredentialsIntelligence(application, config);
+
 				PxLoggingUtils.LogDebug(string.Format("Valid request to {0}", application.Context.Request.RawUrl));
 				PostPageRequestedActivity(pxContext);
 			}
@@ -595,11 +603,21 @@ namespace PerimeterX
 			}
 		}
 
-		/// <summary>
-		/// Uses reflection to check whether an IVerificationHandler was implemented by the customer.
-		/// </summary>
-		/// <returns>If found, returns the IVerificationHandler class instance. Otherwise, returns null.</returns>
-		private static IVerificationHandler GetCustomVerificationHandler(string customHandlerName)
+		private void HandleCredentialsIntelligence(HttpApplication application, PxModuleConfigurationSection config)
+		{
+			if (config.LoginCredentialsExtractionEnabled && 
+				pxContext.LoginCredentialsFields != null && 
+				pxContext.IsBreachedAccount())
+			{
+				application.Context.Request.Headers.Add(config.CompromisedCredentialsHeader, JSON.Serialize(pxContext.Pxde.breached_account));
+			}
+        }
+
+        /// <summary>
+        /// Uses reflection to check whether an IVerificationHandler was implemented by the customer.
+        /// </summary>
+        /// <returns>If found, returns the IVerificationHandler class instance. Otherwise, returns null.</returns>
+        private static IVerificationHandler GetCustomVerificationHandler(string customHandlerName)
 		{
 			if (string.IsNullOrEmpty(customHandlerName))
 			{

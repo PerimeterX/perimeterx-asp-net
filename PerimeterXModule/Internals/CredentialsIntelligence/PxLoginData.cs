@@ -63,7 +63,7 @@ namespace PerimeterX
                     return true;
                 }
 
-                if (extractorObject.PathType == "regex" && Regex.IsMatch(request.RawUrl, extractorObject.Path))
+                if (extractorObject.PathType == "regex" && Regex.IsMatch(request.Path, extractorObject.Path))
                 {
                     return true;
                 }
@@ -89,7 +89,10 @@ namespace PerimeterX
                 return ExtractFromHeader(userFieldName, passwordFieldName, headers);
             } else if (extractionDetails.SentThrough == "query-param")
             {
-                return new ExtractedCredentials(request.QueryString[userFieldName], request.QueryString[passwordFieldName]);
+                return new ExtractedCredentials(
+                    request.QueryString[userFieldName].Replace(" ", "+"),
+                    request.QueryString[passwordFieldName].Replace(" ", "+")
+                );
             } else if (extractionDetails.SentThrough == "body")
             {
                 return ExtractFromBodyAsync(userFieldName, passwordFieldName, headers, request).Result;
@@ -103,7 +106,7 @@ namespace PerimeterX
             bool isUsernameHeaderExist = headers.TryGetValue(userFieldName, out string userName);
             bool isPasswordHeaderExist = headers.TryGetValue(passwordFieldName, out string password);
 
-            if (!isUsernameHeaderExist || !isPasswordHeaderExist) { return null; }
+            if (!isUsernameHeaderExist && !isPasswordHeaderExist) { return null; }
 
             return new ExtractedCredentials(userName, password);
         }
@@ -119,7 +122,7 @@ namespace PerimeterX
                 return null;
             } else if (contentType.Contains("application/json"))
             {
-                return convertToJson(body, userFieldName, passwordFieldName);
+                return ConvertToJson(body, userFieldName, passwordFieldName);
             } else if (contentType.Contains("x-www-form-urlencoded"))
             {
                 return ReadValueFromUrlEncoded(body, userFieldName, passwordFieldName);
@@ -139,11 +142,14 @@ namespace PerimeterX
             }
         }
 
-        public ExtractedCredentials convertToJson(string body, string userFieldName, string passwordFieldName) {
+        public ExtractedCredentials ConvertToJson(string body, string userFieldName, string passwordFieldName) {
 
-            dynamic json = JSON.DeserializeDynamic(body, PxConstants.JSON_OPTIONS);
+            dynamic jsonBody = JSON.DeserializeDynamic(body, PxConstants.JSON_OPTIONS);
 
-            return new ExtractedCredentials((string)json[userFieldName], (string)json[passwordFieldName]);
+            string userValue = PxCommonUtils.ExtractValueFromNestedJson(userFieldName, jsonBody);
+            string passValue = PxCommonUtils.ExtractValueFromNestedJson(passwordFieldName, jsonBody);
+
+            return new ExtractedCredentials(userValue, passValue);
         }
 
         public ExtractedCredentials ReadValueFromUrlEncoded(string body, string userFieldName, string passwordFieldName)
@@ -202,15 +208,14 @@ namespace PerimeterX
             bool isUsernameExist = parametersDictionary.TryGetValue(userFieldName, out string userField);
             bool isPasswordExist = parametersDictionary.TryGetValue(passwordFieldName, out string passwordField);
 
-            if (!isPasswordExist || !isPasswordExist)
+            if (!isUsernameExist && !isPasswordExist)
             {
                 return null;
             }
 
             return new ExtractedCredentials(userField, passwordField);
         }
-
-
-
     } 
+
+
 }

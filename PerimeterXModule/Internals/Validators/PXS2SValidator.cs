@@ -152,7 +152,7 @@ namespace PerimeterX
 
 			SetCredentialsIntelligenceOnRisk(PxContext, riskRequest.Additional);
 
-			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
+            string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
 			var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_PATH);
 			return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
 		}
@@ -164,9 +164,9 @@ namespace PerimeterX
             if (loginCredentialsFields != null)
 			{
                 riskRequest.Username = loginCredentialsFields.Username;
-				riskRequest.Version = loginCredentialsFields.Version;	
+				riskRequest.CiVersion = loginCredentialsFields.CiVersion;	
 				riskRequest.Password = loginCredentialsFields.Password;
-				if (loginCredentialsFields.Version == "multistep_sso")
+				if (loginCredentialsFields.CiVersion == "multistep_sso")
 				{
 					riskRequest.SsoStep = loginCredentialsFields.SsoStep;
 				}

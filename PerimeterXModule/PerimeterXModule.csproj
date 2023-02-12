@@ -64,6 +64,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internals\CredentialsIntelligence\ExtractedCredentials.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\ICredentialsIntelligenceProtocol.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\CredentialsIntelligenceProtocolFactory.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\ExtractorObject.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginCredentialsFields.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\PxLoginData.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\MultistepSSOCredentialsIntelligenceProtocol.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\V2CredentialsIntelligenceProtocol.cs" />
+    <Compile Include="Internals\Enums\CIVersion.cs" />
     <Compile Include="Internals\PxBlock.cs" />
     <Compile Include="Internals\Cookies\PxCookieUtils.cs" />
     <Compile Include="DataContracts\Cookies\DecodedCookieV3.cs" />

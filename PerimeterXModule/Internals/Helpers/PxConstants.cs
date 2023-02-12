@@ -35,8 +35,7 @@ namespace PerimeterX
 		public static readonly string FIRST_PARTY_VALUE = "1";
 		public static readonly string COOKIE_HEADER = "cookie";
 		public static readonly string ENFORCER_TELEMETRY_HEADER = "X-PX-ENFORCER-TELEMETRY";
-        public static readonly string EMAIL_ADDRESS_REGEX = @"^([a - zA - Z0 - 9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?)$";
-
+		public static readonly string EMAIL_ADDRESS_REGEX = @"\A(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)\Z";
         // Endpoints
         public const string RISK_API_PATH = "/api/v3/risk";
 		public const string ACTIVITIES_API_PATH = "/api/v1/collector/s2s";

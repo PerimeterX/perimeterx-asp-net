@@ -14,10 +14,12 @@ namespace PerimeterX.Internals.CredentialsIntelligence
         {
             string rawUsername = null;
             string password = null;
+            string ssoStep = "pass";
 
             if (extractedCredentials.Username != null) 
             {
                 rawUsername = extractedCredentials.Username;
+                ssoStep = "user";
             } 
 
             if (extractedCredentials.Password != null)
@@ -29,7 +31,8 @@ namespace PerimeterX.Internals.CredentialsIntelligence
                 rawUsername, 
                 password, 
                 rawUsername, 
-                "multistep_sso"
+                "multistep_sso",
+                ssoStep
             );
         }
   

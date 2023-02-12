@@ -304,5 +304,11 @@ namespace PerimeterX
 					return "captcha";
 			}
 		}
+
+
+		public bool IsBreachedAccount()
+		{
+			return Pxde != null && Pxde.breached_account != null && IsPxdeVerified;
+		}
 	}
 }

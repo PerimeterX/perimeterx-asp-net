@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Security.Cryptography;
 using System.Text;
+using System.Linq;
 
 namespace PerimeterX
 {
@@ -86,5 +87,28 @@ namespace PerimeterX
 				return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
 			}
 		}
+
+		public static string ExtractValueFromNestedJson(string pathToValue, dynamic jsonObject)
+		{
+            const char CREDENTIAL_FIELD_NESTING_DELIMITER = '.';
+			string[] stepsToCredentialInBody = pathToValue.Split(CREDENTIAL_FIELD_NESTING_DELIMITER);
+
+            dynamic result = jsonObject;
+
+            foreach (string step in stepsToCredentialInBody)
+            {
+                if (result == null || !result.ContainsKey(step))
+                {
+                    result = null;
+                    break;
+                }
+                else
+                {
+                    result = result[step];
+                }
+            }
+
+            return result;
+        }
 	}
 }

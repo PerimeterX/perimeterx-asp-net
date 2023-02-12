@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {
@@ -57,7 +58,7 @@ namespace PerimeterX
         public string RawUsername;
 
         [DataMember(Name = "ci_version")]
-        public string Version;
+        public string CiVersion;
 
         [DataMember(Name = "sso_step", IsRequired = false)]
         public string SsoStep;

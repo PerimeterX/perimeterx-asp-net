@@ -608,7 +608,6 @@ namespace PerimeterX
             }
 
         }
-
     
 
         [ConfigurationProperty("ciVersion", DefaultValue = "v2")]
@@ -626,5 +625,21 @@ namespace PerimeterX
 
         }
 
+        [ConfigurationProperty("compromisedCredentialsHeader", DefaultValue = "px-compromised-credentials")]
+        public string CompromisedCredentialsHeader
+        {
+            get
+            {
+                return (string)this["compromisedCredentialsHeader"];
+            }
+
+            set
+            {
+                this["compromisedCredentialsHeader"] = value;
+            }
+
+        }
+
+       
     }
 }
