@@ -638,8 +638,113 @@ namespace PerimeterX
                 this["compromisedCredentialsHeader"] = value;
             }
 
+        }  
+        
+        [ConfigurationProperty("sendRawUsernameOnAdditionalS2SActivity", DefaultValue = false)]
+        public bool SendRawUsernameOnAdditionalS2SActivity
+        {
+            get
+            {
+                return (bool)this["sendRawUsernameOnAdditionalS2SActivity"];
+            }
+
+            set
+            {
+                this["sendRawUsernameOnAdditionalS2SActivity"] = value;
+            }
+
+        } 
+        
+        [ConfigurationProperty("additionalS2SActivityHeaderEnabled", DefaultValue = false)]
+        public bool AdditionalS2SActivityHeaderEnabled
+        {
+            get
+            {
+                return (bool)this["additionalS2SActivityHeaderEnabled"];
+            }
+
+            set
+            {
+                this["additionalS2SActivityHeaderEnabled"] = value;
+            }
+
         }
 
-       
+
+        [ConfigurationProperty("loginSuccessfulReportingMethod", DefaultValue = "")]
+        public string LoginSuccessfulReportingMethod
+        {
+            get
+            {
+                return (string)this["loginSuccessfulReportingMethod"];
+            }
+
+            set
+            {
+                this["loginSuccessfulReportingMethod"] = value;
+            }
+
+        } 
+        
+        [ConfigurationProperty("loginSuccessfulBodyRegex", DefaultValue = "")]
+        public string LoginSuccessfulBodyRegex
+        {
+            get
+            {
+                return (string)this["loginSuccessfulBodyRegex"];
+            }
+
+            set
+            {
+                this["loginSuccessfulBodyRegex"] = value;
+            }
+
+        }
+
+        [ConfigurationProperty("loginSuccessfulHeaderName", DefaultValue = "")]
+        public string LoginSuccessfulHeaderName
+        {
+            get
+            {
+                return (string)this["loginSuccessfulHeaderName"];
+            }
+
+            set
+            {
+                this["loginSuccessfulHeaderName"] = value;
+            }
+
+        }
+
+        [ConfigurationProperty("loginSuccessfulHeaderValue", DefaultValue = "")]
+        public string LoginSuccessfulHeaderValue
+        {
+            get
+            {
+                return (string)this["loginSuccessfulHeaderValue"];
+            }
+
+            set
+            {
+                this["loginSuccessfulHeaderValue"] = value;
+            }
+
+        }
+
+        [ConfigurationProperty("loginSuccessfulStatus", DefaultValue = "")]
+        [TypeConverter(typeof(CommaDelimitedStringCollectionConverter))]
+        public StringCollection LoginSuccessfulStatus
+        {
+            get
+            {
+                return (StringCollection)this["loginSuccessfulStatus"];
+            }
+
+            set
+            {
+                this["loginSuccessfulStatus"] = value;
+            }
+
+        }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace PerimeterX.Internals.CredentialsIntelligence
+namespace PerimeterX
 {
     public class ExtractedCredentials
     {

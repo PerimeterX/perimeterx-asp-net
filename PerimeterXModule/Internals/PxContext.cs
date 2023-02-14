@@ -4,7 +4,6 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using PerimeterX.DataContracts.Cookies;
-using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {
@@ -53,6 +52,7 @@ namespace PerimeterX
 		public string Pxhd { get; set; }
         public bool MonitorRequest { get; set; }
 		public LoginCredentialsFields LoginCredentialsFields { get; set; }
+		public string RequestId { get; set; }
 
         public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -63,11 +63,12 @@ namespace PerimeterX
 			OriginalTokens = new Dictionary<string, string>();
 			S2SCallReason = "none";
 			IsMobileRequest = false;
+            RequestId = Guid.NewGuid().ToString();
 
-			// Get Headers
+            // Get Headers
 
-			// if userAgentOverride is present override the default user-agent
-			CookieNames = extractCookieNames(context.Request.Headers[PxConstants.COOKIE_HEADER]);
+            // if userAgentOverride is present override the default user-agent
+            CookieNames = extractCookieNames(context.Request.Headers[PxConstants.COOKIE_HEADER]);
 			string userAgentOverride = pxConfiguration.UserAgentOverride;
 			if (!string.IsNullOrEmpty(userAgentOverride))
 			{

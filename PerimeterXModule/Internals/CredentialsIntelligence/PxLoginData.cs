@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
-using System.Security.Policy;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.UI.WebControls;
 using Jil;
-using Microsoft.SqlServer.Server;
-using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {
@@ -26,16 +21,22 @@ namespace PerimeterX
             this.loginCredentialsExtractor = loginCredentialsExraction;
         }
 
-        public LoginCredentialsFields ExtractCredentials(PxContext context, HttpRequest request)
+        public LoginCredentialsFields ExtractCredentialsFromRequest(PxContext context, HttpRequest request)
         {
-            ExtractorObject extarctionDetails = FindMatchCredentialsDetails(request);
-            if (extarctionDetails != null)
+            try
             {
-                ExtractedCredentials extractedCredentials = ExtractCredentials(extarctionDetails, context, request);
-                if (extractedCredentials != null)
+                ExtractorObject extarctionDetails = FindMatchCredentialsDetails(request);
+                if (extarctionDetails != null)
                 {
-                    return protocol.ProcessCredentials(extractedCredentials);
+                    ExtractedCredentials extractedCredentials = ExtractCredentials(extarctionDetails, context, request);
+                    if (extractedCredentials != null)
+                    {
+                        return protocol.ProcessCredentials(extractedCredentials);
+                    }
                 }
+            } catch (Exception ex)
+            {
+                PxLoggingUtils.LogError(string.Format("Failed to extract credentials.", ex.Message));
             }
 
             return null;
@@ -115,14 +116,16 @@ namespace PerimeterX
         {
             bool isContentTypeHeaderExist = headers.TryGetValue("Content-Type", out string contentType);
 
-            string body = await ReadRequestBodyAsync(request);
+            HttpRequest httpRequest = request;
+
+            string body = await ReadRequestBodyAsync(httpRequest);
 
             if (!isContentTypeHeaderExist)
             {
                 return null;
             } else if (contentType.Contains("application/json"))
             {
-                return ConvertToJson(body, userFieldName, passwordFieldName);
+                return ExtractCredentialsFromJson(body, userFieldName, passwordFieldName);
             } else if (contentType.Contains("x-www-form-urlencoded"))
             {
                 return ReadValueFromUrlEncoded(body, userFieldName, passwordFieldName);
@@ -136,13 +139,15 @@ namespace PerimeterX
 
         public static async Task<string> ReadRequestBodyAsync(HttpRequest request)
         {
-            using (var reader = new StreamReader(request.InputStream))
+            HttpRequest httpRequest = request;
+
+            using (var reader = new StreamReader(httpRequest.InputStream))
             {
                 return await reader.ReadToEndAsync();
             }
         }
 
-        public ExtractedCredentials ConvertToJson(string body, string userFieldName, string passwordFieldName) {
+        public ExtractedCredentials ExtractCredentialsFromJson(string body, string userFieldName, string passwordFieldName) {
 
             dynamic jsonBody = JSON.DeserializeDynamic(body, PxConstants.JSON_OPTIONS);
 

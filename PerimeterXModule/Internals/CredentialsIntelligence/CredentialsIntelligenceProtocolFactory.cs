@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PerimeterX;
 
-namespace PerimeterX.Internals.CredentialsIntelligence
+namespace PerimeterX
 {
     public class CredentialsIntelligenceProtocolFactory
     {

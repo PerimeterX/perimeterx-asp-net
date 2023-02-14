@@ -1,5 +1,4 @@
 ﻿using System.Runtime.Serialization;
-using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {

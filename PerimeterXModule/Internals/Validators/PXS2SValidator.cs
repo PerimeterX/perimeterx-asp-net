@@ -3,7 +3,6 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using PerimeterX.DataContracts.Cookies;
-using PerimeterX.Internals.CredentialsIntelligence;
 
 namespace PerimeterX
 {

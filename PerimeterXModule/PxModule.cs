@@ -29,7 +29,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.IO;
 using System.Configuration;
-using System.Diagnostics;
 using System.Collections.Specialized;
 using System.Net;
 using System.Linq;
@@ -39,8 +38,6 @@ using Jil;
 using System.Collections.Generic;
 using PerimeterX.Internals;
 using System.Web.Script.Serialization;
-using PerimeterX.Internals.CredentialsIntelligence;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PerimeterX
 {
@@ -76,7 +73,6 @@ namespace PerimeterX
 		private string nodeName;
 		private bool loginCredentialsExtractionEnabled;
 		private PxLoginData loginData;
-
 
         static PxModule()
 		{
@@ -126,10 +122,10 @@ namespace PerimeterX
 			enforceSpecificRoutes = config.EnforceSpecificRoutes;
 
 
-			extractCredentialsIntelligence(config);
+			InitCredentialsIntelligence(config);
 
-            // Set Decoder
-            if (config.EncryptionEnabled)
+			// Set Decoder
+			if (config.EncryptionEnabled)
 			{
 				cookieDecoder = new EncryptedCookieDecoder(cookieKeyBytes);
 			}
@@ -168,28 +164,33 @@ namespace PerimeterX
 			get { return "PxModule"; }
 		}
 
-		private void extractCredentialsIntelligence(PxModuleConfigurationSection config)
+		private void InitCredentialsIntelligence(PxModuleConfigurationSection config)
 		{
 			List<ExtractorObject> loginCredentialsExtraction;
 			loginCredentialsExtractionEnabled = config.LoginCredentialsExtractionEnabled;
-            
+
 			if (loginCredentialsExtractionEnabled && config.LoginCredentialsExtraction != "")
-            {
-                loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
-                loginData = new PxLoginData(config.CiVersion, loginCredentialsExtraction);
-            }
-        }
+			{
+				loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
+				loginData = new PxLoginData(config.CiVersion, loginCredentialsExtraction);
+			}
+		}
 
 		public void Init(HttpApplication application)
 		{
 			application.BeginRequest += this.Application_BeginRequest;
 			nodeName = application.Context.Server.MachineName;
+			application.EndRequest += this.Application_EndRequest;
 		}
 
 		private void Application_BeginRequest(object source, EventArgs e)
 		{
-			try
-			{
+            try
+            {
+                HttpResponse response = HttpContext.Current.Response;
+				OutputFilterStream filter = new OutputFilterStream(response.Filter);
+				response.Filter = filter;
+          
 				var application = (HttpApplication)source;
 
 				if (application == null)
@@ -264,7 +265,33 @@ namespace PerimeterX
 			}
 		}
 
-		private bool IsTelemetryCommand(HttpContext applicationContext)
+		private void Application_EndRequest(object source, EventArgs e)
+		{
+			var application = (HttpApplication)source;
+
+			if (application == null)
+			{
+				return;
+			}
+
+			var applicationContext = application.Context;
+            var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+            
+			if (!config.AdditionalS2SActivityHeaderEnabled && pxContext != null && pxContext.LoginCredentialsFields != null)
+            {
+            	HandleLoginSuccessful(applicationContext.Response, config);
+            }
+        }
+
+		public void HandleLoginSuccessful(HttpResponse httpResponse, PxModuleConfigurationSection config)
+			{
+            ILoginSuccessfulParser loginSuccessfulParser = LoginSuccessfulParsetFactory.Create(config);
+			
+            bool isLoginSuccessful = loginSuccessfulParser != null && loginSuccessfulParser.IsLoginSuccessful(httpResponse);
+            reporter.Post(AdditionalS2SUtils.CreateAdditionalS2SActivity(config, httpResponse.StatusCode, isLoginSuccessful, pxContext));
+        }
+
+        private bool IsTelemetryCommand(HttpContext applicationContext)
 		{
 			//extract header value and decode it from base64 string
 			string headerValue = applicationContext.Request.Headers[PxConstants.ENFORCER_TELEMETRY_HEADER];
@@ -391,7 +418,19 @@ namespace PerimeterX
 
 		private void PostActivity(PxContext pxContext, string eventType, ActivityDetails details = null)
 		{
-			var activity = new Activity
+            if (pxContext.LoginCredentialsFields != null)
+            {
+				LoginCredentialsFields loginCredentialsFields = pxContext.LoginCredentialsFields;
+				details.CiVersion = loginCredentialsFields.CiVersion;
+				details.CredentialsCompromised = pxContext.IsBreachedAccount();
+
+				if (loginCredentialsFields.CiVersion == "multistep_sso")
+				{
+					details.SsoStep = loginCredentialsFields.SsoStep;
+				}
+            }
+
+            var activity = new Activity
 			{
 				Type = eventType,
 				Timestamp = PxConstants.GetTimestamp(),
@@ -401,7 +440,6 @@ namespace PerimeterX
 				Details = details,
 				Headers = pxContext.GetHeadersAsDictionary(),
 			};
-
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
 			{
@@ -517,7 +555,7 @@ namespace PerimeterX
 
                 if (loginData != null)
                 {
-                    LoginCredentialsFields loginCredentialsFields = loginData.ExtractCredentials(pxContext, application.Context.Request);
+                    LoginCredentialsFields loginCredentialsFields = loginData.ExtractCredentialsFromRequest(pxContext, application.Context.Request);
                     if (loginCredentialsFields != null)
 					{
 						pxContext.LoginCredentialsFields = loginCredentialsFields;
@@ -605,11 +643,19 @@ namespace PerimeterX
 
 		private void HandleCredentialsIntelligence(HttpApplication application, PxModuleConfigurationSection config)
 		{
-			if (config.LoginCredentialsExtractionEnabled && 
-				pxContext.LoginCredentialsFields != null && 
-				pxContext.IsBreachedAccount())
+			if (config.LoginCredentialsExtractionEnabled && pxContext.LoginCredentialsFields != null)
 			{
-				application.Context.Request.Headers.Add(config.CompromisedCredentialsHeader, JSON.Serialize(pxContext.Pxde.breached_account));
+				if (pxContext.IsBreachedAccount())
+				{
+					application.Context.Request.Headers.Add(config.CompromisedCredentialsHeader, JSON.SerializeDynamic(pxContext.Pxde.breached_account, PxConstants.JSON_OPTIONS));
+				}
+
+				if (config.AdditionalS2SActivityHeaderEnabled)
+				{
+					Activity activityPayload = AdditionalS2SUtils.CreateAdditionalS2SActivity(config, null, null, pxContext);
+					application.Context.Request.Headers.Add("px-additional_activity", JSON.SerializeDynamic(activityPayload, PxConstants.JSON_OPTIONS));
+					application.Context.Request.Headers.Add("px-backend-activity-url", PxConstants.FormatBaseUri(config) + PxConstants.ACTIVITIES_API_PATH);
+				}
 			}
         }
 

@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Security.Cryptography;
 using System.Text;
-using System.Linq;
 
 namespace PerimeterX
 {

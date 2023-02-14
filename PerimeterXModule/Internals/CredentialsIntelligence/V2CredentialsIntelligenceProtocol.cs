@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace PerimeterX.Internals.CredentialsIntelligence
+﻿namespace PerimeterX
 {
-
     public class V2CredentialsIntelligenceProtocol : ICredentialsIntelligenceProtocol
     {
         public LoginCredentialsFields ProcessCredentials(ExtractedCredentials extractedCredentials)
