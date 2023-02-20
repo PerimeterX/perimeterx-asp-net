@@ -424,7 +424,7 @@ namespace PerimeterX
 				details.CiVersion = loginCredentialsFields.CiVersion;
 				details.CredentialsCompromised = pxContext.IsBreachedAccount();
 
-				if (loginCredentialsFields.CiVersion == "multistep_sso")
+				if (loginCredentialsFields.CiVersion == CIVersion.MULTISTEP_SSO)
 				{
 					details.SsoStep = loginCredentialsFields.SsoStep;
 				}

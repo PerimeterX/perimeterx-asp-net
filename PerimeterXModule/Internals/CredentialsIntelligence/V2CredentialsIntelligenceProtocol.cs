@@ -18,7 +18,7 @@
                 hashedUsername,
                 hashedPassword,
                 extractedCredentials.Username,
-                "v2"
+                CIVersion.V2
             );
         }
 

@@ -165,7 +165,8 @@ namespace PerimeterX
                 riskRequest.Username = loginCredentialsFields.Username;
 				riskRequest.CiVersion = loginCredentialsFields.CiVersion;	
 				riskRequest.Password = loginCredentialsFields.Password;
-				if (loginCredentialsFields.CiVersion == "multistep_sso")
+				
+				if (loginCredentialsFields.CiVersion == CIVersion.MULTISTEP_SSO)
 				{
 					riskRequest.SsoStep = loginCredentialsFields.SsoStep;
 				}

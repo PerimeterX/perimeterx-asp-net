@@ -6,12 +6,12 @@
         {
             string rawUsername = null;
             string password = null;
-            string ssoStep = "pass";
+            string ssoStep = MultistepSsoStep.PASSWORD;
 
             if (extractedCredentials.Username != null) 
             {
                 rawUsername = extractedCredentials.Username;
-                ssoStep = "user";
+                ssoStep = MultistepSsoStep.USER;
             } 
 
             if (extractedCredentials.Password != null)
@@ -23,7 +23,7 @@
                 rawUsername, 
                 password, 
                 rawUsername, 
-                "multistep_sso",
+                CIVersion.MULTISTEP_SSO,
                 ssoStep
             );
         }

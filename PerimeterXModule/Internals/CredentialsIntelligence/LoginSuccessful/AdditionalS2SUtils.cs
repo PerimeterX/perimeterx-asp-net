@@ -18,8 +18,7 @@
                 RequestId = pxContext.RequestId,
                 CiVersion = config.CiVersion,
                 CredentialsCompromised = isBreachedAccount,
-                RawUsername = shouldAddRawUsername ? loginCredentialsFields.RawUsername : null,
-                SsoStep = config.CiVersion == "multistep_sso" ? loginCredentialsFields.SsoStep : null
+                SsoStep = config.CiVersion == CIVersion.MULTISTEP_SSO ? loginCredentialsFields.SsoStep : null
             };
 
             if (statusCode.HasValue)
@@ -29,7 +28,9 @@
 
             if (loginSuccessful.HasValue)
             {
-                details.LoginSuccessful = loginSuccessful.Value;
+                bool isLoginSuccessful = loginSuccessful.Value;
+                details.LoginSuccessful = isLoginSuccessful;
+                details.RawUsername = shouldAddRawUsername && isLoginSuccessful ? loginCredentialsFields.RawUsername : null;
             }
 
             var activity = new Activity

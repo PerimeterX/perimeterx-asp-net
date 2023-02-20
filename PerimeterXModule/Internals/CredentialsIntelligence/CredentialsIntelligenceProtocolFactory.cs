@@ -9,9 +9,9 @@ namespace PerimeterX
         {
             switch(protocolVersion)
             {
-                case ("v2"):
+                case CIVersion.V2:
                     return new V2CredentialsIntelligenceProtocol();
-                case ("multistep_sso"):
+                case CIVersion.MULTISTEP_SSO:
                     return new MultistepSSoCredentialsIntelligenceProtocol();
                 default:
                     throw new Exception("Unknown CI protocol version" + protocolVersion);

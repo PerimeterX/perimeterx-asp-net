@@ -64,13 +64,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomBehavior\ILoginSuccessful.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\AdditionalS2SUtils.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\BodyLoginSuccessfulParser.cs" />
     <Compile Include="Internals\CredentialsIntelligence\ExtractedCredentials.cs" />
     <Compile Include="Internals\CredentialsIntelligence\ICredentialsIntelligenceProtocol.cs" />
     <Compile Include="Internals\CredentialsIntelligence\CredentialsIntelligenceProtocolFactory.cs" />
     <Compile Include="Internals\CredentialsIntelligence\ExtractorObject.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\ILoginSuccessfulParser.cs" />
     <Compile Include="Internals\CredentialsIntelligence\LoginCredentialsFields.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\HeaderLoginSuccessfulParser.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\LoginSuccessfulParsetFactory.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\OutputFilterStream.cs" />
     <Compile Include="Internals\CredentialsIntelligence\PxLoginData.cs" />
     <Compile Include="Internals\CredentialsIntelligence\MultistepSSOCredentialsIntelligenceProtocol.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\StatusLoginSuccessfulParser.cs" />
     <Compile Include="Internals\CredentialsIntelligence\V2CredentialsIntelligenceProtocol.cs" />
     <Compile Include="Internals\Enums\CIVersion.cs" />
     <Compile Include="Internals\PxBlock.cs" />

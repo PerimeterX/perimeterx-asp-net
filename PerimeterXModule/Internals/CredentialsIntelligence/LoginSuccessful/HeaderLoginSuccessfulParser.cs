@@ -15,12 +15,7 @@ namespace PerimeterX
 
         public bool IsLoginSuccessful(HttpResponse httpResponse)
         {
-            if (httpResponse.Headers[successfulHeaderName] == successfulHeaderValue)
-            {
-                return true;
-            } 
-            
-            return false;
+            return httpResponse.Headers[successfulHeaderName] == successfulHeaderValue;
         }
     }
 }

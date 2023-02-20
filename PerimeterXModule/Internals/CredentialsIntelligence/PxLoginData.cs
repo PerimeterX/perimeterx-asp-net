@@ -25,10 +25,10 @@ namespace PerimeterX
         {
             try
             {
-                ExtractorObject extarctionDetails = FindMatchCredentialsDetails(request);
-                if (extarctionDetails != null)
+                ExtractorObject extractionDetails = FindMatchCredentialsDetails(request);
+                if (extractionDetails != null)
                 {
-                    ExtractedCredentials extractedCredentials = ExtractCredentials(extarctionDetails, context, request);
+                    ExtractedCredentials extractedCredentials = ExtractCredentials(extractionDetails, context, request);
                     if (extractedCredentials != null)
                     {
                         return protocol.ProcessCredentials(extractedCredentials);
@@ -46,7 +46,7 @@ namespace PerimeterX
         {
             foreach (ExtractorObject loginObject in this.loginCredentialsExtractor)
             {
-                if (IsMatchedPath(loginObject, request))
+                if (IsRequestMatchLoginRequestConfiguration(loginObject, request))
                 {
                     return loginObject;
                 }
@@ -55,7 +55,7 @@ namespace PerimeterX
             return null;
         }
 
-        public static bool IsMatchedPath(ExtractorObject extractorObject, HttpRequest request)
+        private static bool IsRequestMatchLoginRequestConfiguration(ExtractorObject extractorObject, HttpRequest request)
         {
             if (request.HttpMethod.ToLower() == extractorObject.Method)
             {
@@ -73,17 +73,17 @@ namespace PerimeterX
             return false;
         }
 
-        public ExtractedCredentials ExtractCredentials(ExtractorObject extractionDetails, PxContext pxContext, HttpRequest request)
+        private ExtractedCredentials ExtractCredentials(ExtractorObject extractionDetails, PxContext pxContext, HttpRequest request)
         {
             string userFieldName = extractionDetails.UserFieldName;
             string passwordFieldName = extractionDetails.PassFieldName;
-
-            Dictionary<string, string> headers = pxContext.GetHeadersAsDictionary();
 
             if (userFieldName == null || passwordFieldName == null)
             {
                 return null;
             }
+
+            Dictionary<string, string> headers = pxContext.GetHeadersAsDictionary();
 
             if (extractionDetails.SentThrough == "header")
             {
@@ -112,7 +112,7 @@ namespace PerimeterX
             return new ExtractedCredentials(userName, password);
         }
 
-        public async Task<ExtractedCredentials> ExtractFromBodyAsync(string userFieldName, string passwordFieldName, Dictionary<string, string> headers, HttpRequest request)
+        private async Task<ExtractedCredentials> ExtractFromBodyAsync(string userFieldName, string passwordFieldName, Dictionary<string, string> headers, HttpRequest request)
         {
             bool isContentTypeHeaderExist = headers.TryGetValue("Content-Type", out string contentType);
 
@@ -131,13 +131,13 @@ namespace PerimeterX
                 return ReadValueFromUrlEncoded(body, userFieldName, passwordFieldName);
             } else if (contentType.Contains("form-data"))
             {
-                return ExtarctValueFromMultipart(body, contentType, userFieldName, passwordFieldName);
+                return ExtractValueFromMultipart(body, contentType, userFieldName, passwordFieldName);
             }
             
             return null;
         }
 
-        public static async Task<string> ReadRequestBodyAsync(HttpRequest request)
+        private static async Task<string> ReadRequestBodyAsync(HttpRequest request)
         {
             HttpRequest httpRequest = request;
 
@@ -147,7 +147,7 @@ namespace PerimeterX
             }
         }
 
-        public ExtractedCredentials ExtractCredentialsFromJson(string body, string userFieldName, string passwordFieldName) {
+        private ExtractedCredentials ExtractCredentialsFromJson(string body, string userFieldName, string passwordFieldName) {
 
             dynamic jsonBody = JSON.DeserializeDynamic(body, PxConstants.JSON_OPTIONS);
 
@@ -157,7 +157,7 @@ namespace PerimeterX
             return new ExtractedCredentials(userValue, passValue);
         }
 
-        public ExtractedCredentials ReadValueFromUrlEncoded(string body, string userFieldName, string passwordFieldName)
+        private ExtractedCredentials ReadValueFromUrlEncoded(string body, string userFieldName, string passwordFieldName)
         {
             var parametersQueryString = HttpUtility.ParseQueryString(body);
             var parametersDictionary = new Dictionary<string, string>();
@@ -166,10 +166,10 @@ namespace PerimeterX
                 parametersDictionary.Add(key, parametersQueryString[key]);
             }
 
-            return ExtractCredentialsFromDictinary(parametersDictionary, userFieldName, passwordFieldName);
+            return ExtractCredentialsFromDictionary(parametersDictionary, userFieldName, passwordFieldName);
         }
 
-        public ExtractedCredentials ExtarctValueFromMultipart(string body, string contentType, string userFieldName, string passwordFieldName)
+        private ExtractedCredentials ExtractValueFromMultipart(string body, string contentType, string userFieldName, string passwordFieldName)
         {
             var formData = new Dictionary<string, string>();
 
@@ -205,10 +205,10 @@ namespace PerimeterX
                 formData.Add(key, value.ToString());
             }
 
-            return ExtractCredentialsFromDictinary(formData, userFieldName, passwordFieldName);
+            return ExtractCredentialsFromDictionary(formData, userFieldName, passwordFieldName);
         }
 
-        public ExtractedCredentials ExtractCredentialsFromDictinary(Dictionary<string, string> parametersDictionary, string userFieldName, string passwordFieldName)
+        private ExtractedCredentials ExtractCredentialsFromDictionary(Dictionary<string, string> parametersDictionary, string userFieldName, string passwordFieldName)
         {
             bool isUsernameExist = parametersDictionary.TryGetValue(userFieldName, out string userField);
             bool isPasswordExist = parametersDictionary.TryGetValue(passwordFieldName, out string passwordField);
