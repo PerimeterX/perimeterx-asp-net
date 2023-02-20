@@ -118,7 +118,7 @@ namespace PerimeterX
 
             HttpRequest httpRequest = request;
 
-            string body = await ReadRequestBodyAsync(httpRequest);
+            string body = await BodyReader.ReadRequestBodyAsync(httpRequest);
 
             if (!isContentTypeHeaderExist)
             {
@@ -135,16 +135,6 @@ namespace PerimeterX
             }
             
             return null;
-        }
-
-        private static async Task<string> ReadRequestBodyAsync(HttpRequest request)
-        {
-            HttpRequest httpRequest = request;
-
-            using (var reader = new StreamReader(httpRequest.InputStream))
-            {
-                return await reader.ReadToEndAsync();
-            }
         }
 
         private ExtractedCredentials ExtractCredentialsFromJson(string body, string userFieldName, string passwordFieldName) {
@@ -166,7 +156,7 @@ namespace PerimeterX
                 parametersDictionary.Add(key, parametersQueryString[key]);
             }
 
-            return ExtractCredentialsFromDictionary(parametersDictionary, userFieldName, passwordFieldName);
+            return ExtractCredentialsFromDictinary(parametersDictionary, userFieldName, passwordFieldName);
         }
 
         private ExtractedCredentials ExtractValueFromMultipart(string body, string contentType, string userFieldName, string passwordFieldName)
@@ -205,10 +195,10 @@ namespace PerimeterX
                 formData.Add(key, value.ToString());
             }
 
-            return ExtractCredentialsFromDictionary(formData, userFieldName, passwordFieldName);
+            return ExtractCredentialsFromDictinary(formData, userFieldName, passwordFieldName);
         }
 
-        private ExtractedCredentials ExtractCredentialsFromDictionary(Dictionary<string, string> parametersDictionary, string userFieldName, string passwordFieldName)
+        private ExtractedCredentials ExtractCredentialsFromDictinary(Dictionary<string, string> parametersDictionary, string userFieldName, string passwordFieldName)
         {
             bool isUsernameExist = parametersDictionary.TryGetValue(userFieldName, out string userField);
             bool isPasswordExist = parametersDictionary.TryGetValue(passwordFieldName, out string passwordField);
