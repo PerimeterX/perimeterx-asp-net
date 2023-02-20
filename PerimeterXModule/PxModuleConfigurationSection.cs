@@ -746,5 +746,31 @@ namespace PerimeterX
             }
 
         }
+
+        [ConfigurationProperty("customLoginSuccessfulHandler")]
+        public string CustomLoginSuccessfulHandler
+        {
+            get
+            {
+                return (string)this["customLoginSuccessfulHandler"];
+            }
+            set
+            {
+                this["customLoginSuccessfulHandler"] = value;
+            }
+        }
+
+        [ConfigurationProperty("customCredentialsExtractionHandler")]
+        public string CustomCredentialsExtractionHandler
+        {
+            get
+            {
+                return (string)this["customCredentialsExtractionHandler"];
+            }
+            set
+            {
+                this["customCredentialsExtractionHandler"] = value;
+            }
+        }
     }
 }

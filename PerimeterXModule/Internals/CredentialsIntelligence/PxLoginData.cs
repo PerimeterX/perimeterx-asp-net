@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Jil;
+using PerimeterX.CustomBehavior;
 
 namespace PerimeterX
 {
@@ -21,19 +22,32 @@ namespace PerimeterX
             this.loginCredentialsExtractor = loginCredentialsExraction;
         }
 
-        public LoginCredentialsFields ExtractCredentialsFromRequest(PxContext context, HttpRequest request)
+        public LoginCredentialsFields ExtractCredentialsFromRequest(PxContext context, HttpRequest request, ICredentialsExtractionHandler credentialsExtractionHandler)
         {
             try
             {
-                ExtractorObject extractionDetails = FindMatchCredentialsDetails(request);
-                if (extractionDetails != null)
+                ExtractedCredentials extractedCredentials = null;
+
+                if (credentialsExtractionHandler != null)
                 {
-                    ExtractedCredentials extractedCredentials = ExtractCredentials(extractionDetails, context, request);
-                    if (extractedCredentials != null)
+                    extractedCredentials = credentialsExtractionHandler.Handle(request);
+                }
+                else
+                {
+                    ExtractorObject extractionDetails = FindMatchCredentialsDetails(request);
+
+                    if (extractionDetails != null)
                     {
-                        return protocol.ProcessCredentials(extractedCredentials);
+                        extractedCredentials = ExtractCredentials(extractionDetails, context, request);
                     }
                 }
+
+                if (extractedCredentials != null)
+                {
+                    return protocol.ProcessCredentials(extractedCredentials);
+                }
+
+                return null;
             } catch (Exception ex)
             {
                 PxLoggingUtils.LogError(string.Format("Failed to extract credentials.", ex.Message));
