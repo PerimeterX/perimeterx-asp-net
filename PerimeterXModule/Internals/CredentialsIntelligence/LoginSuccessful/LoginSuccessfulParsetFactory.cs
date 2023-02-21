@@ -13,6 +13,8 @@ namespace PerimeterX
                     return new HeaderLoginSuccessfulParser(config);
                 case ("status"):
                     return new StatusLoginSuccessfulParser(config);
+                case ("custom"):
+                    return new CustomLoginSuccessfulParser(config);
                 default:
                     return null;
             }

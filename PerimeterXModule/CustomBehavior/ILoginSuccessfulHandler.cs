@@ -4,6 +4,6 @@ namespace PerimeterX.CustomBehavior
 {
     public interface ILoginSuccessfulHandler
     {
-        bool Handle(HttpApplication HttpApplication);
+        bool Handle(HttpResponse httpResponse);
     }
 }

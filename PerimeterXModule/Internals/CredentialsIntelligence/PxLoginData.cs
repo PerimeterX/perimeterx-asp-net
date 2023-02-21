@@ -47,7 +47,6 @@ namespace PerimeterX
                     return protocol.ProcessCredentials(extractedCredentials);
                 }
 
-                return null;
             } catch (Exception ex)
             {
                 PxLoggingUtils.LogError(string.Format("Failed to extract credentials.", ex.Message));

@@ -75,7 +75,6 @@ namespace PerimeterX
 		private string nodeName;
 		private bool loginCredentialsExtractionEnabled;
 		private PxLoginData loginData;
-		private readonly ILoginSuccessfulHandler customLoginSuccessful;
 		private readonly ICredentialsExtractionHandler customCredentialsExtraction;
 
         static PxModule()
@@ -124,7 +123,6 @@ namespace PerimeterX
 			routesWhitelist = config.RoutesWhitelist;
 			useragentsWhitelist = config.UseragentsWhitelist;
 			enforceSpecificRoutes = config.EnforceSpecificRoutes;
-			customLoginSuccessful = PxCustomFunctions.GetCustomLoginSuccessfulHandler(config.CustomLoginSuccessfulHandler);
 			customCredentialsExtraction = PxCustomFunctions.GetCustomLoginCredentialsExtractionHandler(config.CustomCredentialsExtractionHandler);
 
 
@@ -291,15 +289,8 @@ namespace PerimeterX
 
 		public void HandleLoginSuccessful(HttpResponse httpResponse, PxModuleConfigurationSection config, HttpApplication application)
 		{
-			bool isLoginSuccessful;
-
-            if (customLoginSuccessful != null)
-			{
-                isLoginSuccessful = customLoginSuccessful.Handle(application);
-            } else {
-				ILoginSuccessfulParser loginSuccessfulParser = LoginSuccessfulParsetFactory.Create(config);
-				isLoginSuccessful = loginSuccessfulParser != null && loginSuccessfulParser.IsLoginSuccessful(httpResponse);
-			}
+			ILoginSuccessfulParser loginSuccessfulParser = LoginSuccessfulParsetFactory.Create(config);
+			bool isLoginSuccessful = loginSuccessfulParser != null && loginSuccessfulParser.IsLoginSuccessful(httpResponse);	
 
             reporter.Post(AdditionalS2SUtils.CreateAdditionalS2SActivity(config, httpResponse.StatusCode, isLoginSuccessful, pxContext));
         }
