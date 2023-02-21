@@ -25,26 +25,18 @@ namespace PerimeterX
         public LoginCredentialsFields ExtractCredentialsFromRequest(PxContext context, HttpRequest request, ICredentialsExtractionHandler credentialsExtractionHandler)
         {
             try
-            {
-                ExtractedCredentials extractedCredentials = null;
+            {  
+                ExtractorObject extractionDetails = FindMatchCredentialsDetails(request);
 
-                if (credentialsExtractionHandler != null)
+                if (extractionDetails != null)
                 {
-                    extractedCredentials = credentialsExtractionHandler.Handle(request);
-                }
-                else
-                {
-                    ExtractorObject extractionDetails = FindMatchCredentialsDetails(request);
+                    ExtractedCredentials extractedCredentials = ExtractLoginCredentials(context, request, credentialsExtractionHandler, extractionDetails);
 
-                    if (extractionDetails != null)
+
+                    if (extractedCredentials != null)
                     {
-                        extractedCredentials = ExtractCredentials(extractionDetails, context, request);
+                        return protocol.ProcessCredentials(extractedCredentials);
                     }
-                }
-
-                if (extractedCredentials != null)
-                {
-                    return protocol.ProcessCredentials(extractedCredentials);
                 }
 
             } catch (Exception ex)
@@ -53,6 +45,18 @@ namespace PerimeterX
             }
 
             return null;
+        }
+
+        private ExtractedCredentials ExtractLoginCredentials(PxContext context, HttpRequest request, ICredentialsExtractionHandler credentialsExtractionHandler, ExtractorObject extractionDetails)
+        {
+            if (credentialsExtractionHandler != null)
+            {
+                return credentialsExtractionHandler.Handle(request);
+            }
+            else
+            {
+                return HandleExtractCredentials(extractionDetails, context, request);
+            }
         }
 
         private ExtractorObject FindMatchCredentialsDetails(HttpRequest request)
@@ -86,7 +90,7 @@ namespace PerimeterX
             return false;
         }
 
-        private ExtractedCredentials ExtractCredentials(ExtractorObject extractionDetails, PxContext pxContext, HttpRequest request)
+        private ExtractedCredentials HandleExtractCredentials(ExtractorObject extractionDetails, PxContext pxContext, HttpRequest request)
         {
             string userFieldName = extractionDetails.UserFieldName;
             string passwordFieldName = extractionDetails.PassFieldName;

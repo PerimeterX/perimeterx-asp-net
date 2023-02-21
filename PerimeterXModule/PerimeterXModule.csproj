@@ -66,6 +66,7 @@
   <ItemGroup>
     <Compile Include="CustomBehavior\ICredentialsExtractionHandler.cs" />
     <Compile Include="CustomBehavior\ILoginSuccessfulHandler.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\CustomLoginSuccessfulParser.cs" />
     <Compile Include="Internals\Helpers\BodyReader.cs" />
     <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\AdditionalS2SUtils.cs" />
     <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\BodyLoginSuccessfulParser.cs" />
