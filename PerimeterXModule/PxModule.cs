@@ -60,7 +60,6 @@ namespace PerimeterX
 		private readonly bool sendBlockActivities;
 		private readonly int blockingScore;
 		private readonly string appId;
-		private readonly IVerificationHandler customVerificationHandlerInstance;
 		private readonly bool suppressContentBlock;
 		private readonly bool challengeEnabled;
 		private readonly string[] sensetiveHeaders;
@@ -75,7 +74,8 @@ namespace PerimeterX
 		private string nodeName;
 		private bool loginCredentialsExtractionEnabled;
 		private PxLoginData loginData;
-		private readonly ICredentialsExtractionHandler customCredentialsExtraction;
+		private IVerificationHandler customVerificationHandlerInstance;
+		private ICredentialsExtractionHandler customCredentialsExtraction;
 
         static PxModule()
 		{
@@ -115,7 +115,6 @@ namespace PerimeterX
 			cookieKeyBytes = Encoding.UTF8.GetBytes(cookieKey);
 			blockingScore = config.BlockingScore;
 			appId = config.AppId;
-			customVerificationHandlerInstance = PxCustomFunctions.GetCustomVerificationHandler(config.CustomVerificationHandler);
 			suppressContentBlock = config.SuppressContentBlock;
 			challengeEnabled = config.ChallengeEnabled;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
@@ -123,8 +122,6 @@ namespace PerimeterX
 			routesWhitelist = config.RoutesWhitelist;
 			useragentsWhitelist = config.UseragentsWhitelist;
 			enforceSpecificRoutes = config.EnforceSpecificRoutes;
-			customCredentialsExtraction = PxCustomFunctions.GetCustomLoginCredentialsExtractionHandler(config.CustomCredentialsExtractionHandler);
-
 
 			InitCredentialsIntelligence(config);
 
@@ -170,15 +167,23 @@ namespace PerimeterX
 
 		private void InitCredentialsIntelligence(PxModuleConfigurationSection config)
 		{
-			List<ExtractorObject> loginCredentialsExtraction;
-			loginCredentialsExtractionEnabled = config.LoginCredentialsExtractionEnabled;
-
-			if (loginCredentialsExtractionEnabled && config.LoginCredentialsExtraction != "")
+			try
 			{
-				loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
-				loginData = new PxLoginData(config.CiVersion, loginCredentialsExtraction);
-			}
-		}
+				List<ExtractorObject> loginCredentialsExtraction;
+				loginCredentialsExtractionEnabled = config.LoginCredentialsExtractionEnabled;
+
+				if (loginCredentialsExtractionEnabled && config.LoginCredentialsExtraction != "")
+				{
+					loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
+					loginData = new PxLoginData(config.CiVersion, loginCredentialsExtraction);
+					customVerificationHandlerInstance = PxCustomFunctions.GetCustomVerificationHandler(config.CustomVerificationHandler);
+					customCredentialsExtraction = PxCustomFunctions.GetCustomLoginCredentialsExtractionHandler(config.CustomCredentialsExtractionHandler);
+				}
+			} catch(Exception ex)
+			{
+                PxLoggingUtils.LogDebug("An error occurred while initiating the CI configuration " + ex.Message);
+            }
+        }
 
 		public void Init(HttpApplication application)
 		{
