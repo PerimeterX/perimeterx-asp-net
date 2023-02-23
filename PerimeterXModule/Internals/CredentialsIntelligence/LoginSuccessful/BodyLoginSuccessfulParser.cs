@@ -13,8 +13,7 @@ namespace PerimeterX
 
         public bool IsLoginSuccessful(HttpResponse httpResponse)
         {
-            HttpResponse tempHttpResponse = httpResponse;
-            string body = ((OutputFilterStream)tempHttpResponse.Filter).ReadStream();
+            string body = ((OutputFilterStream)httpResponse.Filter).ReadStream();
 
             if (body == null) {
                 return false;

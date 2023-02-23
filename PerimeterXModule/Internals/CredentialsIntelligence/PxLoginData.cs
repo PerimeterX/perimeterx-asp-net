@@ -100,7 +100,7 @@ namespace PerimeterX
                 return null;
             }
 
-            Dictionary<string, string> headers = pxContext.GetHeadersAsDictionary();
+            Dictionary<string, string> headers = pxContext.GetLowercaseHeadersAsDictionary();
 
             if (extractionDetails.SentThrough == "header")
             {
@@ -113,7 +113,7 @@ namespace PerimeterX
                 );
             } else if (extractionDetails.SentThrough == "body")
             {
-                return ExtractFromBodyAsync(userFieldName, passwordFieldName, headers, request).Result;
+                return ExtractFromBodyAsync(userFieldName, passwordFieldName, headers, request);
             }
 
             return null;
@@ -121,21 +121,19 @@ namespace PerimeterX
 
         public static ExtractedCredentials ExtractFromHeader(string userFieldName, string passwordFieldName, Dictionary<string, string> headers)
         {
-            bool isUsernameHeaderExist = headers.TryGetValue(userFieldName, out string userName);
-            bool isPasswordHeaderExist = headers.TryGetValue(passwordFieldName, out string password);
+            bool isUsernameHeaderExist = headers.TryGetValue(userFieldName.ToLower(), out string userName);
+            bool isPasswordHeaderExist = headers.TryGetValue(passwordFieldName.ToLower(), out string password);
 
             if (!isUsernameHeaderExist && !isPasswordHeaderExist) { return null; }
 
             return new ExtractedCredentials(userName, password);
         }
 
-        private async Task<ExtractedCredentials> ExtractFromBodyAsync(string userFieldName, string passwordFieldName, Dictionary<string, string> headers, HttpRequest request)
+        private  ExtractedCredentials ExtractFromBodyAsync(string userFieldName, string passwordFieldName, Dictionary<string, string> headers, HttpRequest request)
         {
-            bool isContentTypeHeaderExist = headers.TryGetValue("Content-Type", out string contentType);
+            bool isContentTypeHeaderExist = headers.TryGetValue("content-type", out string contentType);
 
-            HttpRequest httpRequest = request;
-
-            string body = await BodyReader.ReadRequestBodyAsync(httpRequest);
+            string body = BodyReader.ReadRequestBodyAsync(request);
 
             if (!isContentTypeHeaderExist)
             {

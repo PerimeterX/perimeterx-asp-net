@@ -5,19 +5,21 @@
         public LoginCredentialsFields ProcessCredentials(ExtractedCredentials extractedCredentials)
         {
 
-            if (extractedCredentials.Username == null || extractedCredentials.Password == null) 
+            string username = extractedCredentials.Username;
+            string password = extractedCredentials.Password;
+            if (username == null || password == null || username.Length == 0 || password.Length == 0) 
             { 
                 return null; 
             }
 
-            string normalizedUsername = PxCommonUtils.IsEmailAddress(extractedCredentials.Username) ? NormalizeEmailAddress(extractedCredentials.Username) : extractedCredentials.Username;
+            string normalizedUsername = PxCommonUtils.IsEmailAddress(username) ? NormalizeEmailAddress(username) : username;
             string hashedUsername = PxCommonUtils.Sha256(normalizedUsername);
-            string hashedPassword = HashPassword(hashedUsername, extractedCredentials.Password);
+            string hashedPassword = HashPassword(hashedUsername, password);
 
             return new LoginCredentialsFields(
                 hashedUsername,
                 hashedPassword,
-                extractedCredentials.Username,
+                username,
                 CIVersion.V2
             );
         }

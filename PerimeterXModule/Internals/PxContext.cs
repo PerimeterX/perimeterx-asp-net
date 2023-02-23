@@ -287,7 +287,19 @@ namespace PerimeterX
 			return headersDictionary;
 		}
 
-		public string MapBlockAction()
+        public Dictionary<string, string> GetLowercaseHeadersAsDictionary()
+        {
+            Dictionary<string, string> headersDictionary = new Dictionary<string, string>();
+
+            if (Headers != null && Headers.Count() > 0)
+            {
+                headersDictionary = Headers.ToDictionary(header => header.Name.ToLower(), header => header.Value);
+            }
+
+            return headersDictionary;
+        }
+
+        public string MapBlockAction()
 		{
 			if (string.IsNullOrEmpty(BlockAction))
 			{
