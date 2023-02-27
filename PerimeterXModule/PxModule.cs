@@ -683,7 +683,7 @@ namespace PerimeterX
 				if (config.AdditionalS2SActivityHeaderEnabled)
 				{
 					Activity activityPayload = AdditionalS2SUtils.CreateAdditionalS2SActivity(config, null, null, pxContext);
-					application.Context.Request.Headers.Add("px-additional_activity", JSON.SerializeDynamic(activityPayload, PxConstants.JSON_OPTIONS));
+					application.Context.Request.Headers.Add("px-additional_activity", JSON.SerializeDynamic(activityPayload, new Options(prettyPrint: false, excludeNulls: false, includeInherited: true)));
 					application.Context.Request.Headers.Add("px-additional-activity-url", PxConstants.FormatBaseUri(config) + PxConstants.ACTIVITIES_API_PATH);
 				}
 			}
