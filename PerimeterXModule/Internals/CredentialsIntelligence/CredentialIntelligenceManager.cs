@@ -113,7 +113,7 @@ namespace PerimeterX
                 );
             } else if (extractionDetails.SentThrough == "body")
             {
-                return ExtractFromBodyAsync(userFieldName, passwordFieldName, headers, request);
+                return ExtractFromBody(userFieldName, passwordFieldName, headers, request);
             }
 
             return null;
@@ -129,7 +129,7 @@ namespace PerimeterX
             return new ExtractedCredentials(userName, password);
         }
 
-        private  ExtractedCredentials ExtractFromBodyAsync(string userFieldName, string passwordFieldName, Dictionary<string, string> headers, HttpRequest request)
+        private  ExtractedCredentials ExtractFromBody(string userFieldName, string passwordFieldName, Dictionary<string, string> headers, HttpRequest request)
         {
             bool isContentTypeHeaderExist = headers.TryGetValue("content-type", out string contentType);
 
