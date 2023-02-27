@@ -18,7 +18,7 @@ namespace PerimeterX
             try
             {
                 var customLoginSuccessfulHandler =
-                    getAssebliesTypes().FirstOrDefault(t => t.GetInterface(typeof(ILoginSuccessfulHandler).Name) != null &&
+                    getAssembliesTypes().FirstOrDefault(t => t.GetInterface(typeof(ILoginSuccessfulHandler).Name) != null &&
                                                   t.Name.Equals(customHandlerName) && t.IsClass && !t.IsAbstract);
 
                 if (customLoginSuccessfulHandler != null)
@@ -48,7 +48,7 @@ namespace PerimeterX
             return null;
         }
 
-        private static IEnumerable<Type> getAssebliesTypes()
+        private static IEnumerable<Type> getAssembliesTypes()
         {
             return AppDomain.CurrentDomain.GetAssemblies()
                     .SelectMany(a =>
@@ -77,7 +77,7 @@ namespace PerimeterX
 
 			try
 			{
-				var customVerificationHandlerType = getAssebliesTypes()
+				var customVerificationHandlerType = getAssembliesTypes()
 							 .FirstOrDefault(t => t.GetInterface(typeof(IVerificationHandler).Name) != null &&
 												  t.Name.Equals(customHandlerName) && t.IsClass && !t.IsAbstract);
 
@@ -117,7 +117,7 @@ namespace PerimeterX
 
 			try
 			{
-				var customCredentialsExtraction = getAssebliesTypes()
+				var customCredentialsExtraction = getAssembliesTypes()
 							 .FirstOrDefault(t => t.GetInterface(typeof(ICredentialsExtractionHandler).Name) != null &&
 												  t.Name.Equals(customHandlerName) && t.IsClass && !t.IsAbstract);
 

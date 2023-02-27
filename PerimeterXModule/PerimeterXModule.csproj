@@ -77,9 +77,9 @@
     <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\ILoginSuccessfulParser.cs" />
     <Compile Include="Internals\CredentialsIntelligence\LoginCredentialsFields.cs" />
     <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\HeaderLoginSuccessfulParser.cs" />
-    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\LoginSuccessfulParsetFactory.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\LoginSuccessfulParserFactory.cs" />
     <Compile Include="Internals\CredentialsIntelligence\OutputFilterStream.cs" />
-    <Compile Include="Internals\CredentialsIntelligence\PxLoginData.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\CredentialIntelligenceManager.cs" />
     <Compile Include="Internals\CredentialsIntelligence\MultistepSSOCredentialsIntelligenceProtocol.cs" />
     <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\StatusLoginSuccessfulParser.cs" />
     <Compile Include="Internals\CredentialsIntelligence\V2CredentialsIntelligenceProtocol.cs" />

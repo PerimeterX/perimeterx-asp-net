@@ -11,7 +11,7 @@ namespace PerimeterX
 {
 	class PxCommonUtils
 	{
-		/**
+        /**
 		 * <summary>
 		 * Request helper, extracting the ip from the request according to socketIpHeader or from 
 		 * the request socket when socketIpHeader is absent
@@ -20,7 +20,7 @@ namespace PerimeterX
 		 * <param name="pxConfig">PxConfiguration</param>
 		 * <returns>Ip from the request</returns>
 		 */
-		public static string GetRequestIP(HttpContext context, PxModuleConfigurationSection pxConfig)
+        public static string GetRequestIP(HttpContext context, PxModuleConfigurationSection pxConfig)
 		{
 			// Get IP from custom header
 			string socketIpHeader = pxConfig.SocketIpHeader;
@@ -87,10 +87,10 @@ namespace PerimeterX
 			}
 		}
 
-		public static string ExtractValueFromNestedJson(string pathToValue, dynamic jsonObject)
+		public static string ExtractValueFromNestedJson(string pathToValue, dynamic jsonObject, char seperatorChar = '.')
 		{
-            const char CREDENTIAL_FIELD_NESTING_DELIMITER = '.';
-			string[] stepsToCredentialInBody = pathToValue.Split(CREDENTIAL_FIELD_NESTING_DELIMITER);
+           
+			string[] stepsToCredentialInBody = pathToValue.Split(seperatorChar);
 
             dynamic result = jsonObject;
 

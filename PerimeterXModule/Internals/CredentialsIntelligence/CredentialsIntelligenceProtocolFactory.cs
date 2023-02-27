@@ -14,7 +14,7 @@ namespace PerimeterX
                 case CIVersion.MULTISTEP_SSO:
                     return new MultistepSSoCredentialsIntelligenceProtocol();
                 default:
-                    throw new Exception("Unknown CI protocol version" + protocolVersion);
+                    throw new Exception("Unknown CI protocol version: " + protocolVersion);
             }
         }
     }

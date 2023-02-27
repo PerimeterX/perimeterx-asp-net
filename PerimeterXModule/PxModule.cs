@@ -73,7 +73,7 @@ namespace PerimeterX
 		private readonly string osVersion;
 		private string nodeName;
 		private bool loginCredentialsExtractionEnabled;
-		private PxLoginData loginData;
+		private CredentialIntelligenceManager loginData;
 		private IVerificationHandler customVerificationHandlerInstance;
 		private ICredentialsExtractionHandler customCredentialsExtraction;
 
@@ -115,7 +115,8 @@ namespace PerimeterX
 			cookieKeyBytes = Encoding.UTF8.GetBytes(cookieKey);
 			blockingScore = config.BlockingScore;
 			appId = config.AppId;
-			suppressContentBlock = config.SuppressContentBlock;
+            customVerificationHandlerInstance = PxCustomFunctions.GetCustomVerificationHandler(config.CustomVerificationHandler);
+            suppressContentBlock = config.SuppressContentBlock;
 			challengeEnabled = config.ChallengeEnabled;
 			sensetiveHeaders = config.SensitiveHeaders.Cast<string>().ToArray();
 			fileExtWhitelist = config.FileExtWhitelist;
@@ -175,8 +176,7 @@ namespace PerimeterX
 				if (loginCredentialsExtractionEnabled && config.LoginCredentialsExtraction != "")
 				{
 					loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
-					loginData = new PxLoginData(config.CiVersion, loginCredentialsExtraction);
-					customVerificationHandlerInstance = PxCustomFunctions.GetCustomVerificationHandler(config.CustomVerificationHandler);
+					loginData = new CredentialIntelligenceManager(config.CiVersion, loginCredentialsExtraction);
 					customCredentialsExtraction = PxCustomFunctions.GetCustomLoginCredentialsExtractionHandler(config.CustomCredentialsExtractionHandler);
 				}
 			} catch(Exception ex)
@@ -197,8 +197,7 @@ namespace PerimeterX
             try
             {
                 HttpResponse response = HttpContext.Current.Response;
-				OutputFilterStream filter = new OutputFilterStream(response.Filter);
-				response.Filter = filter;
+				response.Filter = new OutputFilterStream(response.Filter);
           
 				var application = (HttpApplication)source;
 
@@ -283,20 +282,42 @@ namespace PerimeterX
 				return;
 			}
 
-			var applicationContext = application.Context;
-            var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
-            
-			if (!config.AdditionalS2SActivityHeaderEnabled && pxContext != null && pxContext.LoginCredentialsFields != null)
-            {
-            	HandleLoginSuccessful(applicationContext.Response, config, application);
-            }
+			try
+			{
+				var applicationContext = application.Context;
+				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
+
+				if (!config.AdditionalS2SActivityHeaderEnabled && pxContext != null && pxContext.LoginCredentialsFields != null)
+				{
+					bool isLoginSuccessful = HandleLoginSuccessful(applicationContext.Response, config, application);
+                    HandleAutomaticAdditionalS2SActivity(applicationContext.Response, config, isLoginSuccessful);
+                }
+			}
+			catch (Exception ex)
+			{
+				PxLoggingUtils.LogDebug("Failed to handle end reqeust event: " + ex.Message);
+			}
+		}
+
+		public bool HandleLoginSuccessful(HttpResponse httpResponse, PxModuleConfigurationSection config, HttpApplication application)
+        {
+			try
+			{
+				ILoginSuccessfulParser loginSuccessfulParser = LoginSuccessfulParserFactory.Create(config);
+				bool isLoginSuccessful;
+
+				isLoginSuccessful = loginSuccessfulParser != null && loginSuccessfulParser.IsLoginSuccessful(httpResponse);
+				return isLoginSuccessful;
+			}
+			catch (Exception ex)
+			{
+				PxLoggingUtils.LogDebug("Error determining login status: " + ex.Message);
+				return false;
+			}
         }
 
-		public void HandleLoginSuccessful(HttpResponse httpResponse, PxModuleConfigurationSection config, HttpApplication application)
-		{
-			ILoginSuccessfulParser loginSuccessfulParser = LoginSuccessfulParsetFactory.Create(config);
-			bool isLoginSuccessful = loginSuccessfulParser != null && loginSuccessfulParser.IsLoginSuccessful(httpResponse);	
-
+        private void HandleAutomaticAdditionalS2SActivity(HttpResponse httpResponse, PxModuleConfigurationSection config, bool isLoginSuccessful)
+        {
             reporter.Post(AdditionalS2SUtils.CreateAdditionalS2SActivity(config, httpResponse.StatusCode, isLoginSuccessful, pxContext));
         }
 
@@ -615,7 +636,7 @@ namespace PerimeterX
 					PxLoggingUtils.LogDebug("Monitor Mode is activated. passing request");
 				}
 
-				HandleCredentialsIntelligence(application, config);
+				AddCredentialIntelligenceHeadersToRequest(application, config);
 
 				PxLoggingUtils.LogDebug(string.Format("Valid request to {0}", application.Context.Request.RawUrl));
 				PostPageRequestedActivity(pxContext);
@@ -650,7 +671,7 @@ namespace PerimeterX
 			}
 		}
 
-		private void HandleCredentialsIntelligence(HttpApplication application, PxModuleConfigurationSection config)
+		private void AddCredentialIntelligenceHeadersToRequest(HttpApplication application, PxModuleConfigurationSection config)
 		{
 			if (config.LoginCredentialsExtractionEnabled && pxContext.LoginCredentialsFields != null)
 			{
@@ -663,7 +684,7 @@ namespace PerimeterX
 				{
 					Activity activityPayload = AdditionalS2SUtils.CreateAdditionalS2SActivity(config, null, null, pxContext);
 					application.Context.Request.Headers.Add("px-additional_activity", JSON.SerializeDynamic(activityPayload, PxConstants.JSON_OPTIONS));
-					application.Context.Request.Headers.Add("px-backend-activity-url", PxConstants.FormatBaseUri(config) + PxConstants.ACTIVITIES_API_PATH);
+					application.Context.Request.Headers.Add("px-additional-activity-url", PxConstants.FormatBaseUri(config) + PxConstants.ACTIVITIES_API_PATH);
 				}
 			}
         }

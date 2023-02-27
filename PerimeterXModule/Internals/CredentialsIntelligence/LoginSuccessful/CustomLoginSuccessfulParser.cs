@@ -6,20 +6,20 @@ namespace PerimeterX
 {
     public class CustomLoginSuccessfulParser : ILoginSuccessfulParser
     {
-        ILoginSuccessfulHandler loginSuccessfulParserhandler;
+        ILoginSuccessfulHandler loginSuccessfulParserHandler;
 
         public CustomLoginSuccessfulParser(PxModuleConfigurationSection config) 
         {
-            loginSuccessfulParserhandler = PxCustomFunctions.GetCustomLoginSuccessfulHandler(config.CustomLoginSuccessfulHandler);
+            loginSuccessfulParserHandler = PxCustomFunctions.GetCustomLoginSuccessfulHandler(config.CustomLoginSuccessfulHandler);
         }
 
         public bool IsLoginSuccessful(HttpResponse httpResponse)
         {
             try
             {
-                if (loginSuccessfulParserhandler != null)
+                if (loginSuccessfulParserHandler != null)
                 {
-                    return loginSuccessfulParserhandler.Handle(httpResponse);
+                    return loginSuccessfulParserHandler.Handle(httpResponse);
                 } 
             }
             catch (Exception ex)

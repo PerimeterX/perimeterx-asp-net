@@ -1,7 +1,7 @@
 ﻿
 namespace PerimeterX
 {
-    public class LoginSuccessfulParsetFactory
+    public class LoginSuccessfulParserFactory
     {
         public static ILoginSuccessfulParser Create(PxModuleConfigurationSection config)
         {
