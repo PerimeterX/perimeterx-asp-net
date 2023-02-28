@@ -11,12 +11,12 @@ namespace PerimeterX
             bodyRegex = config.LoginSuccessfulBodyRegex;
         }
 
-        public bool IsLoginSuccessful(HttpResponse httpResponse)
+        public bool? IsLoginSuccessful(HttpResponse httpResponse)
         {
             string body = ((OutputFilterStream)httpResponse.Filter).ReadStream();
 
             if (body == null) {
-                return false;
+                return null;
             }
 
             return Regex.IsMatch(body, bodyRegex);       

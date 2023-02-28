@@ -4,6 +4,6 @@ namespace PerimeterX
 {
     public interface ILoginSuccessfulParser
     {
-        bool IsLoginSuccessful(HttpResponse httpResponse);
+        bool? IsLoginSuccessful(HttpResponse httpResponse);
     }
 }

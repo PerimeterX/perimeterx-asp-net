@@ -13,22 +13,22 @@ namespace PerimeterX
             loginSuccessfulParserHandler = PxCustomFunctions.GetCustomLoginSuccessfulHandler(config.CustomLoginSuccessfulHandler);
         }
 
-        public bool IsLoginSuccessful(HttpResponse httpResponse)
+        public bool? IsLoginSuccessful(HttpResponse httpResponse)
         {
             try
             {
                 if (loginSuccessfulParserHandler != null)
                 {
                     return loginSuccessfulParserHandler.Handle(httpResponse);
+                 
                 } 
             }
             catch (Exception ex)
             {
-                PxLoggingUtils.LogDebug("An error occurred while executing login successful handler " + ex.Message);
-                
+                PxLoggingUtils.LogDebug("An error occurred while executing login successful handler " + ex.Message); 
             }
 
-            return false;
+            return null;
         }
     }
 }

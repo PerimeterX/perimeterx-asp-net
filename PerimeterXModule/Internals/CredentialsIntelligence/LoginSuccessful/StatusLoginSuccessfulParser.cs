@@ -13,7 +13,7 @@ namespace PerimeterX
             successfulStatuses = config.LoginSuccessfulStatus.Cast<string>().ToList();
         }
 
-        public bool IsLoginSuccessful(HttpResponse httpResponse)
+        public bool? IsLoginSuccessful(HttpResponse httpResponse)
         {
             return successfulStatuses.Contains(httpResponse.StatusCode.ToString());
         }

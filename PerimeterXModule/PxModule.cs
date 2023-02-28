@@ -289,7 +289,7 @@ namespace PerimeterX
 
 				if (!config.AdditionalS2SActivityHeaderEnabled && pxContext != null && pxContext.LoginCredentialsFields != null)
 				{
-					bool isLoginSuccessful = HandleLoginSuccessful(applicationContext.Response, config, application);
+					bool? isLoginSuccessful = HandleLoginSuccessful(applicationContext.Response, config, application);
                     HandleAutomaticAdditionalS2SActivity(applicationContext.Response, config, isLoginSuccessful);
                 }
 			}
@@ -299,24 +299,27 @@ namespace PerimeterX
 			}
 		}
 
-		public bool HandleLoginSuccessful(HttpResponse httpResponse, PxModuleConfigurationSection config, HttpApplication application)
+		public bool? HandleLoginSuccessful(HttpResponse httpResponse, PxModuleConfigurationSection config, HttpApplication application)
         {
 			try
 			{
 				ILoginSuccessfulParser loginSuccessfulParser = LoginSuccessfulParserFactory.Create(config);
-				bool isLoginSuccessful;
+				bool? isLoginSuccessful = loginSuccessfulParser.IsLoginSuccessful(httpResponse);
 
-				isLoginSuccessful = loginSuccessfulParser != null && loginSuccessfulParser.IsLoginSuccessful(httpResponse);
-				return isLoginSuccessful;
+				if (loginSuccessfulParser != null && isLoginSuccessful.HasValue)
+				{
+					return isLoginSuccessful;
+				}
 			}
 			catch (Exception ex)
 			{
 				PxLoggingUtils.LogDebug("Error determining login status: " + ex.Message);
-				return false;
 			}
+			
+			return null;
         }
 
-        private void HandleAutomaticAdditionalS2SActivity(HttpResponse httpResponse, PxModuleConfigurationSection config, bool isLoginSuccessful)
+        private void HandleAutomaticAdditionalS2SActivity(HttpResponse httpResponse, PxModuleConfigurationSection config, bool? isLoginSuccessful)
         {
             reporter.Post(AdditionalS2SUtils.CreateAdditionalS2SActivity(config, httpResponse.StatusCode, isLoginSuccessful, pxContext));
         }
