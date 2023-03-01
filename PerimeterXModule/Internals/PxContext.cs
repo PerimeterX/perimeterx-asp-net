@@ -51,6 +51,8 @@ namespace PerimeterX
 		public string VidSource { get; set; }
 		public string Pxhd { get; set; }
         public bool MonitorRequest { get; set; }
+		public LoginCredentialsFields LoginCredentialsFields { get; set; }
+		public string RequestId { get; set; }
 
         public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -61,11 +63,12 @@ namespace PerimeterX
 			OriginalTokens = new Dictionary<string, string>();
 			S2SCallReason = "none";
 			IsMobileRequest = false;
+            RequestId = Guid.NewGuid().ToString();
 
-			// Get Headers
+            // Get Headers
 
-			// if userAgentOverride is present override the default user-agent
-			CookieNames = extractCookieNames(context.Request.Headers[PxConstants.COOKIE_HEADER]);
+            // if userAgentOverride is present override the default user-agent
+            CookieNames = extractCookieNames(context.Request.Headers[PxConstants.COOKIE_HEADER]);
 			string userAgentOverride = pxConfiguration.UserAgentOverride;
 			if (!string.IsNullOrEmpty(userAgentOverride))
 			{
@@ -284,7 +287,19 @@ namespace PerimeterX
 			return headersDictionary;
 		}
 
-		public string MapBlockAction()
+        public Dictionary<string, string> GetLowercaseHeadersAsDictionary()
+        {
+            Dictionary<string, string> headersDictionary = new Dictionary<string, string>();
+
+            if (Headers != null && Headers.Count() > 0)
+            {
+                headersDictionary = Headers.ToDictionary(header => header.Name.ToLower(), header => header.Value);
+            }
+
+            return headersDictionary;
+        }
+
+        public string MapBlockAction()
 		{
 			if (string.IsNullOrEmpty(BlockAction))
 			{
@@ -301,6 +316,12 @@ namespace PerimeterX
 				default:
 					return "captcha";
 			}
+		}
+
+
+		public bool IsBreachedAccount()
+		{
+			return Pxde != null && Pxde.breached_account != null && IsPxdeVerified;
 		}
 	}
 }
