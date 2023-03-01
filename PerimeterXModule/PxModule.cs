@@ -73,7 +73,7 @@ namespace PerimeterX
 		private readonly string osVersion;
 		private string nodeName;
 		private bool loginCredentialsExtractionEnabled;
-		private CredentialIntelligenceManager loginData;
+		private CredentialIntelligenceManager ciManager;
 		private IVerificationHandler customVerificationHandlerInstance;
 		private ICredentialsExtractionHandler customCredentialsExtraction;
 
@@ -176,7 +176,7 @@ namespace PerimeterX
 				if (loginCredentialsExtractionEnabled && config.LoginCredentialsExtraction != "")
 				{
 					loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
-					loginData = new CredentialIntelligenceManager(config.CiVersion, loginCredentialsExtraction);
+					ciManager = new CredentialIntelligenceManager(config.CiVersion, loginCredentialsExtraction);
 					customCredentialsExtraction = PxCustomFunctions.GetCustomLoginCredentialsExtractionHandler(config.CustomCredentialsExtractionHandler);
 				}
 			} catch(Exception ex)
@@ -586,9 +586,9 @@ namespace PerimeterX
 				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				pxContext = new PxContext(application.Context, config);
 				
-                if (loginData != null)
+                if (ciManager != null)
                 {
-                    LoginCredentialsFields loginCredentialsFields = loginData.ExtractCredentialsFromRequest(pxContext, application.Context.Request, customCredentialsExtraction);
+                    LoginCredentialsFields loginCredentialsFields = ciManager.ExtractCredentialsFromRequest(pxContext, application.Context.Request, customCredentialsExtraction);
                     if (loginCredentialsFields != null)
 					{
 						pxContext.LoginCredentialsFields = loginCredentialsFields;
@@ -686,7 +686,7 @@ namespace PerimeterX
 				if (config.AdditionalS2SActivityHeaderEnabled)
 				{
 					Activity activityPayload = AdditionalS2SUtils.CreateAdditionalS2SActivity(config, null, null, pxContext);
-					application.Context.Request.Headers.Add("px-additional_activity", JSON.SerializeDynamic(activityPayload, new Options(prettyPrint: false, excludeNulls: false, includeInherited: true)));
+					application.Context.Request.Headers.Add("px-additional-activity", JSON.SerializeDynamic(activityPayload, new Options(prettyPrint: false, excludeNulls: false, includeInherited: true)));
 					application.Context.Request.Headers.Add("px-additional-activity-url", PxConstants.FormatBaseUri(config) + PxConstants.ACTIVITIES_API_PATH);
 				}
 			}
