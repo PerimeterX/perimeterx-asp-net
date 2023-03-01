@@ -110,8 +110,9 @@ namespace PerimeterX
 					PxCookieHMAC = PxContext.PxCookieHmac,
 					CookieOrigin = PxContext.CookieOrigin,
 					RequestCookieNames = PxContext.CookieNames,
-					VidSource = PxContext.VidSource
-				},
+					VidSource = PxContext.VidSource,
+                    RequestId = PxContext.RequestId
+                },
 				FirstParty = PxConfig.FirstPartyEnabled
 			};
 

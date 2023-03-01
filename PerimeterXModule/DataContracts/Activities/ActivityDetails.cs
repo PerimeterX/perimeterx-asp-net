@@ -49,6 +49,9 @@ namespace PerimeterX
 
         [DataMember(Name = "sso_step")]
         public string SsoStep { get; set; }
+
+        [DataMember(Name = "request_id")]
+        public string RequestId { get; set; }
     }
 
     [DataContract]
