@@ -73,7 +73,7 @@ namespace PerimeterX
 		private readonly string osVersion;
 		private string nodeName;
 		private bool loginCredentialsExtractionEnabled;
-		private CredentialIntelligenceManager ciManager;
+		private CredentialIntelligenceManager loginData;
 		private IVerificationHandler customVerificationHandlerInstance;
 		private ICredentialsExtractionHandler customCredentialsExtraction;
 
@@ -176,7 +176,7 @@ namespace PerimeterX
 				if (loginCredentialsExtractionEnabled && config.LoginCredentialsExtraction != "")
 				{
 					loginCredentialsExtraction = JSON.Deserialize<List<ExtractorObject>>(config.LoginCredentialsExtraction, PxConstants.JSON_OPTIONS);
-					ciManager = new CredentialIntelligenceManager(config.CiVersion, loginCredentialsExtraction);
+					loginData = new CredentialIntelligenceManager(config.CiVersion, loginCredentialsExtraction);
 					customCredentialsExtraction = PxCustomFunctions.GetCustomLoginCredentialsExtractionHandler(config.CustomCredentialsExtractionHandler);
 				}
 			} catch(Exception ex)
@@ -463,6 +463,8 @@ namespace PerimeterX
 				}
             }
 
+			details.RequestId = pxContext.RequestId;
+
             var activity = new Activity
 			{
 				Type = eventType,
@@ -586,9 +588,9 @@ namespace PerimeterX
 				var config = (PxModuleConfigurationSection)ConfigurationManager.GetSection(PxConstants.CONFIG_SECTION);
 				pxContext = new PxContext(application.Context, config);
 				
-                if (ciManager != null)
+                if (loginData != null)
                 {
-                    LoginCredentialsFields loginCredentialsFields = ciManager.ExtractCredentialsFromRequest(pxContext, application.Context.Request, customCredentialsExtraction);
+                    LoginCredentialsFields loginCredentialsFields = loginData.ExtractCredentialsFromRequest(pxContext, application.Context.Request, customCredentialsExtraction);
                     if (loginCredentialsFields != null)
 					{
 						pxContext.LoginCredentialsFields = loginCredentialsFields;

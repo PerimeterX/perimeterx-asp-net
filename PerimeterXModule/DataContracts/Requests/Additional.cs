@@ -62,5 +62,8 @@ namespace PerimeterX
         [DataMember(Name = "sso_step", IsRequired = false)]
         public string SsoStep;
 
+        [DataMember(Name = "request_id")]
+        public string RequestId { get; set; }
+
     }
 }
