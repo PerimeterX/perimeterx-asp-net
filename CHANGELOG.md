@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [3.2.0] - 2023-01-03
+### Added
+- Support for credentials intelligence protocols `v2` and `multistep_sso`
+- Support for login successful reporting methods `header`, `status`, `body`, and `custom`
+- Support for automatic sending of `additional_s2s` activity
+- Support for manual sending of `additional_s2s` activity via header
+- Support for sending raw username on `additional_s2s` activity
+- Support for login credentials extraction via custom function
+- New `request_id` field to all enforcer activities
+
 ## [3.1.4] - 2022-12-05
 ### Added
 - Compatibility with .NET Framework 4.7 and higher

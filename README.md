@@ -5,7 +5,7 @@
 [PerimeterX](http://www.perimeterx.com) ASP.NET SDK
 ===================================================
 
-> Latest stable version: [v3.1.4](https://www.nuget.org/packages/PerimeterXModule/3.1.4)
+> Latest stable version: [v3.2.0](https://www.nuget.org/packages/PerimeterXModule/3.2.0)
 
 Table of Contents
 -----------------
