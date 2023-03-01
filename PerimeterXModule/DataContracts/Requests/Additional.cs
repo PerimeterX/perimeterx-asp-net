@@ -46,5 +46,24 @@ namespace PerimeterX
 
 		[DataMember(Name = "enforcer_vid_source", EmitDefaultValue = false)]
 		public string VidSource;
-	}
+
+        [DataMember(Name = "user")]
+        public string Username;
+
+        [DataMember(Name = "pass")]
+        public string Password;
+
+        [DataMember(Name = "raw_username", IsRequired = false)]
+        public string RawUsername;
+
+        [DataMember(Name = "ci_version")]
+        public string CiVersion;
+
+        [DataMember(Name = "sso_step", IsRequired = false)]
+        public string SsoStep;
+
+        [DataMember(Name = "request_id")]
+        public string RequestId { get; set; }
+
+    }
 }

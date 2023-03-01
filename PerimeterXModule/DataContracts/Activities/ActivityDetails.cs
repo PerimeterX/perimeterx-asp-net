@@ -40,6 +40,18 @@ namespace PerimeterX
 
         [DataMember(Name = "simulated_block")]
         public bool? SimulatedBlock;
+
+        [DataMember(Name = "ci_version")]
+        public string CiVersion { get; set; }
+
+        [DataMember(Name = "credentials_compromised")]
+        public bool CredentialsCompromised { get; set; }
+
+        [DataMember(Name = "sso_step")]
+        public string SsoStep { get; set; }
+
+        [DataMember(Name = "request_id")]
+        public string RequestId { get; set; }
     }
 
     [DataContract]
@@ -59,5 +71,37 @@ namespace PerimeterX
 
         [DataMember(Name = "enforcer_configs")]
         public string EnforcerConfigs;
+    }
+
+    [DataContract]
+    public class AdditionalS2SActivityDetails : IActivityDetails
+    {
+
+        [DataMember(Name = "client_uuid")]
+        public string ClientUuid { get; set; }
+
+        [DataMember(Name = "request_id")]
+        public string RequestId { get; set; }
+
+        [DataMember(Name = "ci_version")]
+        public string CiVersion { get; set; }
+
+        [DataMember(Name = "credentials_compromised", EmitDefaultValue = false)]
+        public bool CredentialsCompromised { get; set; }
+
+        [DataMember(Name = "http_status_code")]
+        public int HttpStatusCode { get; set; }
+
+        [DataMember(Name = "login_successful")]
+        public bool LoginSuccessful { get; set; }
+
+        [DataMember(Name = "raw_username")]
+        public string RawUsername { get; set; }
+
+        [DataMember(Name = "sso_step")]
+        public string SsoStep { get; set; }
+
+        [DataMember(Name = "module_version")]
+        public string ModuleVersion { get; internal set; }
     }
 }

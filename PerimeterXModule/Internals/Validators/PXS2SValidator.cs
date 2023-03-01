@@ -110,8 +110,9 @@ namespace PerimeterX
 					PxCookieHMAC = PxContext.PxCookieHmac,
 					CookieOrigin = PxContext.CookieOrigin,
 					RequestCookieNames = PxContext.CookieNames,
-					VidSource = PxContext.VidSource
-				},
+					VidSource = PxContext.VidSource,
+                    RequestId = PxContext.RequestId
+                },
 				FirstParty = PxConfig.FirstPartyEnabled
 			};
 
@@ -149,9 +150,28 @@ namespace PerimeterX
 				riskRequest.Additional.OriginalTokenError = PxContext.OriginalTokenError;
 			}
 
-			string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
+			SetCredentialsIntelligenceOnRisk(PxContext, riskRequest.Additional);
+
+            string requestJson = JSON.SerializeDynamic(riskRequest, PxConstants.JSON_OPTIONS);
 			var responseJson = httpHandler.Post(requestJson, PxConstants.RISK_API_PATH);
 			return JSON.Deserialize<RiskResponse>(responseJson, PxConstants.JSON_OPTIONS);
+		}
+
+		public void SetCredentialsIntelligenceOnRisk(PxContext pxContext, Additional riskRequest)
+		{
+			LoginCredentialsFields loginCredentialsFields = pxContext.LoginCredentialsFields;
+
+            if (loginCredentialsFields != null)
+			{
+                riskRequest.Username = loginCredentialsFields.Username;
+				riskRequest.CiVersion = loginCredentialsFields.CiVersion;	
+				riskRequest.Password = loginCredentialsFields.Password;
+				
+				if (loginCredentialsFields.CiVersion == CIVersion.MULTISTEP_SSO)
+				{
+					riskRequest.SsoStep = loginCredentialsFields.SsoStep;
+				}
+            }
 		}
 	}
 }

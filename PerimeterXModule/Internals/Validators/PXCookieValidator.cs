@@ -103,7 +103,7 @@ namespace PerimeterX
 					return false;
 				}
 
-				if (context.SensitiveRoute)
+				if (context.SensitiveRoute || context.LoginCredentialsFields != null)
 				{
 					PxLoggingUtils.LogDebug(string.Format("Cookie is valid but is a sensitive route {0}", context.Uri));
 					context.S2SCallReason = CALL_REASON_SENSITIVE_ROUTE;

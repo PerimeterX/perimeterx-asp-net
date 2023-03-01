@@ -64,6 +64,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomBehavior\ICredentialsExtractionHandler.cs" />
+    <Compile Include="CustomBehavior\ILoginSuccessfulHandler.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\CustomLoginSuccessfulParser.cs" />
+    <Compile Include="Internals\Helpers\BodyReader.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\AdditionalS2SUtils.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\BodyLoginSuccessfulParser.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\ExtractedCredentials.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\ICredentialsIntelligenceProtocol.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\CredentialsIntelligenceProtocolFactory.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\ExtractorObject.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\ILoginSuccessfulParser.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginCredentialsFields.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\HeaderLoginSuccessfulParser.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\LoginSuccessfulParserFactory.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\OutputFilterStream.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\CredentialIntelligenceManager.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\MultistepSSOCredentialsIntelligenceProtocol.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\LoginSuccessful\StatusLoginSuccessfulParser.cs" />
+    <Compile Include="Internals\CredentialsIntelligence\V2CredentialsIntelligenceProtocol.cs" />
+    <Compile Include="Internals\Enums\MultistepSsoStep.cs" />
+    <Compile Include="Internals\Enums\CIVersion.cs" />
     <Compile Include="Internals\PxBlock.cs" />
     <Compile Include="Internals\Cookies\PxCookieUtils.cs" />
     <Compile Include="DataContracts\Cookies\DecodedCookieV3.cs" />
@@ -104,6 +125,7 @@
     <Compile Include="Internals\TemplateFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Internals\CookieDecoder.cs" />
+    <Compile Include="PxCustomFunctions.cs" />
     <Compile Include="PxModule.cs" />
     <Compile Include="PxModuleConfigurationSection.cs" />
     <Compile Include="Internals\ActivityReporter.cs" />
