@@ -502,6 +502,251 @@ window._pxOnCaptchaSuccess = function(isValid) {
 }
 ```
 
+
+<a name="credentials-intelligence"></a> Credentials Intelligence 
+------------------------------------------------------------------
+The Credentials Intelligence feature allows you to safeguard your users login information by leveraging HUMAN's database of compromised credentials.
+TO enable this feature:
+1. Change the loginCredentialsExtractionEnabled value to true. Default: false
+2. In `loginCredentialsExtraction`, add unique login extraction paths by defining an array of credential extraction definition objects. Each of these represents a particular type of request, from which to extract credentials. You need to define the following fields:
+
+
+| Property Name  | Type      | Description                            | Possible Values           |
+| :---           | :---      | :---                                   | :---                      |
+| `method`       | string    | The HTTP method of the login request   |                           |
+| `path_type`    | string    | Whether the path property should be an exact match or evaluated as a regular expression | `exact`, `regex`   |
+| `path`         | string    | The path of the login request as an exact string or regular expression | |
+| `sent_through` | string    | The location of the credentials on the request | `body`, `header`, `query-param`, `custom` |
+| `user_field`   | string    | The name of the username field         |                           |
+| `pass_field`   | string    | The name of the password field         |                           |
+
+
+Below is an example of a valid array that lists three different login endpoints, from which credentials should be extracted:
+
+```json
+[{
+	"method": "get",
+	"path_type": "exact",
+	"path": "/login/query",
+	"sent_through": "query-param",
+	"pass_field": "password",
+	"user_field": "username"
+}, {
+	"method": "post",
+	"path_type": "exact",
+	"path": "/login-nested-object",
+	"sent_through": "body",
+	"pass_field": "nested.password",
+	"user_field": "nested.username"
+}, {
+    "method": "post",
+	"path_type": "regex",
+	"path": "^/user/[A-Za-z0-9]{8,12}/session$",
+	"sent_through": "body",
+	"pass_field": "password",
+	"user_field": "username"
+}, {
+    "method": "post",
+    "path_type": "exact",
+    "path": "/login",
+    "sent_through": "custom"
+}]
+```
+
+ If the `sent_through` is `custom`, the `user_field` and `pass_field` do not need to be defined. Instead, a custom function must be defined. (a link for the Custom credentials extraction Handler title). All login endpoints that have `custom` as the value for `sent_through` will trigger this function.
+
+In ciVersion, select either the single step (v2) or multi-step login (multistep_sso). Default: v2.
+In sendRawUsernameOnAdditionalS2SActivity, select whether the original username used for the login attempt should be sent to PerimeterX to aid in detection. Default: false.
+
+
+Custom credentials extraction Handler
+A custom function handler is a function called to extract the username and password from the request. The function should accept the request object (HttpRequest) as a parameter and return an ExtractedCredentials object with the user and pass. If the extraction is unsuccessful, the function should return null.
+The custom handler class should implement the `ICredentialsExtractionHandler` interface, and its name should be added to the configuration section:
+
+```xml
+…
+   customCredentialsExtractionHandler = “MyCredentialsExtractorHandler”
+… 
+```
+
+The custom logic will reside in the `Handle` method, making use of the following argument:
+`HttpRequest httpRequest` - The HttpRequest object in C# represents the incoming HTTP request from a client to a server, containing information such as headers, query parameters, and form data.
+
+```c#
+namespace myUniqueApp  
+{  
+   public class MyCredentialsExtractorHandler : ICredentialsExtractionHandler  
+   {  
+      public ExtractedCredentials Handle(HttpRequest httpRequest)  
+      {  
+         // Custom credentials extraction logic goes here.  
+
+         // return the ExtractedCredentials object containing the user and pass strings.  
+         return new ExtractedCredentials("user", "pass");  
+      }  
+   }  
+}
+```
+
+
+### Additional S2S Activity
+
+To enhance detection on login credentials extraction endpoints, the following additional information is sent to PerimeterX via an additional_s2s activity:
+Response Code - The numerical HTTP status code of the response. This is sent automatically.
+Login Success - A boolean indicating whether the login was completed successfully. See the options listed below for how to provide this data.
+Raw Username - The original username used for the login attempt. In order to report this information, make sure the configuration `sendRawUsernameOnAdditionalS2SActivity` is set to true.
+This additional_s2s activity can be sent either automatically via the PxModule or manually from the origin server using the Additional Activity Header feature. 
+
+#### Manual Additional S2S Activity Via Header
+
+Rather than using the PxModule to send the additional_s2s activity, it is instead possible to generate the base additional_s2s activity along with the URL endpoint, and pass them to the origin server as headers on the original HTTP request. 
+When enabled (by the additionalS2SActivityHeaderEnabled field), the module will add two new headers to the original request and send them to the origin:
+px-additional-activity, a stringified JSON activity that should be sent.
+px-additional-activity-url, the complete URL endpoint to which the JSON object should be sent.
+**Default Value**: false
+
+```xml
+...
+   additionalS2SActivityHeaderEnabled: ‘true’
+...
+```
+
+This flag determines if the headers that use the origin to send the additional S2S activity should be added.
+The px-additional-activity header value is a stringified JSON object that looks like this. Only the fields indicated with // MODIFY should be changed prior to sending. Other fields should not be altered in any way.
+
+
+```json
+{
+  "type": "additional_s2s",
+  "timestamp": 1637000000,
+  "socket_ip": "1.1.1.1",
+  "px_app_id": "PX_APP_ID",
+  "url": "https://www.example.com/the-target-url",
+  "vid": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+  "details": {
+    "client_uuid": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "request_id": "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX",
+    "ci_version": "v1",
+    "http_status_code": null, // MODIFY, number (e.g., 200, 401, 404, etc.)
+    "login_successful": null, // MODIFY, boolean (e.g., true, false)
+    "raw_username": null // MODIFY, string (e.g., "test@mail.com")
+  }
+}
+```
+
+After parsing the object and adding the appropriate http_status_code and login_successful fields in the origin server, send the JSON object as an HTTP POST request to the URL provided in the px-additional-activity-url header. 
+Note: The POST request should be sent with the Content-Type: application/json and Authorization: Bearer <PX_AUTH_TOKEN> headers.
+
+#### Automatic Additional S2S Activities via PxModule
+
+To enable automatic sending of the additional_s2s activity on the PxModule, ensure the following configuration is enabled and the login successful reporting method is configured. If left empty, the login successful status will always be reported as false.
+
+
+**Default Values**
+additionalS2SActivityHeaderEnabled: false
+loginSuccessfulReportingMethod: Empty
+
+```xml
+… 
+   additionalS2SActivityHeaderEnabled: ‘false’
+   loginSuccessfulReportingMethod: ‘status’
+… 
+```
+
+Each login successful reporting method (status, body, header, and custom) requires an additional configuration specific to that reporting method.
+
+
+##### Status
+Provide a status a list of statuses that represent a successful login. If a response's status code matches the provided value or one of the values in the provided array, the login successful status is set to true. Otherwise, it's set to false.
+
+Note: To define a range of statuses, use the custom reporting method.
+
+**Default Values:**
+loginSuccessfulStatus: 200
+
+```xml
+…
+   loginSuccessfulReportingMethod: 'status'
+   loginSuccessfulStatus: '200,201,202'
+… 
+
+```
+
+
+
+##### Header
+Provide a header name and value. If the header exists on the response and matches the provided value, the login successful status is set to true. If the header is not found on the response, or if the header value does not match the value in the configuration, the login successful status is set to false.
+**Default Values:**
+loginSuccessfulHeaderName: Empty
+
+loginSuccessfulHeaderValue: Empty
+
+```xml
+…
+    loginSuccessfulReportingMethod: 'header',
+    loginSuccessfulHeaderName: 'login-successful',
+    loginSuccessfulHeaderValue: 'true'
+… 
+```
+
+##### Body 
+Provide a string or regular expression. If the body of the response results in any match with the configured provided regex value, the login successful status is set to `true`. If no match is found, the login successful status is set to `false`.
+
+
+**Default Values:**
+loginSuccessfulReportingMethod: Empty
+loginSuccessfulBodyRegex: Empty
+
+```xml
+…
+   loginSuccessfulReportingMethod: 'body'
+   loginSuccessfulBodyRegex: '.*You logged in successfully.*'
+… 
+```
+
+##### Custom
+
+The login_successful field will be set to the return value of the provided custom function. The function should accept the response object (HttpRespone) as a parameter and return a boolean indicating if the login was successful. 
+
+The custom handler class should implement the `ILoginSuccessfulHandler` interface, and its name should be added to the configuration section:
+
+```xml
+…
+   customLoginSuccessfulHandler = “MyLoginSuccessfulHandler”
+… 
+```
+
+
+The custom logic will reside in the `Handle` method, making use of the following argument:
+`HttpResponse httpResponse` - The HttpResponse object in C# represents the server's response to an HTTP request made by a client and contains information such as the response status code, headers, and body.
+
+```c#
+namespace myUniqueApp
+{
+    public class MyCredentialsExtractorHandler : ILoginSuccessfulHandler
+    {
+        public bool Handle(HttpResponse httpResponse)
+        {
+           // custom implementation resulting in boolean isLoginSuccessful  
+	  
+   		      return isLoginSuccessful;
+       }
+    }
+}
+```
+
+### Raw Username
+When enabled, the raw username used for logins on login credentials extraction endpoints will be reported to PerimeterX if (1) the credentials were identified as compromised, and (2) the login was successful as reported via the property above.
+*Default Value:* false
+
+```xml  
+...
+   sendRawUsernameOnAdditionalS2SActivity: true
+...
+```
+
+
+
 For details on how to create a custom Captcha page, refer to the [documentation](https://docs.perimeterx.com/pxconsole/docs/customize-challenge-page)
 
 <a name="contributing"></a> Contributing
