@@ -26,7 +26,7 @@ namespace PerimeterX.Internals
 		{
 			Dictionary<string, string> headers = pxContext.GetHeadersAsDictionary();
 			string jsonHeader;
-			bool jsonHeaderExists = headers.TryGetValue("accept", out jsonHeader) || headers.TryGetValue("content-type", out jsonHeader);
+			bool jsonHeaderExists = headers.TryGetValue("Accept", out jsonHeader) || headers.TryGetValue("Content-Type", out jsonHeader);
 			if (jsonHeaderExists)
 			{
 				string[] values = jsonHeader.Split(',');
