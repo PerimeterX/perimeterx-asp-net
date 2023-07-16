@@ -473,7 +473,7 @@ namespace PerimeterX
 				SocketIP = pxContext.Ip,
 				Url = pxContext.FullUrl,
 				Details = details,
-				Headers = pxContext.GetHeadersAsDictionary(),
+				Headers = pxContext.lowercaseHttpHeaders,
 			};
 
 			if (!string.IsNullOrEmpty(pxContext.Vid))
