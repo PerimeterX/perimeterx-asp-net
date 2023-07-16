@@ -100,7 +100,7 @@ namespace PerimeterX
                 return null;
             }
 
-            Dictionary<string, string> headers = pxContext.GetLowercaseHeadersAsDictionary();
+            Dictionary<string, string> headers = pxContext.lowercaseHttpHeaders;
 
             if (extractionDetails.SentThrough == "header")
             {

@@ -53,6 +53,7 @@ namespace PerimeterX
         public bool MonitorRequest { get; set; }
 		public LoginCredentialsFields LoginCredentialsFields { get; set; }
 		public string RequestId { get; set; }
+		public Dictionary<string,string> lowercaseHttpHeaders;
 
         public PxContext(HttpContext context, PxModuleConfigurationSection pxConfiguration)
 		{
@@ -194,6 +195,7 @@ namespace PerimeterX
 			RedirectOnCustomUrl = pxConfiguration.RedirectOnCustomUrl;
 
             MonitorRequest = shouldMonitorRequest(context, pxConfiguration);
+            lowercaseHttpHeaders = GetLowercaseHeadersAsDictionary();
 		}
 
         private bool shouldMonitorRequest(HttpContext context, PxModuleConfigurationSection pxConfiguration)
@@ -273,18 +275,6 @@ namespace PerimeterX
 				return null;
 			}
 			return PxCookies.ContainsKey(PxConstants.COOKIE_V3_PREFIX) ? PxCookies[PxConstants.COOKIE_V3_PREFIX] : PxCookies[PxConstants.COOKIE_V1_PREFIX];
-		}
-
-		public Dictionary<string, string> GetHeadersAsDictionary()
-		{
-			Dictionary<string, string> headersDictionary = new Dictionary<string, string>();
-
-			if (Headers != null && Headers.Count() > 0)
-			{
-				headersDictionary = Headers.ToDictionary(header => header.Name, header => header.Value);
-			}
-
-			return headersDictionary;
 		}
 
         public Dictionary<string, string> GetLowercaseHeadersAsDictionary()
