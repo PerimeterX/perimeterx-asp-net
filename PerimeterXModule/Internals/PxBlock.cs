@@ -24,9 +24,17 @@ namespace PerimeterX.Internals
 
 		public bool IsJsonResponse(PxContext pxContext)
 		{
-			Dictionary<string, string> headers = pxContext.GetHeadersAsDictionary();
-			string jsonHeader;
-			bool jsonHeaderExists = headers.TryGetValue("accept", out jsonHeader) || headers.TryGetValue("content-type", out jsonHeader);
+			Dictionary<string, string> headers = pxContext.lowercaseHttpHeaders;
+			string acceptHeader;
+			string contentTypeHeader;
+			bool jsonHeaderExistsInAccept = headers.TryGetValue("accept", out acceptHeader);
+			bool jsonHeaderExistsInContentType = headers.TryGetValue("content-type", out contentTypeHeader);
+			return DoesJsonExists(acceptHeader, jsonHeaderExistsInAccept) || DoesJsonExists(contentTypeHeader, jsonHeaderExistsInContentType);
+
+        }
+
+		private static bool DoesJsonExists(string jsonHeader, bool jsonHeaderExists)
+		{
 			if (jsonHeaderExists)
 			{
 				string[] values = jsonHeader.Split(',');

@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [3.2.1] - 2023-08-17
+### Fixed
+- Fixed advanced blocking response feature
+
+
 ## [3.2.0] - 2023-01-03
 ### Added
 - Support for credentials intelligence protocols `v2` and `multistep_sso`
