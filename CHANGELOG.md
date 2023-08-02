@@ -3,7 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
-## [3.2.1] - 2023-08-17
+## [3.2.2] - 2023-08-02
+### Fixed
+- Added firstPartyEnabled field to advanced blocking response
+
+
+## [3.2.1] - 2023-07-17
 ### Fixed
 - Fixed advanced blocking response feature
 

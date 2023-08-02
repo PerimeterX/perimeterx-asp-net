@@ -17,5 +17,7 @@ namespace PerimeterX
 		public string HostUrl;
 		[DataMember(Name = "blockScript")]
 		public string BlockScript;
-	}
+        [DataMember(Name = "firstPartyEnabled")]
+        public string firstPartyEnabled;
+    }
 }
