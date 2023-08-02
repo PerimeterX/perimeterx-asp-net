@@ -104,8 +104,9 @@ namespace PerimeterX.Internals
 							Vid = pxContext.Vid,
 							JsClientSrc = props["jsClientSrc"],
 							HostUrl = props["hostUrl"],
-							BlockScript = props["blockScript"]
-						}, output);
+							BlockScript = props["blockScript"],
+                            firstPartyEnabled = props["firstPartyEnabled"]
+                        }, output);
 					content = output.ToString();
 				}
 
