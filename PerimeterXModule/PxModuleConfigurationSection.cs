@@ -188,6 +188,19 @@ namespace PerimeterX
             }
         }
 
+        [ConfigurationProperty("customCookieHeader", DefaultValue = "x-px-cookies")]
+        public string CustomCookieHeader
+        {
+            get
+            {
+                return (string)this["customCookieHeader"];
+            }
+            set
+            {
+                this["customCookieHeader"] = value;
+            }
+        }
+
         [ConfigurationProperty("apiTimeout", DefaultValue = 1500)]
         public int ApiTimeout
         {
