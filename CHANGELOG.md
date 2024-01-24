@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 
+## [3.3.0] - 2024-01-24
+### Added
+- Support for custom cookie header
+
+### Fixed
+- first-party XHR url validation
+
 ## [3.2.2] - 2023-08-02
 ### Fixed
 - Added firstPartyEnabled field to advanced blocking response
