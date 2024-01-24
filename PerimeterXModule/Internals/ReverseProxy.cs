@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Web;
+using System.Text.RegularExpressions;
 
 namespace PerimeterX
 {
@@ -175,7 +176,16 @@ namespace PerimeterX
 				RenderPredefinedResponse(context, contentType, defaultResponse);
 				return;
 			}
-			string uri = context.Request.RawUrl.Replace(XhrReversePrefix, "");
+
+			string pathName = context.Request.Path.Replace(XhrReversePrefix, "");
+			string url = CollectorUrl + pathName + context.Request.QueryString;
+			string host = Regex.Replace(CollectorUrl, "https?:\\/\\/", "");
+			if (!isValidThirdPartyUrl(url, host, pathName))
+			{
+				PxLoggingUtils.LogDebug(string.Format("First party XHR URL is inaccurate: {0}, rendreing default response", url));
+				RenderPredefinedResponse(context, contentType, defaultResponse);
+				return;
+			}
 
 			string vid = null;
 			HttpCookie pxvid = context.Request.Cookies.Get("pxvid");
@@ -212,7 +222,7 @@ namespace PerimeterX
 				context.Request.Headers.Add("Cookie", string.Format("pxvid={0}", vid));
 			}
 
-			bool success = ProcessRequest(context, CollectorUrl, uri);
+			bool success = ProcessRequest(context, CollectorUrl, pathName);
 			if (!success)
 			{
 				PxLoggingUtils.LogDebug("Redirect XHR returned bad status, rendering default response");
@@ -296,6 +306,17 @@ namespace PerimeterX
 			context.Response.End();
 		}
 
-		
+		public bool isValidThirdPartyUrl(string url, string expectedHost, string expectedPath)
+		{
+			try
+			{
+				Uri uri = new Uri(url);
+				return uri.Host.ToLower() == expectedHost.ToLower() && uri.PathAndQuery.StartsWith(expectedPath);
+			}
+			catch (Exception e)
+			{
+				return false;
+			}
+		}
 	}
 }

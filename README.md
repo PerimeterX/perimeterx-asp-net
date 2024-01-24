@@ -5,7 +5,7 @@
 [PerimeterX](http://www.perimeterx.com) ASP.NET SDK
 ===================================================
 
-> Latest stable version: [v3.2.2](https://www.nuget.org/packages/PerimeterXModule/3.2.1)
+> Latest stable version: [v3.3.0](https://www.nuget.org/packages/PerimeterXModule/3.2.1)
 
 Table of Contents
 -----------------
@@ -32,6 +32,7 @@ Table of Contents
   *   [Monitor Mode](#monitor-mode)
   *   [Base URI](#base-uri)
   *   [Override UA header](#override-ua)
+  *   [Custom Cookie Header](#customCookieHeader)
   *   [Mitigation Urls](#mitigiation-urls)
   *   [Test Block Flow on Monitoring Mode](#bypass-monitor-header)
 
@@ -422,6 +423,18 @@ The user's user agent can be returned to the PerimeterX module using a name of a
 ...
   useragentOverride="px-user-agent"
 ...
+```
+
+#### <a name="customCookieHeader"></a>Custom Cookie Header
+
+When set, instead of extrating the PerimeterX Cookie from the `Cookie` header, this property specifies a header name that will contain the PerimeterX Cookie.
+
+**Default:** x-px-cookies
+
+```xml
+  ...
+  customCookieHeader: "some-header-name"
+  ...
 ```
 
 #### <a name="data-enrichment"></a> Data Enrichment

@@ -148,9 +148,19 @@ namespace PerimeterX
 			else
 			{
 				// Case its not mobile token
+				if (pxConfiguration.CustomCookieHeader != null)
+				{
+					string customCookieHeaderValue = context.Request.Headers[pxConfiguration.CustomCookieHeader];
+
+					if (customCookieHeaderValue != null)
+					{
+						addCookiesToDict(customCookieHeaderValue, PxCookies);
+					}
+				}
+
 				foreach (string key in contextCookie.AllKeys)
 				{
-					if (Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1)
+					if (!PxCookies.ContainsKey(key) && Array.IndexOf(PxConstants.PX_COOKIES_PREFIX, key) > -1)
 					{
 						PxCookies[key] = contextCookie.Get(key).Value;
 					}
@@ -266,6 +276,24 @@ namespace PerimeterX
 				}
 			}
 			return serverProtocol;
+		}
+
+		private void addCookiesToDict(string customHeaderValue, Dictionary<string, string> cookiesDict)
+		{
+			var cookieArray = customHeaderValue.Trim().Split(';');
+			foreach (var cookie in cookieArray)
+			{
+				if (cookie != null)
+				{
+					var cookieSeperatorIndex = cookie.IndexOf('=');
+					if (cookieSeperatorIndex > 0)
+					{
+						string cookieName = cookie.Substring(0, cookieSeperatorIndex);
+						string cookieValue = cookie.Substring(cookieSeperatorIndex + 1);
+						cookiesDict.Add(cookieName, cookieValue);
+					}
+				}
+			}
 		}
 
 		public string GetPxCookie()
